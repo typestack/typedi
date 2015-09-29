@@ -1,0 +1,40 @@
+{
+  "name": "typedi",
+  "version": "0.0.0",
+  "description": "Dependancy injection for Typescript",
+  "license": "Apache-2.0",
+  "readmeFilename": "README.md",
+  "author": {
+    "name": "Umed Khudoiberdiev",
+    "email": "zarrhost@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PLEEROCK/typedi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PLEEROCK/typedi/issues"
+  },
+  "tags": [
+    "di",
+    "typescript",
+    "typescript-di",
+    "dependancy-injection",
+    "typescript-require"
+  ],
+  "typings": "./typedi.d.ts",
+  "dependencies": {
+    "reflect-metadata": "0.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^1.6.2",
+    "tsd": "^0.6.4",
+    "gulp": "^3.9.0",
+    "gulp-exec": "^2.1.1",
+    "gulp-plumber": "^1.0.1",
+    "gulp-typescript": "^2.9.0",
+    "run-sequence": "^1.1.4",
+    "dts-generator": "^1.5.0",
+    "del": "^2.0.2"
+  }
+}
