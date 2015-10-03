@@ -40,8 +40,10 @@ class CoffeeMaker {
 
     @Inject()
     beanFactory: BeanFactory;
+    
     @Inject()
     sugarFactory: SugarFactory;
+    
     @Inject()
     waterFactory: WaterFactory;
 
@@ -77,7 +79,7 @@ class WaterFactory {
 }
 
 @Resolve()
-export class CoffeeMaker {
+class CoffeeMaker {
 
     private beanFactory: BeanFactory;
     private sugarFactory: SugarFactory;
@@ -111,7 +113,7 @@ class SomeClass {
 }
 
 @Resolve()
-export class CoffeeMaker {
+class CoffeeMaker {
 
     private someClass: SomeClass;
     private gulp: any; // you can use type if you have definition for this package
@@ -133,6 +135,6 @@ coffeeMaker.make();
 
 Take a look on samples in `./sample` for more examples of usages.
 
-## Todos (for contributors)
+## Todos
 
 * cover with tests

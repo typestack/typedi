@@ -1,4 +1,3 @@
-/// <reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts" />
 import 'reflect-metadata';
 
 export interface Instance {
@@ -29,7 +28,7 @@ export class Container {
         this.requireParams.push({ type: cls, index: index, packageName: packageName });
     }
 
-    static get(type: Function, params?: any[]):any {
+    static get(type: Function, params?: any[]): any {
         let obj = this.findInstanceOfType(type);
         if (obj) return obj;
 

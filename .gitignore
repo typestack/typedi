@@ -18,14 +18,7 @@ Icon
 
 ### Project
 
-.tmp/
-built/
 typings/
 node_modules/
-sample/**/*.js
-sample/**/*.d.ts
-sample/**/*.js.map
-src/**/*.js
-src/**/*.d.ts
-src/**/*.js.map
+built/
 npm-debug.log

@@ -1,6 +1,6 @@
 {
   "name": "typedi",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Dependancy injection for Typescript",
   "license": "Apache-2.0",
   "readmeFilename": "README.md",
@@ -23,6 +23,9 @@
     "typescript-require"
   ],
   "typings": "./typedi.d.ts",
+  "typescript": {
+    "definition": "typedi.d.ts"
+  },
   "dependencies": {
     "reflect-metadata": "0.1.2"
   },
@@ -36,5 +39,8 @@
     "run-sequence": "^1.1.4",
     "dts-generator": "^1.5.0",
     "del": "^2.0.2"
+  },
+  "scripts": {
+    "postversion": "./node_modules/.bin/gulp package"
   }
 }
