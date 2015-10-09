@@ -28,9 +28,10 @@ export class Container {
         this.customParamHandlers.push(paramHandler);
     }
 
-    static get(type: Function, params?: any[]): any {
+    static get<T>(type: Function, params?: any[]): T {
         let obj = this.findInstanceOfType(type);
-        if (obj) return obj;
+        if (obj)
+            return <T> obj;
 
         if (params) {
             params = this.mapParams(type, params);
@@ -46,7 +47,7 @@ export class Container {
     // Private Static Methods
     // -------------------------------------------------------------------------
 
-    private static findInstanceOfType(type: Function): Instance {
+    private static findInstanceOfType(type: Function): Object {
         return this.instances.reduce((found, typeInstance) => typeInstance.type === type ? typeInstance.instance : found, null);
     }
 
