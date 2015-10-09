@@ -1,6 +1,6 @@
 {
   "name": "typedi",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Dependancy injection for Typescript",
   "license": "Apache-2.0",
   "readmeFilename": "README.md",

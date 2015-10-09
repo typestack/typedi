@@ -3,6 +3,13 @@ import {Container} from './Container';
 
 export function Require(name: string) {
     return function(target: Function, key: string, index: number) {
-        Container.registerRequireParam(target, index, name);
+
+        Container.registerCustomParamHandler({
+            type: target,
+            index: index,
+            getValue: function() {
+                return require(name);
+            }
+        });
     }
 }

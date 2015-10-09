@@ -5,10 +5,10 @@ export interface Instance {
     instance: Object;
 }
 
-export interface RequiredParam {
+export interface CustomParamHandler {
     type: Function;
     index: number;
-    packageName: string;
+    getValue: () => any;
 }
 
 export class Container {
@@ -18,14 +18,14 @@ export class Container {
     // -------------------------------------------------------------------------
 
     static instances: Instance[] = [];
-    static requireParams: RequiredParam[] = [];
+    static customParamHandlers: CustomParamHandler[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
     // -------------------------------------------------------------------------
 
-    static registerRequireParam(cls: Function, index: number, packageName: string) {
-        this.requireParams.push({ type: cls, index: index, packageName: packageName });
+    static registerCustomParamHandler(paramHandler: CustomParamHandler) {
+        this.customParamHandlers.push(paramHandler);
     }
 
     static get(type: Function, params?: any[]): any {
@@ -50,15 +50,15 @@ export class Container {
         return this.instances.reduce((found, typeInstance) => typeInstance.type === type ? typeInstance.instance : found, null);
     }
 
-    private static findRequireParams(type: Function, index: number): RequiredParam {
-        return this.requireParams.reduce((found, param) => param.type === type && param.index === index ? param : found, null);
+    private static findCustomParamHandler(type: Function, index: number): CustomParamHandler {
+        return this.customParamHandlers.reduce((found, param) => param.type === type && param.index === index ? param : found, null);
     }
 
     private static mapParams(type: Function, params: any[]): any[] {
         return params.map((param, key) => {
-            let requireParam = this.findRequireParams(type, key);
-            if (requireParam)
-                return require(requireParam.packageName);
+            let paramHandler = this.findCustomParamHandler(type, key);
+            if (paramHandler)
+                return paramHandler.getValue();
 
             return Container.get(param, Reflect.getMetadata('design:paramtypes', param));
         });
