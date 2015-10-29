@@ -48,7 +48,8 @@ gulp.task('build-package-generate-dts', function () {
             './src/Container.ts',
             './src/Inject.ts',
             './src/Require.ts',
-            './src/Resolve.ts'
+            './src/Resolve.ts',
+            './src/Service.ts'
         ],
         out: './built/package/' + name + '.d.ts'
     });

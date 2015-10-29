@@ -17,8 +17,9 @@ export class Container {
     // Static Properties
     // -------------------------------------------------------------------------
 
-    static instances: Instance[] = [];
-    static customParamHandlers: CustomParamHandler[] = [];
+    private static instances: Instance[] = [];
+    private static customParamHandlers: CustomParamHandler[] = [];
+    private static defaultParameters: { type: Function, params: any[] }[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
@@ -28,10 +29,20 @@ export class Container {
         this.customParamHandlers.push(paramHandler);
     }
 
+    static registerDefaultInitializationParameter(type: Function, params?: any[]) {
+        this.defaultParameters.push({ type: type, params: params });
+    }
+
     static get<T>(type: Function, params?: any[]): T {
         let obj = this.findInstanceOfType(type);
         if (obj)
             return <T> obj;
+
+        if (!params) {
+            let defaultParams = this.defaultParameters.reduce((found, i) => i.type === type ? i : found, undefined);
+            if (defaultParams)
+                params = defaultParams.params;
+        }
 
         if (params) {
             params = this.mapParams(type, params);
@@ -41,6 +52,10 @@ export class Container {
         var objectInstance = new (type.bind.apply(type, params))();
         this.instances.push({ type: type, instance: objectInstance });
         return objectInstance;
+    }
+
+    static set(type: Function, value: any) {
+        this.instances.push({ type: type, instance: value });
     }
 
     // -------------------------------------------------------------------------
@@ -61,7 +76,7 @@ export class Container {
             if (paramHandler)
                 return paramHandler.getValue();
 
-            return Container.get(param, Reflect.getMetadata('design:paramtypes', param));
+            return Container.get(param);//, Reflect.getMetadata('design:paramtypes', param));
         });
     }
 
