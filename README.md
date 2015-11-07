@@ -14,7 +14,7 @@ class SomeClass {
 
 }
 
-let someClass = Container.get(SomeClass);
+let someClass = Container.get<SomeClass>(SomeClass);
 someClass.someMethod();
 ```
 
@@ -55,7 +55,7 @@ class CoffeeMaker {
 
 }
 
-let coffeeMaker = Container.get(CoffeeMaker);
+let coffeeMaker = Container.get<CoffeeMaker>(CoffeeMaker);
 coffeeMaker.make();
 ```
 
@@ -78,7 +78,7 @@ class WaterFactory {
     }
 }
 
-@Resolve()
+@Service()
 class CoffeeMaker {
 
     private beanFactory: BeanFactory;
@@ -99,7 +99,7 @@ class CoffeeMaker {
 
 }
 
-let coffeeMaker = Container.get(CoffeeMaker);
+let coffeeMaker = Container.get<CoffeeMaker>(CoffeeMaker);
 coffeeMaker.make();
 ```
 
@@ -112,7 +112,7 @@ class SomeClass {
     }
 }
 
-@Resolve()
+@Service()
 class CoffeeMaker {
 
     private someClass: SomeClass;
@@ -129,7 +129,7 @@ class CoffeeMaker {
     }
 }
 
-let coffeeMaker = Container.get(CoffeeMaker);
+let coffeeMaker = Container.get<CoffeeMaker>(CoffeeMaker);
 coffeeMaker.make();
 ```
 
