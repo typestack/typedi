@@ -76,8 +76,19 @@ export class Container {
             if (paramHandler)
                 return paramHandler.getValue();
 
-            return Container.get(param);//, Reflect.getMetadata('design:paramtypes', param));
+            if (this.isParamValid(param))
+                return Container.get(param);
+
+            return undefined;
         });
+    }
+
+    private static isParamValid(param: any) {
+        const ignoredTypes = ['string', 'boolean', 'number', 'object'];
+        if (param && param.name && ignoredTypes.indexOf(param.name.toLowerCase()) !== -1)
+            return false;
+
+        return true;
     }
 
 }

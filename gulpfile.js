@@ -7,7 +7,7 @@ var dtsGenerator = require('dts-generator');
 var exec = require('gulp-exec');
 
 gulp.task('clean', function (cb) {
-    return del(['./built/**'], cb);
+    return del(['./build/**'], cb);
 });
 
 gulp.task('compile', function() {
@@ -18,7 +18,7 @@ gulp.task('compile', function() {
     return tsProject.src()
         .pipe(plumber())
         .pipe(ts(tsProject))
-        .js.pipe(gulp.dest('./built/es5'));
+        .js.pipe(gulp.dest('./build/es5'));
 });
 
 gulp.task('tsd', function() {
@@ -30,13 +30,13 @@ gulp.task('tsd', function() {
 });
 
 gulp.task('build-package-copy-src', function() {
-    return gulp.src('./built/es5/src/**/*')
-        .pipe(gulp.dest('./built/package'));
+    return gulp.src('./build/es5/src/**/*')
+        .pipe(gulp.dest('./build/package'));
 });
 
 gulp.task('build-package-copy-package-files', function() {
     return gulp.src(['./package.json', 'README.md'])
-        .pipe(gulp.dest('./built/package'));
+        .pipe(gulp.dest('./build/package'));
 });
 
 gulp.task('build-package-generate-dts', function () {
@@ -51,7 +51,7 @@ gulp.task('build-package-generate-dts', function () {
             './src/Resolve.ts',
             './src/Service.ts'
         ],
-        out: './built/package/' + name + '.d.ts'
+        out: './build/package/' + name + '.d.ts'
     });
 });
 
