@@ -27,13 +27,18 @@
     "reflect-metadata": "0.1.2"
   },
   "devDependencies": {
+    "chai": "^3.4.1",
     "del": "^2.2.0",
     "dts-generator": "^1.6.3",
     "glob": "^6.0.2",
     "gulp": "^3.9.0",
+    "gulp-mocha": "^2.2.0",
     "gulp-replace": "^0.5.4",
     "gulp-shell": "^0.5.1",
     "gulpclass": "0.0.4",
+    "mocha": "^2.3.2",
+    "sinon": "^1.17.2",
+    "sinon-chai": "^2.8.0",
     "tsd": "^0.6.5",
     "typescript": "^1.7.5"
   },
