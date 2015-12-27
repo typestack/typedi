@@ -1,9 +1,10 @@
 {
   "name": "typedi",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Dependancy injection for Typescript",
   "license": "Apache-2.0",
   "readmeFilename": "README.md",
+  "private": true,
   "author": {
     "name": "Umed Khudoiberdiev",
     "email": "zarrhost@gmail.com"
@@ -19,26 +20,22 @@
     "di",
     "typescript",
     "typescript-di",
-    "dependancy-injection",
+    "dependency-injection",
     "typescript-require"
   ],
-  "typings": "./typedi.d.ts",
-  "typescript": {
-    "definition": "typedi.d.ts"
-  },
   "dependencies": {
     "reflect-metadata": "0.1.2"
   },
   "devDependencies": {
-    "typescript": "^1.6.2",
-    "tsd": "^0.6.4",
+    "del": "^2.2.0",
+    "dts-generator": "^1.6.3",
+    "glob": "^6.0.2",
     "gulp": "^3.9.0",
-    "gulp-exec": "^2.1.1",
-    "gulp-plumber": "^1.0.1",
-    "gulp-typescript": "^2.9.0",
-    "run-sequence": "^1.1.4",
-    "dts-generator": "^1.5.0",
-    "del": "^2.0.2"
+    "gulp-replace": "^0.5.4",
+    "gulp-shell": "^0.5.1",
+    "gulpclass": "0.0.4",
+    "tsd": "^0.6.5",
+    "typescript": "^1.7.5"
   },
   "scripts": {
     "postversion": "./node_modules/.bin/gulp package"

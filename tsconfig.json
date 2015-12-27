@@ -4,6 +4,7 @@
         "outDir": "build/es5",
         "target": "es5",
         "module": "commonjs",
+        "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "sourceMap": true,

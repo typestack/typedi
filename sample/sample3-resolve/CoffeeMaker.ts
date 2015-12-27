@@ -1,9 +1,9 @@
-import {Resolve} from "../../src/Resolve";
+import {Service} from "../../src/Decorators";
 import {BeanFactory} from "./BeanFactory";
 import {SugarFactory} from "./SugarFactory";
 import {WaterFactory} from "./WaterFactory";
 
-@Resolve()
+@Service()
 export class CoffeeMaker {
 
     private beanFactory: BeanFactory;

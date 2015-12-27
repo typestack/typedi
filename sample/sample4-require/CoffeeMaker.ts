@@ -1,8 +1,7 @@
-import {Require} from "../../src/Require";
-import {Resolve} from "../../src/Resolve";
+import {Require, Service} from "../../src/Decorators";
 import {BeanFactory} from "./BeanFactory";
 
-@Resolve()
+@Service()
 export class CoffeeMaker {
 
     private beanFactory: BeanFactory;

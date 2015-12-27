@@ -1,4 +1,4 @@
-import {Inject} from "../../src/Inject";
+import {Inject} from "../../src/Decorators";
 import {BeanFactory} from "./BeanFactory";
 import {SugarFactory} from "./SugarFactory";
 import {WaterFactory} from "./WaterFactory";

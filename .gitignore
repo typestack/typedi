@@ -2,3 +2,4 @@ typings/
 node_modules/
 build/
 npm-debug.log
+tsd-debug.log
