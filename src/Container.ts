@@ -1,10 +1,13 @@
 import "reflect-metadata";
 import {ParamHandler, PropertyHandler} from "./Handlers";
 
+/**
+ * Service container.
+ */
 export class Container {
 
     // -------------------------------------------------------------------------
-    // Static Properties
+    // Private Static Properties
     // -------------------------------------------------------------------------
 
     private static instances: { name: string, type: Function, instance: Object }[] = [];
@@ -16,38 +19,49 @@ export class Container {
     // Public Static Methods
     // -------------------------------------------------------------------------
 
+    /**
+     * Registers a new constructor parameter handler.
+     */
     static registerParamHandler(paramHandler: ParamHandler) {
         this.paramHandlers.push(paramHandler);
     }
 
+    /**
+     * Registers a new class property handler.
+     */
     static registerPropertyHandler(propertyHandler: PropertyHandler) {
         this.propertyHandlers.push(propertyHandler);
     }
 
+    /**
+     * Registers a new service.
+     *
+     * @param name Service name. Optional
+     * @param type Service class
+     * @param params Parameters to be sent to constructor on service initialization
+     */
     static registerService(name: string, type: Function, params?: any[]) {
         this.registeredServices.push({ name: name, type: type, params: params });
     }
 
+    /**
+     * Retrieves the service with the specific name or given type from the service container.
+     * Optionally parameters can be pass in the case if instance is initialized in the container for the first time.
+     */
     static get<T>(type: Function, params?: any[]): T;
     static get<T>(name: string, params?: any[]): T;
     static get<T>(typeOrName: Function|string, params?: any[]): T {
-        let type: Function,
-            name: string,
-            registeredService: { name: string, type: Function, params: any[] },
-            instance: T;
 
+        // normalize parameters
+        let type: Function, name: string;
         if (typeof typeOrName === 'string') {
             name = <string> typeOrName;
         } else {
             type = <Function> typeOrName;
         }
 
-        if (name) {
-            registeredService = this.findRegisteredServiceByName(name);
-        } else if (type) {
-            registeredService = this.findRegisteredServiceByType(type);
-        }
-
+        // find if service was already registered
+        const registeredService = this.findRegisteredService(name, type);
         if (registeredService) {
             if (!type)
                 type = registeredService.type;
@@ -55,44 +69,53 @@ export class Container {
                 params = registeredService.params;
         }
 
+        // if named service was requested but service was not registered we throw exception
         if (!type && name)
             throw new Error('Service named "' + name + '" was not found, probably it was not registered');
 
-        if (name) {
-            instance = <T> this.findInstanceByName(name);
-        } else if (type) {
-            instance = <T> this.findInstanceByType(type);
-        }
+        // find if instance of this object already initialized in the container and return it if it is
+        const instance = this.findInstance(name, type);
         if (instance)
-            return instance;
+            return <T> instance;
 
+        // if params are given we need to go throw each of them and initialize them all properly
         if (params) {
-            params = this.mapParams(type, params);
+            params = this.initializeParams(type, params);
             params.unshift(null);
         }
 
-        var objectInstance = new (type.bind.apply(type, params))();
+        // create a new instance of the requested object
+        const objectInstance = new (type.bind.apply(type, params))();
         this.applyPropertyHandlers(type);
         this.instances.push({ name: name, type: type, instance: objectInstance });
         return objectInstance;
     }
 
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
     static set(type: Function, value: any): void;
     static set(name: string, type: Function, value: any): void;
     static set(nameOrType: string|Function, typeOrValue: Function|any, value?: any) {
 
-        let name: string, type: Function;
         if (arguments.length === 3) {
-            name = <string> nameOrType;
-            type = <Function> typeOrValue;
+            this.instances.push({
+                name: <string> nameOrType,
+                type: <Function> typeOrValue,
+                instance: value
+            });
         } else {
-            type = <Function> nameOrType;
-            value = typeOrValue;
+            this.instances.push({
+                name: undefined,
+                type: <Function> nameOrType,
+                instance: typeOrValue
+            });
         }
-
-        this.instances.push({ name: name, type: type, instance: value });
     }
 
+    /**
+     * Provides a set of values to be saved in the container.
+     */
     static provide(values: { name?: string, type: Function, value: any }[]) {
         values.forEach(v => this.set(v.name, v.type, v.value));
     }
@@ -114,16 +137,32 @@ export class Container {
             });
     }
 
-    private static findInstanceByName(name: string): Object {
+    private static findInstance(name: string, type: Function) {
+        if (name) {
+            return this.findInstanceByName(name);
+        } else if (type) {
+            return this.findInstanceByType(type);
+        }
+    }
+
+    private static findInstanceByName(name: string) {
         return this.instances.reduce((found, typeInstance) => {
             return typeInstance.name === name ? typeInstance.instance : found
         }, undefined);
     }
 
-    private static findInstanceByType(type: Function): Object {
+    private static findInstanceByType(type: Function) {
         return this.instances.reduce((found, typeInstance) => {
             return typeInstance.type === type ? typeInstance.instance : found
         }, undefined);
+    }
+
+    private static findRegisteredService(name: string, type: Function) {
+        if (name) {
+            return this.findRegisteredServiceByName(name);
+        } else if (type) {
+            return this.findRegisteredServiceByType(type);
+        }
     }
 
     private static findRegisteredServiceByType(type: Function) {
@@ -144,25 +183,20 @@ export class Container {
         }, undefined);
     }
 
-    private static mapParams(type: Function, params: any[]): any[] {
+    private static initializeParams(type: Function, params: any[]): any[] {
         return params.map((param, key) => {
-            let paramHandler = this.findParamHandler(type, key);
+            const paramHandler = this.findParamHandler(type, key);
             if (paramHandler)
                 return paramHandler.getValue();
 
-            if (this.isParamValid(param))
+            if (param && param.name && !this.isTypeSimple(param.name))
                 return Container.get(param);
 
             return undefined;
         });
     }
 
-    private static isParamValid(param: any): boolean {
-        const ignoredTypes = ['string', 'boolean', 'number', 'object'];
-        if (param && param.name && ignoredTypes.indexOf(param.name.toLowerCase()) !== -1)
-            return false;
-
-        return true;
+    private static isTypeSimple(param: string): boolean {
+        return ['string', 'boolean', 'number', 'object'].indexOf(param.toLowerCase()) !== -1;
     }
-
 }
