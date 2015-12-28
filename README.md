@@ -176,7 +176,8 @@ class CoffeeMaker {
     @Inject('water.factory')
     waterFactory: Factory;
 
-    constructor(@Inject('bean.factory') beanFactory: BeanFactory, @Inject('sugar.factory') sugarFactory: SugarFactory) {
+    constructor(@Inject('bean.factory') beanFactory: BeanFactory,
+                @Inject('sugar.factory') sugarFactory: SugarFactory) {
         this.beanFactory = beanFactory;
         this.sugarFactory = sugarFactory;
     }
