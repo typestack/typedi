@@ -4,7 +4,7 @@ import * as sinon from "sinon";
 import {Service, Inject, Require} from "../../src/Decorators";
 import {Container} from "../../src/Container";
 
-describe('Service Decorator', function() {
+describe("Service Decorator", function() {
 
     @Service()
     class TestService {
@@ -14,7 +14,7 @@ describe('Service Decorator', function() {
     class SecondTestService {
     }
 
-    @Service('super.service')
+    @Service("super.service")
     class NamedService {
     }
 
@@ -28,17 +28,17 @@ describe('Service Decorator', function() {
     // Specifications
     // -------------------------------------------------------------------------
 
-    it('should register class in the container, and its instance should be retrievable', function() {
+    it("should register class in the container, and its instance should be retrievable", function() {
         Container.get(TestService).should.be.instanceOf(TestService);
         Container.get(TestService).should.not.be.instanceOf(NamedService);
     });
 
-    it('should register class in the container with given name, and its instance should be retrievable', function() {
-        Container.get('super.service').should.be.instanceOf(NamedService);
-        Container.get('super.service').should.not.be.instanceOf(TestService);
+    it("should register class in the container with given name, and its instance should be retrievable", function() {
+        Container.get("super.service").should.be.instanceOf(NamedService);
+        Container.get("super.service").should.not.be.instanceOf(TestService);
     });
 
-    it('should register class in the container, and its parameter dependencies should be properly initialized', function() {
+    it("should register class in the container, and its parameter dependencies should be properly initialized", function() {
         Container.get(TestServiceWithParameters).should.be.instanceOf(TestServiceWithParameters);
         Container.get<TestServiceWithParameters>(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
         Container.get<TestServiceWithParameters>(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
@@ -46,13 +46,13 @@ describe('Service Decorator', function() {
 
 });
 
-describe('Inject Decorator', function() {
+describe("Inject Decorator", function() {
 
     @Service()
     class TestService {
     }
 
-    @Service('mega.service')
+    @Service("mega.service")
     class NamedService {
     }
 
@@ -62,7 +62,7 @@ describe('Inject Decorator', function() {
         @Inject()
         testService: TestService;
 
-        @Inject('mega.service')
+        @Inject("mega.service")
         megaService: any;
 
     }
@@ -71,7 +71,7 @@ describe('Inject Decorator', function() {
     class TestServiceWithParameters {
         constructor(public testClass: TestService,
                     @Inject(SecondTestService) public secondTest: any,
-                    @Inject('mega.service') public megaService: any) {
+                    @Inject("mega.service") public megaService: any) {
         }
     }
 
@@ -79,15 +79,15 @@ describe('Inject Decorator', function() {
     // Specifications
     // -------------------------------------------------------------------------
 
-    it('should inject service into class property', function() {
+    it("should inject service into class property", function() {
         Container.get<SecondTestService>(SecondTestService).testService.should.be.instanceOf(TestService);
     });
 
-    it('should inject named service into class property', function() {
+    it("should inject named service into class property", function() {
         Container.get<SecondTestService>(SecondTestService).megaService.should.be.instanceOf(NamedService);
     });
 
-    it('should inject service via constructor', function() {
+    it("should inject service via constructor", function() {
         Container.get<TestServiceWithParameters>(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
         Container.get<TestServiceWithParameters>(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
         Container.get<TestServiceWithParameters>(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
@@ -95,15 +95,15 @@ describe('Inject Decorator', function() {
 
 });
 
-describe('Require Decorator', function() {
+describe("Require Decorator", function() {
 
     @Service()
     class TestService {
 
-        @Require('path')
+        @Require("path")
         path: any;
 
-        @Require('fs')
+        @Require("fs")
         fs: any;
 
     }
@@ -111,8 +111,8 @@ describe('Require Decorator', function() {
     @Service()
     class SecondTestService {
 
-        constructor(@Require('path') public path: any,
-                    @Require('fs') public fs: any) {
+        constructor(@Require("path") public path: any,
+                    @Require("fs") public fs: any) {
         }
 
     }
@@ -125,14 +125,14 @@ describe('Require Decorator', function() {
     // Specifications
     // -------------------------------------------------------------------------
 
-    it('should require package into class property', function() {
-        Container.get<TestService>(TestService).path.should.be.equal(require('path'));
-        Container.get<TestService>(TestService).fs.should.be.equal(require('fs'));
+    it("should require package into class property", function() {
+        Container.get<TestService>(TestService).path.should.be.equal(require("path"));
+        Container.get<TestService>(TestService).fs.should.be.equal(require("fs"));
     });
 
-    it('should require package to constructor parameter', function() {
-        Container.get<SecondTestService>(SecondTestService).path.should.be.equal(require('path'));
-        Container.get<SecondTestService>(SecondTestService).fs.should.be.equal(require('fs'));
+    it("should require package to constructor parameter", function() {
+        Container.get<SecondTestService>(SecondTestService).path.should.be.equal(require("path"));
+        Container.get<SecondTestService>(SecondTestService).fs.should.be.equal(require("fs"));
     });
 
 });

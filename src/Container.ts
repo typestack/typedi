@@ -11,7 +11,7 @@ export class Container {
     // -------------------------------------------------------------------------
 
     private static instances: { name: string, type: Function, instance: Object }[] = [];
-    private static paramHandlers: ParamHandler[] = [];
+     static paramHandlers: ParamHandler[] = [];
     private static propertyHandlers: PropertyHandler[] = [];
     private static registeredServices: { name: string, type: Function, params: any[] }[] = [];
 
@@ -54,7 +54,7 @@ export class Container {
 
         // normalize parameters
         let type: Function, name: string;
-        if (typeof typeOrName === 'string') {
+        if (typeof typeOrName === "string") {
             name = <string> typeOrName;
         } else {
             type = <Function> typeOrName;
@@ -69,14 +69,14 @@ export class Container {
                 params = registeredService.params;
         }
 
-        // if named service was requested but service was not registered we throw exception
-        if (!type && name)
-            throw new Error('Service named "' + name + '" was not found, probably it was not registered');
-
         // find if instance of this object already initialized in the container and return it if it is
         const instance = this.findInstance(name, type);
         if (instance)
             return <T> instance;
+
+        // if named service was requested but service was not registered we throw exception
+        if (!type && name)
+            throw new Error(`Service named ${name} was not found, probably it was not registered`);
 
         // if params are given we need to go throw each of them and initialize them all properly
         if (params) {
@@ -117,7 +117,13 @@ export class Container {
      * Provides a set of values to be saved in the container.
      */
     static provide(values: { name?: string, type: Function, value: any }[]) {
-        values.forEach(v => this.set(v.name, v.type, v.value));
+        values.forEach(v => {
+            if (v.name) {
+                this.set(v.name, v.type, v.value);
+            } else {
+                this.set(v.type, v.value);
+            }
+        });
     }
 
     // -------------------------------------------------------------------------
@@ -147,13 +153,13 @@ export class Container {
 
     private static findInstanceByName(name: string) {
         return this.instances.reduce((found, typeInstance) => {
-            return typeInstance.name === name ? typeInstance.instance : found
+            return typeInstance.name === name ? typeInstance.instance : found;
         }, undefined);
     }
 
     private static findInstanceByType(type: Function) {
-        return this.instances.reduce((found, typeInstance) => {
-            return typeInstance.type === type ? typeInstance.instance : found
+        return this.instances.filter(instance => !instance.name).reduce((found, typeInstance) => {
+            return typeInstance.type === type ? typeInstance.instance : found;
         }, undefined);
     }
 
@@ -166,7 +172,7 @@ export class Container {
     }
 
     private static findRegisteredServiceByType(type: Function) {
-        return this.registeredServices.reduce((found, service) => {
+        return this.registeredServices.filter(service => !service.name).reduce((found, service) => {
             return service.type === type ? service : found;
         }, undefined);
     }
@@ -179,13 +185,13 @@ export class Container {
 
     private static findParamHandler(type: Function, index: number): ParamHandler {
         return this.paramHandlers.reduce((found, param) => {
-            return param.type === type && param.index === index ? param : found
+            return param.type === type && param.index === index ? param : found;
         }, undefined);
     }
 
     private static initializeParams(type: Function, params: any[]): any[] {
-        return params.map((param, key) => {
-            const paramHandler = this.findParamHandler(type, key);
+        return params.map((param, index) => {
+            const paramHandler = this.findParamHandler(type, index);
             if (paramHandler)
                 return paramHandler.getValue();
 
@@ -197,6 +203,6 @@ export class Container {
     }
 
     private static isTypeSimple(param: string): boolean {
-        return ['string', 'boolean', 'number', 'object'].indexOf(param.toLowerCase()) !== -1;
+        return ["string", "boolean", "number", "object"].indexOf(param.toLowerCase()) !== -1;
     }
 }
