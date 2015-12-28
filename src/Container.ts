@@ -11,7 +11,7 @@ export class Container {
     // -------------------------------------------------------------------------
 
     private static instances: { name: string, type: Function, instance: Object }[] = [];
-     static paramHandlers: ParamHandler[] = [];
+    private static paramHandlers: ParamHandler[] = [];
     private static propertyHandlers: PropertyHandler[] = [];
     private static registeredServices: { name: string, type: Function, params: any[] }[] = [];
 
