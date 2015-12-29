@@ -169,7 +169,6 @@ class WaterFactory implements Factory {
 @Service('coffee.maker')
 class CoffeeMaker {
 
-
     beanFactory: Factory;
     sugarFactory: Factory;
 
