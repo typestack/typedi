@@ -23,6 +23,11 @@
     "dependency-injection",
     "typescript-require"
   ],
+  "typescript": {
+    "definitions": [
+      "index.d.ts"
+    ]
+  },
   "dependencies": {
     "reflect-metadata": "0.1.2"
   },
