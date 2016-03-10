@@ -1,20 +1,20 @@
 {
   "name": "typedi",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Dependency injection for Typescript",
   "license": "Apache-2.0",
   "readmeFilename": "README.md",
   "private": true,
   "author": {
     "name": "Umed Khudoiberdiev",
-    "email": "zarrhost@gmail.com"
+    "email": "pleerock.me@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/PLEEROCK/typedi.git"
+    "url": "https://github.com/pleerock/typedi.git"
   },
   "bugs": {
-    "url": "https://github.com/PLEEROCK/typedi/issues"
+    "url": "https://github.com/pleerock/typedi/issues"
   },
   "tags": [
     "di",

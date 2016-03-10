@@ -234,5 +234,5 @@ Container.provide([
 
 ## Samples
 
-Take a look on samples in [./sample](https://github.com/PLEEROCK/typedi/tree/master/sample) for more examples of
+Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for more examples of
 usages.
