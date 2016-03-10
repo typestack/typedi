@@ -1,7 +1,7 @@
 export class WaterFactory {
 
     create() {
-        console.log('water created');
+        console.log("water created");
     }
 
 }

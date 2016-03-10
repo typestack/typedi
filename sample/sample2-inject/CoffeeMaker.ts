@@ -1,4 +1,4 @@
-import {Inject} from "../../src/Decorators";
+import {Inject} from "../../src/typedi";
 import {BeanFactory} from "./BeanFactory";
 import {SugarFactory} from "./SugarFactory";
 import {WaterFactory} from "./WaterFactory";
@@ -19,7 +19,7 @@ export class CoffeeMaker {
         this.sugarFactory.create();
         this.waterFactory.create();
 
-        console.log('coffee is made');
+        console.log("coffee is made");
     }
 
 }

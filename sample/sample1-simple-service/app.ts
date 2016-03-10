@@ -1,4 +1,4 @@
-import {Container} from "../../src/Container";
+import {Container} from "../../src/typedi";
 import {CarFactory} from "./CarFactory";
 import {Counter} from "./Counter";
 

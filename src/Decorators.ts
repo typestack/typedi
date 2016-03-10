@@ -43,6 +43,7 @@ export function Inject(typeOrName?: Function|string): Function {
 
 /**
  * Makes a "require" npm package with the given name and injects its value.
+ * NOTE: experemental.
  *
  * @param name The name of the package to require
  */

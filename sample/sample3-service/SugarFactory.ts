@@ -1,7 +1,7 @@
 export class SugarFactory {
 
     create() {
-        console.log('sugar created');
+        console.log("sugar created");
     }
 
 }

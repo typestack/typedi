@@ -1,7 +1,7 @@
 export class BeanFactory {
 
     create() {
-        console.log('bean created');
+        console.log("bean created");
     }
 
 }

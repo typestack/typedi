@@ -1,5 +1,5 @@
 {
-    "version": "1.6.2",
+    "version": "1.8.0",
     "compilerOptions": {
         "outDir": "build/es5",
         "target": "es5",
@@ -8,10 +8,13 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "sourceMap": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "declaration": true
     },
     "exclude": [
         "build",
-        "node_modules"
+        "node_modules",
+        "typings/browser.d.ts",
+        "typings/browser"
     ]
 }

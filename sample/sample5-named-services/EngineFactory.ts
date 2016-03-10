@@ -1,10 +1,10 @@
-import {Service} from "../../src/Decorators";
+import {Service} from "../../src/typedi";
 import {Factory} from "./Factory";
 
-@Service('engine.factory')
+@Service("engine.factory")
 export class EngineFactory implements Factory {
 
-    private series: string = '0000';
+    private series: string = "0000";
 
     setSeries(series: string) {
         this.series = series;
@@ -15,7 +15,7 @@ export class EngineFactory implements Factory {
     }
 
     create(): void {
-        console.log('engine ' + this.series + ' is created');
+        console.log("engine " + this.series + " is created");
     }
 
 }

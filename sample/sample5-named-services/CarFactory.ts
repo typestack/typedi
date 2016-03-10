@@ -1,22 +1,22 @@
-import {Service, Inject} from "../../src/Decorators";
+import {Service, Inject} from "../../src/typedi";
 import {Factory} from "./Factory";
 
-@Service('car.factory')
+@Service("car.factory")
 export class CarFactory {
 
-    @Inject('wheel.factory')
+    @Inject("wheel.factory")
     wheelFactory: Factory;
 
-    constructor(@Inject('engine.factory') private engineFactory: Factory,
-                @Inject('body.factory') private bodyFactory: Factory) {
+    constructor(@Inject("engine.factory") private engineFactory: Factory,
+                @Inject("body.factory") private bodyFactory: Factory) {
     }
 
     create() {
-        console.log('Creating a car:');
+        console.log("Creating a car:");
         this.engineFactory.create();
         this.bodyFactory.create();
         this.wheelFactory.create();
-        console.log('car created');
+        console.log("car created");
     }
 
 }
