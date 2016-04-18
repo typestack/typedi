@@ -1,2 +1,2 @@
 export {Container} from "./Container";
-export * from "./Decorators";
+export * from "./decorators";

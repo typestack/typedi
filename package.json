@@ -1,6 +1,6 @@
 {
   "name": "typedi",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Dependency injection for Typescript",
   "license": "Apache-2.0",
   "readmeFilename": "README.md",
@@ -44,6 +44,7 @@
     "typings": "^0.7.7"
   },
   "scripts": {
-    "postversion": "./node_modules/.bin/gulp package"
+    "postversion": "./node_modules/.bin/gulp package",
+    "test": "./node_modules/.bin/gulp tests"
   }
 }

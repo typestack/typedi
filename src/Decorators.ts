@@ -29,13 +29,13 @@ export function Inject(typeOrName?: Function|string): Function {
             Container.registerParamHandler({
                 type: target,
                 index: index,
-                getValue: () => Container.get(<Function> typeOrName)
+                getValue: () => Container.get(<any> typeOrName)
             });
         } else {
             Container.registerPropertyHandler({
                 target: target,
                 key: key,
-                getValue: () => Container.get(<Function> typeOrName)
+                getValue: () => Container.get(<any> typeOrName)
             });
         }
     };
@@ -43,7 +43,7 @@ export function Inject(typeOrName?: Function|string): Function {
 
 /**
  * Makes a "require" npm package with the given name and injects its value.
- * NOTE: experemental.
+ * NOTE: experimental.
  *
  * @param name The name of the package to require
  */

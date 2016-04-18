@@ -2,7 +2,7 @@ import * as chai from "chai";
 import {expect} from "chai";
 import * as sinon from "sinon";
 import {Container} from "../../src/Container";
-import {Service} from "../../src/Decorators";
+import {Service} from "../../src/decorators";
 
 describe("Container", function() {
 
@@ -45,8 +45,8 @@ describe("Container", function() {
         const testService = new TestService();
         testService.name = "this is test";
         Container.set(TestService, testService);
-        Container.get<TestService>(TestService).should.be.equal(testService);
-        Container.get<TestService>(TestService).name.should.be.equal("this is test");
+        Container.get(TestService).should.be.equal(testService);
+        Container.get(TestService).name.should.be.equal("this is test");
     });
 
     it("should set named service", function() {
@@ -73,7 +73,7 @@ describe("Container", function() {
             { name: "test2-service", type: TestService, value: test2Service },
         ]);
 
-        Container.get<TestService>(TestService).should.be.equal(testService);
+        Container.get(TestService).should.be.equal(testService);
         Container.get<TestService>("test1-service").should.be.equal(test1Service);
         Container.get<TestService>("test2-service").should.be.equal(test2Service);
     });
@@ -90,13 +90,13 @@ describe("Container", function() {
             getValue: () => "hello parameter"
         });
 
-        Container.get<ExtraService>(ExtraService).luckyNumber.should.be.equal(777);
-        Container.get<ExtraService>(ExtraService).message.should.be.equal("hello parameter");
+        Container.get(ExtraService).luckyNumber.should.be.equal(777);
+        Container.get(ExtraService).message.should.be.equal("hello parameter");
     });
 
     it("should have ability to pre-specify initialized class properties", function() {
-        Container.get<ExtraService>(ExtraService).badNumber.should.be.equal(888);
-        Container.get<ExtraService>(ExtraService).byeMessage.should.be.equal("buy world");
+        Container.get(ExtraService).badNumber.should.be.equal(888);
+        Container.get(ExtraService).byeMessage.should.be.equal("buy world");
     });
 
 });

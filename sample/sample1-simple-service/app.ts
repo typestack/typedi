@@ -2,10 +2,10 @@ import {Container} from "../../src/typedi";
 import {CarFactory} from "./CarFactory";
 import {Counter} from "./Counter";
 
-let carFactory = Container.get<CarFactory>(CarFactory);
+let carFactory = Container.get(CarFactory);
 carFactory.create();
 
-let counter = Container.get<Counter>(Counter);
+let counter = Container.get(Counter);
 counter.increase();
 counter.increase();
 counter.increase();

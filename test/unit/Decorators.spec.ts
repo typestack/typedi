@@ -1,7 +1,7 @@
 import * as chai from "chai";
 import {expect} from "chai";
 import * as sinon from "sinon";
-import {Service, Inject, Require} from "../../src/Decorators";
+import {Service, Inject, Require} from "../../src/decorators";
 import {Container} from "../../src/Container";
 
 describe("Service Decorator", function() {
@@ -40,8 +40,8 @@ describe("Service Decorator", function() {
 
     it("should register class in the container, and its parameter dependencies should be properly initialized", function() {
         Container.get(TestServiceWithParameters).should.be.instanceOf(TestServiceWithParameters);
-        Container.get<TestServiceWithParameters>(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
-        Container.get<TestServiceWithParameters>(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
+        Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
+        Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
     });
 
 });
@@ -80,17 +80,17 @@ describe("Inject Decorator", function() {
     // -------------------------------------------------------------------------
 
     it("should inject service into class property", function() {
-        Container.get<SecondTestService>(SecondTestService).testService.should.be.instanceOf(TestService);
+        Container.get(SecondTestService).testService.should.be.instanceOf(TestService);
     });
 
     it("should inject named service into class property", function() {
-        Container.get<SecondTestService>(SecondTestService).megaService.should.be.instanceOf(NamedService);
+        Container.get(SecondTestService).megaService.should.be.instanceOf(NamedService);
     });
 
     it("should inject service via constructor", function() {
-        Container.get<TestServiceWithParameters>(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
-        Container.get<TestServiceWithParameters>(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
-        Container.get<TestServiceWithParameters>(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
+        Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
+        Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
+        Container.get(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
     });
 
 });
@@ -126,13 +126,13 @@ describe("Require Decorator", function() {
     // -------------------------------------------------------------------------
 
     it("should require package into class property", function() {
-        Container.get<TestService>(TestService).path.should.be.equal(require("path"));
-        Container.get<TestService>(TestService).fs.should.be.equal(require("fs"));
+        Container.get(TestService).path.should.be.equal(require("path"));
+        Container.get(TestService).fs.should.be.equal(require("fs"));
     });
 
     it("should require package to constructor parameter", function() {
-        Container.get<SecondTestService>(SecondTestService).path.should.be.equal(require("path"));
-        Container.get<SecondTestService>(SecondTestService).fs.should.be.equal(require("fs"));
+        Container.get(SecondTestService).path.should.be.equal(require("path"));
+        Container.get(SecondTestService).fs.should.be.equal(require("fs"));
     });
 
 });

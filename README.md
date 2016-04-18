@@ -25,7 +25,7 @@ Dependency injection tool for Typescript.
 If you simply want to use a container:
 
 ```typescript
-import {Container} from "typedi/Container";
+import {Container} from "typedi/typedi";
 
 class SomeClass {
 
@@ -34,15 +34,14 @@ class SomeClass {
 
 }
 
-let someClass = Container.get<SomeClass>(SomeClass);
+let someClass = Container.get(SomeClass);
 someClass.someMethod();
 ```
 
 If you want to inject other classes into your service you can do:
 
 ```typescript
-import {Container} from "typedi/Container";
-import {Inject} from "typedi/Decorators";
+import {Container, Inject} from "typedi/typedi";
 
 class BeanFactory {
     create() {
@@ -78,15 +77,14 @@ class CoffeeMaker {
 
 }
 
-let coffeeMaker = Container.get<CoffeeMaker>(CoffeeMaker);
+let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
 
 If you want to use constructor injection:
 
 ```typescript
-import {Container} from "typedi/Container";
-import {Service} from "typedi/Decorators";
+import {Container, Service} from "typedi/typedi";
 
 class BeanFactory {
     create() {
@@ -124,7 +122,7 @@ class CoffeeMaker {
 
 }
 
-let coffeeMaker = Container.get<CoffeeMaker>(CoffeeMaker);
+let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
 
@@ -132,13 +130,12 @@ coffeeMaker.make();
 `@Service` decorator to all classes you are using with container, especially if you class injects other
 services
 
-### Extra feature: Injecting third-party dependencies *(experemental)*
+### Extra feature: Injecting third-party dependencies *(experimental)*
 
 Also you can inject a modules that you want to `require`:
 
 ```typescript
-import {Container} from "typedi/Container";
-import {Service, Require} from "typedi/Decorators";
+import {Container, Service, Require} from "typedi/typedi";
 
 @Service()
 class CoffeeMaker {
@@ -154,7 +151,7 @@ class CoffeeMaker {
     }
 }
 
-let coffeeMaker = Container.get<CoffeeMaker>(CoffeeMaker);
+let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
 
@@ -163,8 +160,7 @@ coffeeMaker.make();
 You can use a named services. In this case you can use interface-based services.
 
 ```typescript
-import {Container} from "typedi/Container";
-import {Service, Inject} from "typedi/Decorators";
+import {Container, Service, Inject} from "typedi/typedi";
 
 interface Factory {
     create(): void;

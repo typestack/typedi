@@ -2,6 +2,11 @@ import "reflect-metadata";
 import {ParamHandler, PropertyHandler} from "./Handlers";
 
 /**
+ * Special type that allows to use Function and to known its type as T.
+ */
+export type ConstructorFunction<T> = { new (...args: any[]): T };
+
+/**
  * Service container.
  */
 export class Container {
@@ -48,9 +53,9 @@ export class Container {
      * Retrieves the service with the specific name or given type from the service container.
      * Optionally parameters can be pass in the case if instance is initialized in the container for the first time.
      */
-    static get<T>(type: Function, params?: any[]): T;
+    static get<T>(type: ConstructorFunction<T>, params?: any[]): T;
     static get<T>(name: string, params?: any[]): T;
-    static get<T>(typeOrName: Function|string, params?: any[]): T {
+    static get<T>(typeOrName: ConstructorFunction<T>|string, params?: any[]): T {
 
         // normalize parameters
         let type: Function, name: string;

@@ -12,6 +12,6 @@ Container.provide([
 ]);
 
 // drive!
-let driver = Container.get<Driver>(Driver);
+let driver = Container.get(Driver);
 driver.driveBus();
 driver.driveCar();
