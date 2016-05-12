@@ -1,3 +1,5 @@
+import "es6-shim";
+import "reflect-metadata";
 import * as chai from "chai";
 import {expect} from "chai";
 import * as sinon from "sinon";

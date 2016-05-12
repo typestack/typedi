@@ -1,4 +1,6 @@
-import {Container} from "../../src/typedi";
+import "es6-shim";
+import "reflect-metadata";
+import {Container} from "../../src/index";
 import {Driver} from "./Driver";
 import {FakeBus} from "./FakeBus";
 import {FakeCar} from "./FakeCar";

@@ -13,19 +13,20 @@ Dependency injection tool for Typescript.
 
     `typings install`
 
-3. ES6 features are used, so you may want to install [es6-shim](https://github.com/paulmillr/es6-shim) too:
+3. ES6 features are used, so you may want to install [es6-shim](https://github.com/paulmillr/es6-shim) too. You also
+need to install [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package.
 
     `npm install es6-shim --save`
+    `npm install reflect-metadata --save`
 
-    if you are building nodejs app, you may want to `require("es6-shim");` in your app.
-    or if you are building web app, you man want to add `<script src="path-to-shim/es6-shim.js">` on your page.
+    if you are building nodejs app, you may want to `require("es6-shim");` and `require("reflect-metadata")` in your app.
 
 ## Usage
 
 If you simply want to use a container:
 
 ```typescript
-import {Container} from "typedi/typedi";
+import {Container} from "typedi";
 
 class SomeClass {
 
@@ -41,7 +42,7 @@ someClass.someMethod();
 If you want to inject other classes into your service you can do:
 
 ```typescript
-import {Container, Inject} from "typedi/typedi";
+import {Container, Inject} from "typedi";
 
 class BeanFactory {
     create() {
@@ -84,7 +85,7 @@ coffeeMaker.make();
 If you want to use constructor injection:
 
 ```typescript
-import {Container, Service} from "typedi/typedi";
+import {Container, Service} from "typedi";
 
 class BeanFactory {
     create() {
@@ -135,7 +136,7 @@ services
 Also you can inject a modules that you want to `require`:
 
 ```typescript
-import {Container, Service, Require} from "typedi/typedi";
+import {Container, Service, Require} from "typedi";
 
 @Service()
 class CoffeeMaker {
@@ -160,7 +161,7 @@ coffeeMaker.make();
 You can use a named services. In this case you can use interface-based services.
 
 ```typescript
-import {Container, Service, Inject} from "typedi/typedi";
+import {Container, Service, Inject} from "typedi";
 
 interface Factory {
     create(): void;

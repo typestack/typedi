@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import {Container} from "./Container";
 
 /**
@@ -9,7 +8,7 @@ import {Container} from "./Container";
  */
 export function Service(name?: string) {
     return function(target: Function) {
-        const params = Reflect.getMetadata("design:paramtypes", target);
+        const params = (<any> Reflect).getMetadata("design:paramtypes", target);
         Container.registerService(name, target, params);
     };
 }
@@ -23,7 +22,7 @@ export function Inject(typeOrName?: Function|string): Function {
     return function(target: any, key: string, index?: number) {
 
         if (!typeOrName)
-            typeOrName = Reflect.getMetadata("design:type", target, key);
+            typeOrName = (<any> Reflect).getMetadata("design:type", target, key);
 
         if (index !== undefined) {
             Container.registerParamHandler({

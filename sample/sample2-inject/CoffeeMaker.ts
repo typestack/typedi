@@ -1,4 +1,4 @@
-import {Inject} from "../../src/typedi";
+import {Inject} from "../../src/index";
 import {BeanFactory} from "./BeanFactory";
 import {SugarFactory} from "./SugarFactory";
 import {WaterFactory} from "./WaterFactory";

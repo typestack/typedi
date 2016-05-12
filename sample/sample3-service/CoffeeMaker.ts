@@ -1,4 +1,4 @@
-import {Service} from "../../src/typedi";
+import {Service} from "../../src/index";
 import {BeanFactory} from "./BeanFactory";
 import {SugarFactory} from "./SugarFactory";
 import {WaterFactory} from "./WaterFactory";

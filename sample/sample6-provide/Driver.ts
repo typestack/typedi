@@ -1,4 +1,4 @@
-import {Service} from "../../src/typedi";
+import {Service} from "../../src/index";
 import {Bus} from "./Bus";
 import {Car} from "./Car";
 

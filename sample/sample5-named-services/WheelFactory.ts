@@ -1,4 +1,4 @@
-import {Service} from "../../src/typedi";
+import {Service} from "../../src/index";
 import {Factory} from "./Factory";
 
 @Service("wheel.factory")

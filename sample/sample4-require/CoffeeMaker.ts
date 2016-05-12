@@ -1,4 +1,4 @@
-import {Require, Service} from "../../src/typedi";
+import {Require, Service} from "../../src/index";
 import {BeanFactory} from "./BeanFactory";
 
 @Service()

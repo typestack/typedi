@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import {ParamHandler, PropertyHandler} from "./Handlers";
 
 /**
@@ -196,7 +195,7 @@ export class Container {
 
     private static initializeParams(type: Function, params: any[]): any[] {
         return params.map((param, index) => {
-            const paramHandler = this.findParamHandler(type, index);
+            const paramHandler = Container.findParamHandler(type, index);
             if (paramHandler)
                 return paramHandler.getValue();
 
