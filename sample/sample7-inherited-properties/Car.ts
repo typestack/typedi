@@ -4,10 +4,16 @@ import {Inject} from "../../src/decorators";
 import {Engine} from "../sample7-inherited-properties/Engine";
 
 @Service()
-export class Car {
+export abstract class Car {
 
-    drive(): void {
-        console.log("Im driving the car");
-    }
+    @Inject(type => Driver)
+    driver: Driver;
+
+    @Inject(type => Engine)
+    engine: Engine;
+
+    year = 2016;
+
+    abstract drive(): void;
 
 }

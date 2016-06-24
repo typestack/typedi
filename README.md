@@ -229,6 +229,70 @@ Container.provide([
 ]);
 ```
 
+### Problem with circular references
+
+There is a known issue in language that it can't handle circular references. For example:
+
+```typescript
+// Car.ts
+@Service()
+export class Car {
+    @Inject()
+    engine: Engine;
+}
+
+// Engine.ts
+@Service()
+export class Engine {
+    @Inject()
+    car: Car;
+}
+```
+
+This code will not work, because Engine has a reference to Car, and Car has a reference to Engine.
+One of them will be undefined and it will cause an errors. To fix them you need to specify a type in a function like this:
+
+```typescript
+// Car.ts
+@Service()
+export class Car {
+    @Inject(type => Engine)
+    engine: Engine;
+}
+
+// Engine.ts
+@Service()
+export class Engine {
+    @Inject(type => Car)
+    car: Car;
+}
+```
+
+And that's all. Same for injects for constructor injection.
+
+### Inherited injections
+
+Inherited injections are supported as well. In order to use them you must mark inherited class as a @Service.
+For example:
+
+```typescript
+// Car.ts
+@Service()
+export abstract class Car {
+
+    @Inject(type => Engine)
+    engine: Engine;
+
+}
+
+// Engine.ts
+@Service()
+export class Bus extends Car {
+
+    // you can call this.engine in this class
+}
+```
+
 ## Samples
 
 Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for more examples of

@@ -72,7 +72,7 @@ describe("Inject Decorator", function() {
     @Service()
     class TestServiceWithParameters {
         constructor(public testClass: TestService,
-                    @Inject(SecondTestService) public secondTest: any,
+                    @Inject(type => SecondTestService) public secondTest: any,
                     @Inject("mega.service") public megaService: any) {
         }
     }

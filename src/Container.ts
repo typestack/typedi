@@ -66,6 +66,7 @@ export class Container {
 
         // find if service was already registered
         const registeredService = this.findRegisteredService(name, type);
+        // console.log("registeredService: ", registeredService);
         if (registeredService) {
             if (!type)
                 type = registeredService.type;
@@ -90,8 +91,8 @@ export class Container {
 
         // create a new instance of the requested object
         const objectInstance = new (type.bind.apply(type, params))();
-        this.applyPropertyHandlers(type);
         this.instances.push({ name: name, type: type, instance: objectInstance });
+        this.applyPropertyHandlers(type);
         return objectInstance;
     }
 
@@ -136,7 +137,7 @@ export class Container {
 
     private static applyPropertyHandlers(target: Function) {
         this.propertyHandlers
-            .filter(propertyHandler => propertyHandler.target.constructor === target)
+            .filter(propertyHandler => propertyHandler.target.constructor === target || target.prototype instanceof propertyHandler.target.constructor)
             .forEach(propertyHandler => {
                 Object.defineProperty(propertyHandler.target, propertyHandler.key, {
                     enumerable: true,
@@ -177,7 +178,9 @@ export class Container {
 
     private static findRegisteredServiceByType(type: Function) {
         return this.registeredServices.filter(service => !service.name).reduce((found, service) => {
-            return service.type === type ? service : found;
+            // console.log(service.type, "::", type);
+            // console.log(type.prototype instanceof service.type);
+            return service.type === type || type.prototype instanceof service.type ? service : found;
         }, undefined);
     }
 
