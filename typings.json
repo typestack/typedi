@@ -1,5 +1,5 @@
 {
-  "ambientDevDependencies": {
+  "globalDevDependencies": {
     "Q": "github:DefinitelyTyped/DefinitelyTyped/q/Q.d.ts#a6ff9f6e195a334afd89e4b721d05e9520eee4c0",
     "assertion-error": "github:DefinitelyTyped/DefinitelyTyped/assertion-error/assertion-error.d.ts#7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645",
     "chai": "github:DefinitelyTyped/DefinitelyTyped/chai/chai.d.ts#7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645",
@@ -9,7 +9,7 @@
     "orchestrator": "github:DefinitelyTyped/DefinitelyTyped/orchestrator/orchestrator.d.ts#a6ff9f6e195a334afd89e4b721d05e9520eee4c0",
     "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#7a3ca1f0b8a0960af9fc1838f3234cc9d6ce0645"
   },
-  "ambientDependencies": {
+  "globalDependencies": {
     "es6-shim": "registry:dt/es6-shim#0.31.2+20160215162030",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#a6ff9f6e195a334afd89e4b721d05e9520eee4c0"
   }
