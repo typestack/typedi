@@ -1,8 +1,5 @@
 import "es6-shim";
 import "reflect-metadata";
-import * as chai from "chai";
-import {expect} from "chai";
-import * as sinon from "sinon";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators";
 
@@ -54,11 +51,11 @@ describe("Container", function() {
     it("should set named service", function() {
         const firstService = new TestService();
         firstService.name = "first";
-        Container.set("first.service", TestService, firstService);
+        Container.set("first.service", firstService);
 
         const secondService = new TestService();
         secondService.name = "second";
-        Container.set("second.service", TestService, secondService);
+        Container.set("second.service", secondService);
 
         Container.get<TestService>("first.service").name.should.be.equal("first");
         Container.get<TestService>("second.service").name.should.be.equal("second");

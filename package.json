@@ -1,8 +1,8 @@
 {
   "name": "typedi",
-  "version": "0.4.2",
-  "description": "Dependency injection for Typescript",
-  "license": "Apache-2.0",
+  "version": "0.4.3",
+  "description": "Dependency injection for TypeScript",
+  "license": "MIT",
   "readmeFilename": "README.md",
   "private": true,
   "author": {

@@ -100,14 +100,14 @@ export class Container {
      * Sets a value for the given type or service name in the container.
      */
     static set(type: Function, value: any): void;
-    static set(name: string, type: Function, value: any): void;
-    static set(nameOrType: string|Function, typeOrValue: Function|any, value?: any) {
+    static set(name: string, value: any): void;
+    static set(nameOrType: string|Function, typeOrValue: Function|any) {
 
-        if (arguments.length === 3) {
+        if (typeof nameOrType === "string") {
             this.instances.push({
-                name: <string> nameOrType,
-                type: <Function> typeOrValue,
-                instance: value
+                name: nameOrType,
+                type: undefined,
+                instance: typeOrValue
             });
         } else {
             this.instances.push({
@@ -121,10 +121,10 @@ export class Container {
     /**
      * Provides a set of values to be saved in the container.
      */
-    static provide(values: { name?: string, type: Function, value: any }[]) {
+    static provide(values: { name?: string, type?: Function, value: any }[]) {
         values.forEach(v => {
             if (v.name) {
-                this.set(v.name, v.type, v.value);
+                this.set(v.name, v.value);
             } else {
                 this.set(v.type, v.value);
             }
