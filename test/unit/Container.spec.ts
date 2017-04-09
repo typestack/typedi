@@ -36,6 +36,21 @@ describe("Container", function() {
         }
     }
 
+    class FactoriedService {
+        constructor (public message: string) {
+        }
+    }
+
+    class ServiceFactory {
+
+        constructor (private message: string) {
+        }
+
+        public create () {
+            return new FactoriedService(this.message);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Specifications
     // -------------------------------------------------------------------------
@@ -96,6 +111,16 @@ describe("Container", function() {
     it("should have ability to pre-specify initialized class properties", function() {
         Container.get(ExtraService).badNumber.should.be.equal(888);
         Container.get(ExtraService).byeMessage.should.be.equal("buy world");
+    });
+
+    it("should support class factories", function() {
+
+        const serviceFactory = new ServiceFactory("Hello Factory");
+
+        Container.registerService(undefined, FactoriedService, undefined, serviceFactory.create.bind(serviceFactory));
+
+        Container.get(FactoriedService).message.should.be.equal("Hello Factory");
+
     });
 
 });

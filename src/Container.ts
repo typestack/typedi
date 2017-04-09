@@ -17,7 +17,7 @@ export class Container {
     private static instances: { name: string, type: Function, instance: Object }[] = [];
     private static paramHandlers: ParamHandler[] = [];
     private static propertyHandlers: PropertyHandler[] = [];
-    private static registeredServices: { name: string, type: Function, params: any[] }[] = [];
+    private static registeredServices: { name: string, type: Function, params: any[], factory?: Function }[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
@@ -42,15 +42,16 @@ export class Container {
      *
      * @param name Service name. Optional
      * @param type Service class
-     * @param params Parameters to be sent to constructor on service initialization
+     * @param params Parameters to be sent to a class constructor or factory function on service initialization
+     * @param factory Factory function to be called on service initialization
      */
-    static registerService(name: string, type: Function, params?: any[]) {
-        this.registeredServices.push({ name: name, type: type, params: params });
+    static registerService(name: string, type: Function, params?: any[], factory?: Function) {
+        this.registeredServices.push({ name: name, type: type, params: params, factory: factory });
     }
 
     /**
      * Retrieves the service with the specific name or given type from the service container.
-     * Optionally parameters can be pass in the case if instance is initialized in the container for the first time.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
     static get<T>(type: ConstructorFunction<T>, params?: any[]): T;
     static get<T>(name: string, params?: any[]): T;
@@ -64,14 +65,16 @@ export class Container {
             type = <Function> typeOrName;
         }
 
+        let factory: Function;
+
         // find if service was already registered
         const registeredService = this.findRegisteredService(name, type);
-        // console.log("registeredService: ", registeredService);
         if (registeredService) {
             if (!type)
                 type = registeredService.type;
             if (!params)
                 params = registeredService.params;
+            factory = registeredService.factory;
         }
 
         // find if instance of this object already initialized in the container and return it if it is
@@ -89,8 +92,16 @@ export class Container {
             params.unshift(null);
         }
 
-        // create a new instance of the requested object
-        const objectInstance = new (type.bind.apply(type, params))();
+        let objectInstance: any;
+
+        if (factory) {
+            // Calling factory function if specified to create an instance.
+            objectInstance = factory.apply(undefined, params);
+        } else {
+            // Calling class constructor to create an instance.
+            objectInstance = new (type.bind.apply(type, params))();
+        }
+
         this.instances.push({ name: name, type: type, instance: objectInstance });
         this.applyPropertyHandlers(type);
         return objectInstance;
