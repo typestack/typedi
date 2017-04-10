@@ -45,8 +45,18 @@ export class Container {
      * @param params Parameters to be sent to a class constructor or factory function on service initialization
      * @param factory Factory function to be called on service initialization
      */
-    static registerService(name: string, type: Function, params?: any[], factory?: Function) {
-        this.registeredServices.push({ name: name, type: type, params: params, factory: factory });
+    static registerService(
+      name: string,
+      type: Function,
+      params?: any[],
+      factory?: (...params: any[]) => Object
+    ) {
+        this.registeredServices.push({
+            name: name,
+            type: type,
+            params: params,
+            factory: factory
+        });
     }
 
     /**

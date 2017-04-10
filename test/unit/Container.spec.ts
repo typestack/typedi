@@ -36,21 +36,6 @@ describe("Container", function() {
         }
     }
 
-    class FactoriedService {
-        constructor (public message: string) {
-        }
-    }
-
-    class ServiceFactory {
-
-        constructor (private message: string) {
-        }
-
-        public create () {
-            return new FactoriedService(this.message);
-        }
-    }
-
     // -------------------------------------------------------------------------
     // Specifications
     // -------------------------------------------------------------------------
@@ -113,13 +98,44 @@ describe("Container", function() {
         Container.get(ExtraService).byeMessage.should.be.equal("buy world");
     });
 
-    it("should support class factories", function() {
+    it("should support basic factory functions", function() {
 
-        const serviceFactory = new ServiceFactory("Hello Factory");
+        class Bus {
+            public color = "Yellow";
+        }
 
-        Container.registerService(undefined, FactoriedService, undefined, serviceFactory.create.bind(serviceFactory));
+        function createBus() {
+            return new Bus();
+        }
 
-        Container.get(FactoriedService).message.should.be.equal("Hello Factory");
+        Container.registerService(undefined, Bus, undefined, createBus);
+
+        Container.get(Bus).color.should.be.equal("Yellow");
+
+    });
+
+    it("should support factory functions with dependencies", function() {
+
+        class Engine {
+            public serialNumber: "A-123";
+        }
+
+        class Car {
+            constructor (private engine: Engine) {
+            }
+            getEngineSerialNumber () {
+                return this.engine.serialNumber;
+            }
+        }
+
+        function createCar (engine: Engine) {
+            return new Car(engine);
+        }
+
+        // @todo: how do we tell container that `createCar()` needs an instance of `Engine`?
+        Container.registerService(undefined, Car, undefined, createCar);
+
+        Container.get(Car).getEngineSerialNumber().should.be.equal("A-123");
 
     });
 
