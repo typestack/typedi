@@ -17,7 +17,8 @@ export class Container {
     private static instances: { name: string, type: Function, instance: Object }[] = [];
     private static paramHandlers: ParamHandler[] = [];
     private static propertyHandlers: PropertyHandler[] = [];
-    private static registeredServices: { name: string, type: Function, params: any[], factory?: Function }[] = [];
+    private static registeredServices: { name: string, type: Function, params: any[] }[] = [];
+    private static registeredFactories: { factoryFunction: Function, type: Function, params?: any[] }[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
@@ -43,19 +44,31 @@ export class Container {
      * @param name Service name. Optional
      * @param type Service class
      * @param params Parameters to be sent to a class constructor or factory function on service initialization
-     * @param factory Factory function to be called on service initialization
      */
     static registerService(
       name: string,
       type: Function,
-      params?: any[],
-      factory?: (...params: any[]) => Object
+      params?: any[]
     ) {
         this.registeredServices.push({
             name: name,
             type: type,
-            params: params,
-            factory: factory
+            params: params
+        });
+    }
+
+    /**
+     * Registers specified factory function for the specified service type.
+     *
+     * @param factoryFunction Factory function
+     * @param type Service type
+     * @param params Parameters of factory function
+     */
+    static registerFactory(factoryFunction: Function, type: Function, params?: any[]) {
+        this.registeredFactories.push({
+            factoryFunction: factoryFunction,
+            type: type,
+            params: params
         });
     }
 
@@ -75,8 +88,6 @@ export class Container {
             type = <Function> typeOrName;
         }
 
-        let factory: Function;
-
         // find if service was already registered
         const registeredService = this.findRegisteredService(name, type);
         if (registeredService) {
@@ -84,7 +95,6 @@ export class Container {
                 type = registeredService.type;
             if (!params)
                 params = registeredService.params;
-            factory = registeredService.factory;
         }
 
         // find if instance of this object already initialized in the container and return it if it is
@@ -96,18 +106,29 @@ export class Container {
         if (!type && name)
             throw new Error(`Service named ${name} was not found, probably it was not registered`);
 
-        // if params are given we need to go throw each of them and initialize them all properly
-        if (params) {
-            params = this.initializeParams(type, params);
-            params.unshift(null);
-        }
-
         let objectInstance: any;
 
+        const factory = this.findRegisteredFactoryByType(type);
+
+        if (factory && factory.params) {
+            params = factory.params;
+        }
+
+        // if params are given we need to go through each of them and initialize them all properly
+        if (params) {
+            params = this.initializeParams(type, params);
+            if (!factory) {
+                params.unshift(null);
+            }
+        }
+
         if (factory) {
-            // Calling factory function if specified to create an instance.
-            objectInstance = factory.apply(undefined, params);
+
+            // Calling factory method to create an instance.
+            objectInstance = factory.factoryFunction.apply(undefined, params);
+
         } else {
+
             // Calling class constructor to create an instance.
             objectInstance = new (type.bind.apply(type, params))();
         }
@@ -203,6 +224,12 @@ export class Container {
             // console.log(type.prototype instanceof service.type);
             return service.type === type || type.prototype instanceof service.type ? service : found;
         }, undefined);
+    }
+
+    private static findRegisteredFactoryByType(type: Function) {
+        return this.registeredFactories.find(factory => {
+            return factory.type === type;
+        });
     }
 
     private static findRegisteredServiceByName(name: string) {

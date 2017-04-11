@@ -13,6 +13,14 @@ export function Service(name?: string) {
     };
 }
 
+export function Factory() {
+    return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+        const params = (<any> Reflect).getMetadata("design:paramtypes", target, propertyKey);
+        const returnType = (<any> Reflect).getMetadata("design:returntype", target, propertyKey);
+        Container.registerFactory(target[propertyKey], returnType, params);
+    };
+}
+
 /**
  * Injects a service into class property or into constructor parameter.
  */

@@ -1,7 +1,7 @@
 import "es6-shim";
 import "reflect-metadata";
 import {Container} from "../../src/Container";
-import {Service} from "../../src/decorators";
+import {Factory, Service} from "../../src/decorators";
 
 describe("Container", function() {
 
@@ -98,26 +98,10 @@ describe("Container", function() {
         Container.get(ExtraService).byeMessage.should.be.equal("buy world");
     });
 
-    it("should support basic factory functions", function() {
-
-        class Bus {
-            public color = "Yellow";
-        }
-
-        function createBus() {
-            return new Bus();
-        }
-
-        Container.registerService(undefined, Bus, undefined, createBus);
-
-        Container.get(Bus).color.should.be.equal("Yellow");
-
-    });
-
     it("should support factory functions with dependencies", function() {
 
         class Engine {
-            public serialNumber: "A-123";
+            public serialNumber = "A-123";
         }
 
         class Car {
@@ -128,12 +112,12 @@ describe("Container", function() {
             }
         }
 
-        function createCar (engine: Engine) {
-            return new Car(engine);
+        class CarFactory {
+            @Factory()
+            public static createCar (engine: Engine): Car {
+                return new Car(engine);
+            }
         }
-
-        // @todo: how do we tell container that `createCar()` needs an instance of `Engine`?
-        Container.registerService(undefined, Car, undefined, createCar);
 
         Container.get(Car).getEngineSerialNumber().should.be.equal("A-123");
 
