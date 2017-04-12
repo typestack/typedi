@@ -125,7 +125,7 @@ export class Container {
         if (factory) {
 
             // Calling factory method to create an instance.
-            objectInstance = factory.factoryFunction.apply(undefined, params);
+            objectInstance = factory.factoryFunction(...params);
 
         } else {
 
