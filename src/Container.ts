@@ -131,6 +131,16 @@ export class Container {
         });
     }
 
+    /**
+     * Clears the container by removing all previously registered artifacts from it.
+     */
+    static clear () {
+        this.instances = [];
+        this.paramHandlers = [];
+        this.propertyHandlers = [];
+        this.registeredServices = [];
+    }
+
     // -------------------------------------------------------------------------
     // Private Static Methods
     // -------------------------------------------------------------------------

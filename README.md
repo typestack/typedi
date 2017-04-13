@@ -293,6 +293,11 @@ export class Bus extends Car {
 }
 ```
 
+### Container clearing
+
+You can clear the container by calling `Container.clear()` method.
+This will effectively remove references to all registered artifacts from it, making it pristine (empty). 
+
 ## Samples
 
 Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for more examples of
