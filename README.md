@@ -293,6 +293,11 @@ export class Bus extends Car {
 }
 ```
 
+### Container reset
+
+You can reset the container by calling `Container.reset()` method.
+This will effectively remove references to all registered artifacts from it, making it pristine (empty). 
+
 ## Samples
 
 Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for more examples of
