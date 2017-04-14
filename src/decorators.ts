@@ -1,23 +1,31 @@
-import {Container} from "./Container";
+
+import {Container, ServiceDescriptor} from "./Container";
+
 
 /**
  * Marks class as a service that can be injected using container.
  *
- * @param name Optional service name can be specified. If service name is specified then this service can only be
- *              retrieved by a service name. If no service name is specified then service can be retrieved by its type
+ * @param descriptor
  */
-export function Service(name?: string) {
+export function Service(descriptor: ServiceDescriptor = {}) {
     return function(target: Function) {
-        const params = (<any> Reflect).getMetadata("design:paramtypes", target);
-        Container.registerService(name, target, params);
+        if (!descriptor.type) {
+            descriptor.type = target;
+        }
+        if (!descriptor.params) {
+            if (descriptor.factory) {
+                // @todo: get parameters from factory function
+            } else {
+                descriptor.params = (<any> Reflect).getMetadata("design:paramtypes", target);
+            }
+        }
+        Container.registerService(descriptor);
     };
 }
 
 export function Factory() {
-    return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-        const params = (<any> Reflect).getMetadata("design:paramtypes", target, propertyKey);
-        const returnType = (<any> Reflect).getMetadata("design:returntype", target, propertyKey);
-        Container.registerFactory(target[propertyKey], returnType, params);
+    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      // @todo: maybe we still need it...
     };
 }
 

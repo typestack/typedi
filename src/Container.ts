@@ -1,4 +1,13 @@
+
 import {ParamHandler, PropertyHandler} from "./Handlers";
+
+
+export interface ServiceDescriptor {
+    name?: string;
+    type?: Function;
+    factory?: Function;
+    params?: any[];
+}
 
 /**
  * Special type that allows to use Function and to known its type as T.
@@ -17,8 +26,7 @@ export class Container {
     private static instances: { name: string, type: Function, instance: Object }[] = [];
     private static paramHandlers: ParamHandler[] = [];
     private static propertyHandlers: PropertyHandler[] = [];
-    private static registeredServices: { name: string, type: Function, params: any[] }[] = [];
-    private static registeredFactories: { factoryFunction: Function, type: Function, params?: any[] }[] = [];
+    private static registeredServices: ServiceDescriptor[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
@@ -41,35 +49,10 @@ export class Container {
     /**
      * Registers a new service.
      *
-     * @param name Service name. Optional
-     * @param type Service class
-     * @param params Parameters to be sent to a class constructor or factory function on service initialization
+     * @param descriptor
      */
-    static registerService(
-      name: string,
-      type: Function,
-      params?: any[]
-    ) {
-        this.registeredServices.push({
-            name: name,
-            type: type,
-            params: params
-        });
-    }
-
-    /**
-     * Registers specified factory function for the specified service type.
-     *
-     * @param factoryFunction Factory function
-     * @param type Service type
-     * @param params Parameters of factory function
-     */
-    static registerFactory(factoryFunction: Function, type: Function, params?: any[]) {
-        this.registeredFactories.push({
-            factoryFunction: factoryFunction,
-            type: type,
-            params: params
-        });
+    static registerService(descriptor: ServiceDescriptor) {
+        this.registeredServices.push(descriptor);
     }
 
     /**
@@ -81,7 +64,9 @@ export class Container {
     static get<T>(typeOrName: ConstructorFunction<T>|string, params?: any[]): T {
 
         // normalize parameters
-        let type: Function, name: string;
+        let type: Function;
+        let name: string;
+        let factory: Function;
         if (typeof typeOrName === "string") {
             name = <string> typeOrName;
         } else {
@@ -89,12 +74,17 @@ export class Container {
         }
 
         // find if service was already registered
-        const registeredService = this.findRegisteredService(name, type);
-        if (registeredService) {
-            if (!type)
-                type = registeredService.type;
-            if (!params)
-                params = registeredService.params;
+        const serviceDescriptor = this.findRegisteredService(name, type);
+        if (serviceDescriptor) {
+            if (!type) {
+                type = serviceDescriptor.type;
+            }
+            if (!params) {
+                params = serviceDescriptor.params;
+            }
+            if (serviceDescriptor.factory) {
+                factory = serviceDescriptor.factory;
+            }
         }
 
         // find if instance of this object already initialized in the container and return it if it is
@@ -108,12 +98,6 @@ export class Container {
 
         let objectInstance: any;
 
-        const factory = this.findRegisteredFactoryByType(type);
-
-        if (factory && factory.params) {
-            params = factory.params;
-        }
-
         // if params are given we need to go through each of them and initialize them all properly
         if (params) {
             params = this.initializeParams(type, params);
@@ -124,8 +108,8 @@ export class Container {
 
         if (factory) {
 
-            // Calling factory method to create an instance.
-            objectInstance = factory.factoryFunction(...params);
+            // Calling factory function to create an instance.
+            objectInstance = factory(...params);
 
         } else {
 
@@ -220,7 +204,7 @@ export class Container {
         }, undefined);
     }
 
-    private static findRegisteredService(name: string, type: Function) {
+    private static findRegisteredService(name: string, type: Function): ServiceDescriptor {
         if (name) {
             return this.findRegisteredServiceByName(name);
         } else if (type) {
@@ -228,21 +212,13 @@ export class Container {
         }
     }
 
-    private static findRegisteredServiceByType(type: Function) {
+    private static findRegisteredServiceByType(type: Function): ServiceDescriptor {
         return this.registeredServices.filter(service => !service.name).reduce((found, service) => {
-            // console.log(service.type, "::", type);
-            // console.log(type.prototype instanceof service.type);
             return service.type === type || type.prototype instanceof service.type ? service : found;
         }, undefined);
     }
 
-    private static findRegisteredFactoryByType(type: Function) {
-        return this.registeredFactories.find(factory => {
-            return factory.type === type;
-        });
-    }
-
-    private static findRegisteredServiceByName(name: string) {
+    private static findRegisteredServiceByName(name: string): ServiceDescriptor {
         return this.registeredServices.reduce((found, service) => {
             return service.name === name ? service : found;
         }, undefined);

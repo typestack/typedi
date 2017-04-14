@@ -1,7 +1,7 @@
 import "es6-shim";
 import "reflect-metadata";
 import {Container} from "../../src/Container";
-import {Factory, Service} from "../../src/decorators";
+import {Service} from "../../src/decorators";
 
 describe("Container", function() {
 
@@ -136,21 +136,23 @@ describe("Container", function() {
         }
 
         class Car {
-            constructor (private engine: Engine) {
-            }
-            getEngineSerialNumber () {
-                return this.engine.serialNumber;
+            constructor (public engine: Engine) {
             }
         }
 
         class CarFactory {
-            @Factory()
             public static createCar (engine: Engine): Car {
                 return new Car(engine);
             }
         }
 
-        Container.get(Car).getEngineSerialNumber().should.be.equal("A-123");
+        Container.registerService({
+            type: Car,
+            factory: CarFactory.createCar
+            // @todo: how do you pass parameters of the factory function?
+        });
+
+        Container.get(Car).engine.serialNumber.should.be.equal("A-123");
 
     });
 

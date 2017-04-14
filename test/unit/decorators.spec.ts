@@ -1,7 +1,7 @@
 
 import "es6-shim";
 import "reflect-metadata";
-import {Service, Inject, Require} from "../../src/decorators";
+import {Service, Inject, Require, Factory} from "../../src/decorators";
 import {Container} from "../../src/Container";
 
 
@@ -19,7 +19,7 @@ describe("Service Decorator", function() {
         @Service()
         class TestService {
         }
-        @Service("super.service")
+        @Service({ name: "super.service" })
         class NamedService {
         }
         Container.get(TestService).should.be.instanceOf(TestService);
@@ -30,7 +30,7 @@ describe("Service Decorator", function() {
         @Service()
         class TestService {
         }
-        @Service("super.service")
+        @Service({ name: "super.service" })
         class NamedService {
         }
         Container.get("super.service").should.be.instanceOf(NamedService);
@@ -52,6 +52,33 @@ describe("Service Decorator", function() {
         Container.get(TestServiceWithParameters).should.be.instanceOf(TestServiceWithParameters);
         Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
         Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
+    });
+
+    it("should support factory functions with dependencies", function() {
+
+        class Engine {
+            public serialNumber = "A-123";
+        }
+
+        class CarFactory {
+            public static createCar (engine: Engine): Car {
+                return new Car(engine);
+            }
+        }
+
+        @Service({ factory: CarFactory.createCar })
+        class Car {
+            constructor (public engine: Engine) {
+            }
+        }
+
+        Container.registerService({
+            type: Car,
+            factory: CarFactory.createCar
+        });
+
+        Container.get(Car).engine.serialNumber.should.be.equal("A-123");
+
     });
 
 });
@@ -79,7 +106,7 @@ describe("Inject Decorator", function() {
     });
 
     it("should inject named service into class property", function() {
-        @Service("mega.service")
+        @Service({ name: "mega.service" })
         class NamedService {
         }
         @Service()
@@ -97,7 +124,7 @@ describe("Inject Decorator", function() {
         @Service()
         class SecondTestService {
         }
-        @Service("mega.service")
+        @Service({ name: "mega.service" })
         class NamedService {
         }
         @Service()
