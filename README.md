@@ -293,9 +293,9 @@ export class Bus extends Car {
 }
 ```
 
-### Container clearing
+### Container reset
 
-You can clear the container by calling `Container.clear()` method.
+You can reset the container by calling `Container.reset()` method.
 This will effectively remove references to all registered artifacts from it, making it pristine (empty). 
 
 ## Samples

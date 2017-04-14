@@ -10,7 +10,7 @@ describe("Container", function() {
     // -------------------------------------------------------------------------
 
     beforeEach(() => {
-        Container.clear();
+        Container.reset();
     });
 
     it("should set a new class into the container", function() {
@@ -115,7 +115,7 @@ describe("Container", function() {
 
     });
 
-    it("should support container clearing", () => {
+    it("should support container reset", () => {
         class TestService {
             constructor(public name: string = "frank") {
             }
@@ -124,7 +124,7 @@ describe("Container", function() {
         Container.set(TestService, testService);
         Container.get(TestService).should.be.equal(testService);
         Container.get(TestService).name.should.be.equal("john");
-        Container.clear();
+        Container.reset();
         Container.get(TestService).should.not.be.equal(testService);
         Container.get(TestService).name.should.be.equal("frank");
     });

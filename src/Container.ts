@@ -132,9 +132,9 @@ export class Container {
     }
 
     /**
-     * Clears the container by removing all previously registered artifacts from it.
+     * Resets the container by removing all previously registered artifacts from it.
      */
-    static clear () {
+    static reset () {
         this.instances = [];
         this.paramHandlers = [];
         this.propertyHandlers = [];

@@ -8,7 +8,7 @@ import {Container} from "../../src/Container";
 describe("Service Decorator", function() {
 
     beforeEach(() => {
-       Container.clear();
+       Container.reset();
     });
 
     // -------------------------------------------------------------------------
@@ -59,7 +59,7 @@ describe("Service Decorator", function() {
 describe("Inject Decorator", function() {
 
     beforeEach(() => {
-        Container.clear();
+        Container.reset();
     });
 
     // -------------------------------------------------------------------------
@@ -119,7 +119,7 @@ describe("Inject Decorator", function() {
 describe("Require Decorator", function() {
 
     beforeEach(() => {
-        Container.clear();
+        Container.reset();
     });
 
     // -------------------------------------------------------------------------
