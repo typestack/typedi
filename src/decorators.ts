@@ -1,5 +1,6 @@
 
-import {Container, ServiceDescriptor} from "./Container";
+import {Container} from "./Container";
+import {ServiceDescriptor} from "./ServiceDescriptor";
 
 
 /**

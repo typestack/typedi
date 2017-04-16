@@ -1,13 +1,7 @@
 
 import {ParamHandler, PropertyHandler} from "./Handlers";
+import {ServiceDescriptor} from "./ServiceDescriptor";
 
-
-export interface ServiceDescriptor {
-    name?: string;
-    type?: Function;
-    factory?: Function;
-    params?: any[];
-}
 
 /**
  * Special type that allows to use Function and to known its type as T.
