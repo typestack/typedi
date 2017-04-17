@@ -19,7 +19,7 @@ describe("Service Decorator", function() {
         @Service()
         class TestService {
         }
-        @Service({ name: "super.service" })
+        @Service("super.service")
         class NamedService {
         }
         Container.get(TestService).should.be.instanceOf(TestService);
@@ -30,7 +30,7 @@ describe("Service Decorator", function() {
         @Service()
         class TestService {
         }
-        @Service({ name: "super.service" })
+        @Service("super.service")
         class NamedService {
         }
         Container.get("super.service").should.be.instanceOf(NamedService);
@@ -72,11 +72,6 @@ describe("Service Decorator", function() {
             }
         }
 
-        Container.registerService({
-            type: Car,
-            factory: CarFactory.createCar
-        });
-
         Container.get(Car).engine.serialNumber.should.be.equal("A-123");
 
     });
@@ -106,7 +101,7 @@ describe("Inject Decorator", function() {
     });
 
     it("should inject named service into class property", function() {
-        @Service({ name: "mega.service" })
+        @Service("mega.service")
         class NamedService {
         }
         @Service()
@@ -124,7 +119,7 @@ describe("Inject Decorator", function() {
         @Service()
         class SecondTestService {
         }
-        @Service({ name: "mega.service" })
+        @Service("mega.service")
         class NamedService {
         }
         @Service()

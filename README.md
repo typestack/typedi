@@ -214,37 +214,33 @@ coffeeMaker.make();
 
 ### Using factory function to create service
 
-You can register your service with the container using factory function.
+You can register your services with the container using factory functions.
 
 This way, service instance will be created by calling your factory function instead of
 instantiating a class directly.
 
 ```typescript
-import {Container} from "typedi";
+import {Container, Service} from "typedi";
 
-class Service {
-  constructor (public message: string) {
-  }
+
+class CarFactory {
+    public static createCar(): Car {
+        return new Car("V8");
+    }
 }
 
-function createService () {
-  return new Service("Built with factory!");
+@Service({ factory: CarFactory.createCar })
+class Car {
+    constructor (public engineType: string) {
+    }
 }
-
-// Registering service with container.
-// You can also pass additional arguments for your factory function.
-Container.registerService("my-service", Service, [], createService);
 
 // Getting service from the container.
 // Service will be created by calling the specified factory function.
-const service = Container.get(Service);
+const car = Container.get(Car);
 
-console.log(service.message); // > Built with factory!
+console.log(car.engineType); // > "V8"
 ```
-
-> If you are using a class instance as a factory, make sure to bind proper `this` reference
-  to the factory function, when you pass it to `Container.registerService()`,
-  otherwise it will be unbound when called by container.
 
 ### Providing values to the container
 
