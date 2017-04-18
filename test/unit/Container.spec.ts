@@ -1,7 +1,9 @@
+
 import "es6-shim";
 import "reflect-metadata";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators";
+
 
 describe("Container", function() {
 
@@ -127,6 +129,33 @@ describe("Container", function() {
         Container.reset();
         Container.get(TestService).should.not.be.equal(testService);
         Container.get(TestService).name.should.be.equal("frank");
+    });
+
+    it("should support factory functions with dependencies", function() {
+
+        class Engine {
+            public serialNumber = "A-123";
+        }
+
+        class Car {
+            constructor (public engine: Engine) {
+            }
+        }
+
+        class CarFactory {
+            public static createCar (engine: Engine): Car {
+                return new Car(engine);
+            }
+        }
+
+        Container.registerService({
+            type: Car,
+            factory: CarFactory.createCar
+            // @todo: how do you pass parameters of the factory function?
+        });
+
+        Container.get(Car).engine.serialNumber.should.be.equal("A-123");
+
     });
 
 });

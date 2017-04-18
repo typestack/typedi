@@ -212,6 +212,36 @@ let coffeeMaker = Container.get<CoffeeMaker>("coffee.maker");
 coffeeMaker.make();
 ```
 
+### Using factory function to create service
+
+You can register your services with the container using factory functions.
+
+This way, service instance will be created by calling your factory function instead of
+instantiating a class directly.
+
+```typescript
+import {Container, Service} from "typedi";
+
+
+class CarFactory {
+    public static createCar(): Car {
+        return new Car("V8");
+    }
+}
+
+@Service({ factory: CarFactory.createCar })
+class Car {
+    constructor (public engineType: string) {
+    }
+}
+
+// Getting service from the container.
+// Service will be created by calling the specified factory function.
+const car = Container.get(Car);
+
+console.log(car.engineType); // > "V8"
+```
+
 ### Providing values to the container
 
 If you are writing unit tests for you class, you may want to provide fakes to your classes. You can use `set` or

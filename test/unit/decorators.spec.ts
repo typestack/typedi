@@ -1,7 +1,7 @@
 
 import "es6-shim";
 import "reflect-metadata";
-import {Service, Inject, Require} from "../../src/decorators";
+import {Service, Inject, Require, Factory} from "../../src/decorators";
 import {Container} from "../../src/Container";
 
 
@@ -52,6 +52,28 @@ describe("Service Decorator", function() {
         Container.get(TestServiceWithParameters).should.be.instanceOf(TestServiceWithParameters);
         Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
         Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
+    });
+
+    it("should support factory functions with dependencies", function() {
+
+        class Engine {
+            public serialNumber = "A-123";
+        }
+
+        class CarFactory {
+            public static createCar (engine: Engine): Car {
+                return new Car(engine);
+            }
+        }
+
+        @Service({ factory: CarFactory.createCar })
+        class Car {
+            constructor (public engine: Engine) {
+            }
+        }
+
+        Container.get(Car).engine.serialNumber.should.be.equal("A-123");
+
     });
 
 });
