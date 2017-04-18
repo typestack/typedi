@@ -53,22 +53,36 @@ describe("Service Decorator", function() {
 
     it("should support factory functions with dependencies", function() {
 
+        @Service()
         class Engine {
             public serialNumber = "A-123";
         }
 
+        function createCar(engine: Engine) {
+            return new Car("BMW", engine);
+        }
+
+        @Service()
         class CarFactory {
-            public static createCar (engine: Engine): Car {
-                return new Car(engine);
+
+            constructor(public engine: Engine) {
             }
+
+            createCar(engine: Engine) {
+                return new Car("BMW", engine);
+            }
+
         }
 
-        @Service({ factory: CarFactory.createCar })
+        @Service({ factory: [CarFactory, "createCar"] })
         class Car {
-            constructor (public engine: Engine) {
+            name: string;
+            constructor(name: string, public engine: Engine) {
+                this.name = name;
             }
         }
 
+        Container.get(Car).name.should.be.equal("BMW");
         Container.get(Car).engine.serialNumber.should.be.equal("A-123");
 
     });

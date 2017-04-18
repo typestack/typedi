@@ -1,7 +1,5 @@
-
 import {ParamHandler, PropertyHandler} from "./Handlers";
 import {ServiceDescriptor} from "./ServiceDescriptor";
-
 
 /**
  * Special type that allows to use Function and to known its type as T.
@@ -20,7 +18,7 @@ export class Container {
     private static instances: { name: string, type: Function, instance: Object }[] = [];
     private static paramHandlers: ParamHandler[] = [];
     private static propertyHandlers: PropertyHandler[] = [];
-    private static registeredServices: ServiceDescriptor[] = [];
+    private static registeredServices: ServiceDescriptor<any, any>[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
@@ -45,7 +43,7 @@ export class Container {
      *
      * @param descriptor
      */
-    static registerService(descriptor: ServiceDescriptor) {
+    static registerService<T, K extends keyof T>(descriptor: ServiceDescriptor<T, K>) {
         this.registeredServices.push(descriptor);
     }
 
@@ -60,7 +58,7 @@ export class Container {
         // normalize parameters
         let type: Function;
         let name: string;
-        let factory: Function;
+        let factory: Function|Array<any>;
         if (typeof typeOrName === "string") {
             name = <string> typeOrName;
         } else {
@@ -100,14 +98,22 @@ export class Container {
             }
         }
 
+        // if factory is set then use it to create service instance
         if (factory) {
 
-            // Calling factory function to create an instance.
-            objectInstance = factory(...params);
+            // filter out non-service parameters
+            params = params ? params.filter(param => param !== undefined) : [];
+
+            if (factory instanceof Array) { // special [Type, "method"] syntax to allow factory services
+                objectInstance = (this.get(factory[0]) as any)[factory[1]](...params);
+
+            } else { // regular factory function
+                objectInstance = factory(...params);
+            }
 
         } else {
 
-            // Calling class constructor to create an instance.
+            // otherwise simply create a new object instance
             objectInstance = new (type.bind.apply(type, params))();
         }
 
@@ -198,7 +204,7 @@ export class Container {
         }, undefined);
     }
 
-    private static findRegisteredService(name: string, type: Function): ServiceDescriptor {
+    private static findRegisteredService(name: string, type: Function): ServiceDescriptor<any, any> {
         if (name) {
             return this.findRegisteredServiceByName(name);
         } else if (type) {
@@ -206,13 +212,13 @@ export class Container {
         }
     }
 
-    private static findRegisteredServiceByType(type: Function): ServiceDescriptor {
+    private static findRegisteredServiceByType(type: Function): ServiceDescriptor<any, any> {
         return this.registeredServices.filter(service => !service.name).reduce((found, service) => {
             return service.type === type || type.prototype instanceof service.type ? service : found;
         }, undefined);
     }
 
-    private static findRegisteredServiceByName(name: string): ServiceDescriptor {
+    private static findRegisteredServiceByName(name: string): ServiceDescriptor<any, any> {
         return this.registeredServices.reduce((found, service) => {
             return service.name === name ? service : found;
         }, undefined);

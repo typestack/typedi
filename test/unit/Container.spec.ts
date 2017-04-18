@@ -131,25 +131,31 @@ describe("Container", function() {
 
     it("should support factory functions with dependencies", function() {
 
+        @Service()
         class Engine {
             public serialNumber = "A-123";
         }
 
         class Car {
-            constructor (public engine: Engine) {
+            constructor(public engine: Engine) {
             }
         }
 
+        @Service()
         class CarFactory {
-            public static createCar (engine: Engine): Car {
-                return new Car(engine);
+
+            constructor(private engine: Engine) {
             }
+
+            createCar(): Car {
+                return new Car(this.engine);
+            }
+
         }
 
         Container.registerService({
             type: Car,
-            factory: CarFactory.createCar
-            // @todo: how do you pass parameters of the factory function?
+            factory: [CarFactory, "createCar"]
         });
 
         Container.get(Car).engine.serialNumber.should.be.equal("A-123");

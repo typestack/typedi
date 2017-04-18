@@ -1,32 +1,41 @@
-
 import {Container} from "./Container";
 import {ServiceDescriptor} from "./ServiceDescriptor";
 
+/**
+ * Marks class as a service that can be injected using container.
+ */
+export function Service(): Function;
 
 /**
  * Marks class as a service that can be injected using container.
- *
- * @param descriptor
  */
-export function Service(descriptor: ServiceDescriptor = {}) {
-    return function(target: Function) {
-        if (!descriptor.type) {
-            descriptor.type = target;
-        }
-        if (!descriptor.params) {
-            if (descriptor.factory) {
-                // @todo: get parameters from factory function
-            } else {
-                descriptor.params = (<any> Reflect).getMetadata("design:paramtypes", target);
-            }
-        }
-        Container.registerService(descriptor);
-    };
-}
+export function Service(name: string): Function;
 
-export function Factory() {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-      // @todo: maybe we still need it...
+/**
+ * Marks class as a service that can be injected using container.
+ */
+export function Service<T, K extends keyof T>(options?: ServiceDescriptor<T, K>): Function;
+
+/**
+ * Marks class as a service that can be injected using container.
+ */
+export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceDescriptor<T, K>|string): Function {
+    return function(target: Function) {
+        const options: ServiceDescriptor<T, K> = optionsOrServiceName instanceof Object ? optionsOrServiceName : {};
+        if (typeof optionsOrServiceName === "string")
+            options.name = optionsOrServiceName;
+
+        if (!options.type) {
+            options.type = target;
+        }
+        if (!options.params) {
+            // if (options.factory) {
+            //     @todo: get parameters from factory function
+            // } else {
+            options.params = (<any> Reflect).getMetadata("design:paramtypes", target);
+            // }
+        }
+        Container.registerService(options);
     };
 }
 
@@ -59,8 +68,8 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string): Function
 
 /**
  * Makes a "require" npm package with the given name and injects its value.
- * NOTE: experimental.
  *
+ * @experimental
  * @param name The name of the package to require
  */
 export function Require(name: string) {
