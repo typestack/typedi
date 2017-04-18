@@ -1,9 +1,6 @@
-
-import "es6-shim";
 import "reflect-metadata";
-import {Service, Inject, Require, Factory} from "../../src/decorators";
+import {Inject, Require, Service} from "../../src/decorators";
 import {Container} from "../../src/Container";
-
 
 describe("Service Decorator", function() {
 

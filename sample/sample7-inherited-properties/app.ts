@@ -1,4 +1,3 @@
-import "es6-shim";
 import "reflect-metadata";
 import {Container} from "../../src/index";
 import {BmwCar} from "./BmwCar";

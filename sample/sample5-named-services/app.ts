@@ -1,17 +1,15 @@
-import "es6-shim";
 import "reflect-metadata";
 import {Container} from "../../src/index";
 import {CarFactory} from "./CarFactory";
 import {EngineFactory} from "./EngineFactory";
 import {BodyFactory} from "./BodyFactory";
 import {WheelFactory} from "./WheelFactory";
-
-// we need to import all services we need to make sure they are injected properly
-
 import "./BodyFactory";
 import "./WheelFactory";
 import "./EngineFactory";
 import "./CarFactory";
+
+// we need to import all services we need to make sure they are injected properly
 
 // setup services
 

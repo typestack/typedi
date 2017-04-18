@@ -1,9 +1,9 @@
 {
-    "version": "1.8.0",
     "compilerOptions": {
-        "outDir": "build/es5",
+        "outDir": "build/compiled",
         "target": "es5",
         "module": "commonjs",
+        "lib": ["es6"],
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
@@ -13,8 +13,6 @@
     },
     "exclude": [
         "build",
-        "node_modules",
-        "typings/browser.d.ts",
-        "typings/browser"
+        "node_modules"
     ]
 }

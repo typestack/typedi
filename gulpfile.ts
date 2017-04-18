@@ -1,4 +1,4 @@
-import {Gulpclass, Task, SequenceTask, MergedTask} from "gulpclass";
+import {Gulpclass, MergedTask, SequenceTask, Task} from "gulpclass";
 
 const gulp = require("gulp");
 const del = require("del");
@@ -31,7 +31,7 @@ export class Gulpfile {
      */
     @Task()
     compile() {
-        return gulp.src("*.js", { read: false })
+        return gulp.src("./package.json", { read: false })
             .pipe(shell(["tsc"]));
     }
 
@@ -44,7 +44,7 @@ export class Gulpfile {
      */
     @Task()
     npmPublish() {
-        return gulp.src("*.js", { read: false })
+        return gulp.src("./package.json", { read: false })
             .pipe(shell([
                 "cd ./build/package && npm publish"
             ]));
@@ -64,7 +64,7 @@ export class Gulpfile {
             tsResult.dts.pipe(gulp.dest("build/package")),
             tsResult.js
                 .pipe(sourcemaps.write(".", { sourceRoot: "", includeContent: true }))
-                .pipe(gulp.dest('build/package'))
+                .pipe(gulp.dest("build/package"))
         ];
     }
 
@@ -109,15 +109,6 @@ export class Gulpfile {
     }
 
     /**
-     * This task will copy typings.json file to the build package.
-     */
-    @Task()
-    copyTypingsFile() {
-        return gulp.src("./typings.json")
-            .pipe(gulp.dest("./build/package"));
-    }
-
-    /**
      * Creates a package that can be published to npm.
      */
     @SequenceTask()
@@ -127,7 +118,7 @@ export class Gulpfile {
             "packageCompile",
             "packageMoveCompiledFiles",
             "packageClearCompileDirectory",
-            ["packagePreparePackageFile", "packageReadmeFile", "copyTypingsFile"]
+            ["packagePreparePackageFile", "packageReadmeFile"]
         ];
     }
 
@@ -164,7 +155,7 @@ export class Gulpfile {
     unit() {
         chai.should();
         chai.use(require("sinon-chai"));
-        return gulp.src("./build/es5/test/unit/**/*.js")
+        return gulp.src("./build/compiled/test/unit/**/*.js")
             .pipe(mocha());
     }
 

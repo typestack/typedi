@@ -1,5 +1,3 @@
-
-import "es6-shim";
 import "reflect-metadata";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators";
