@@ -1,40 +1,41 @@
 import {ServiceDescriptor} from "../types/ServiceDescriptor";
 import {Container} from "../Container";
+import {ServiceOptions} from "../types/ServiceOptions";
 
 /**
- * Marks class as a service that can be injected using container.
+ * Marks class as a service that can be injected using Container.
  */
 export function Service(): Function;
 
 /**
- * Marks class as a service that can be injected using container.
+ * Marks class as a service that can be injected using Container.
  */
 export function Service(name: string): Function;
 
 /**
- * Marks class as a service that can be injected using container.
+ * Marks class as a service that can be injected using Container.
  */
-export function Service<T, K extends keyof T>(options?: ServiceDescriptor<T, K>): Function;
+export function Service<T, K extends keyof T>(options?: ServiceOptions<T, K>): Function;
 
 /**
  * Marks class as a service that can be injected using container.
  */
-export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceDescriptor<T, K>|string): Function {
+export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOptions<T, K>|string): Function {
     return function(target: Function) {
-        const options: ServiceDescriptor<T, K> = optionsOrServiceName instanceof Object ? optionsOrServiceName : {};
-        if (typeof optionsOrServiceName === "string")
+
+        const options: ServiceDescriptor<T, K> = {
+            type: target,
+            params: (Reflect as any).getMetadata("design:paramtypes", target)
+        };
+
+        if (typeof optionsOrServiceName === "string") {
             options.name = optionsOrServiceName;
 
-        if (!options.type) {
-            options.type = target;
+        } else if (optionsOrServiceName) {
+            options.name = optionsOrServiceName.name;
+            options.factory = optionsOrServiceName.factory;
         }
-        if (!options.params) {
-            // if (options.factory) {
-            //     @todo: get parameters from factory function
-            // } else {
-            options.params = (<any> Reflect).getMetadata("design:paramtypes", target);
-            // }
-        }
+
         Container.registerService(options);
     };
 }

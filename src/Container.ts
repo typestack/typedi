@@ -1,5 +1,5 @@
 import {ServiceDescriptor} from "./types/ServiceDescriptor";
-import {ConstructorFunction} from "./types/ConstructorFunction";
+import {ObjectType} from "./types/ObjectType";
 import {Handler} from "./types/Handler";
 
 /**
@@ -20,7 +20,7 @@ export class Container {
     // -------------------------------------------------------------------------
 
     /**
-     * Registers a new constructor parameter handler.
+     * Registers a new handler.
      */
     static registerHandler(handler: Handler) {
         this.handlers.push(handler);
@@ -28,27 +28,36 @@ export class Container {
 
     /**
      * Registers a new service.
-     *
-     * @param descriptor
      */
     static registerService<T, K extends keyof T>(descriptor: ServiceDescriptor<T, K>) {
         this.registeredServices.push(descriptor);
     }
 
     /**
-     * Retrieves the service with the specific name or given type from the service container.
+     * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
-    static get<T>(type: ConstructorFunction<T>, params?: any[]): T;
+    static get<T>(type: ObjectType<T>, params?: any[]): T;
+
+    /**
+     * Retrieves the service with given name or type from the service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
     static get<T>(name: string, params?: any[]): T;
-    static get<T>(typeOrName: ConstructorFunction<T>|string, params?: any[]): T {
+
+    /**
+     * Retrieves the service with given name or type from the service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
+    static get<T>(typeOrName: ObjectType<T>|string, params?: any[]): T {
 
         // normalize parameters
         let type: Function;
         let name: string;
         let factory: Function|Array<any>;
+
         if (typeof typeOrName === "string") {
-            name = <string> typeOrName;
+            name = typeOrName;
         } else {
             type = <Function> typeOrName;
         }
@@ -114,7 +123,15 @@ export class Container {
      * Sets a value for the given type or service name in the container.
      */
     static set(type: Function, value: any): void;
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
     static set(name: string, value: any): void;
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
     static set(nameOrType: string|Function, typeOrValue: Function|any) {
 
         if (typeof nameOrType === "string") {
@@ -146,9 +163,9 @@ export class Container {
     }
 
     /**
-     * Resets the container by removing all previously registered artifacts from it.
+     * Completely resets the container by removing all previously registered services and handlers from it.
      */
-    static reset () {
+    static reset() {
         this.instances = [];
         this.handlers = [];
         this.registeredServices = [];
@@ -233,4 +250,5 @@ export class Container {
     private static isTypeSimple(param: string): boolean {
         return ["string", "boolean", "number", "object"].indexOf(param.toLowerCase()) !== -1;
     }
+
 }
