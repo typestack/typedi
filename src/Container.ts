@@ -1,10 +1,7 @@
-import {ParamHandler, PropertyHandler} from "./Handlers";
-import {ServiceDescriptor} from "./ServiceDescriptor";
-
-/**
- * Special type that allows to use Function and to known its type as T.
- */
-export type ConstructorFunction<T> = { new (...args: any[]): T };
+import {ServiceDescriptor} from "./types/ServiceDescriptor";
+import {ConstructorFunction} from "./types/ConstructorFunction";
+import {ParamHandler} from "./types/ParamHandler";
+import {PropertyHandler} from "./types/PropertyHandler";
 
 /**
  * Service container.

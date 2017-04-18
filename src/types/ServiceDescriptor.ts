@@ -1,5 +1,4 @@
-
-export type ObjectType<T> = { new (): T }|Function;
+import {ObjectType} from "./ObjectType";
 
 export interface ServiceDescriptor<T, K extends keyof T> {
   name?: string;

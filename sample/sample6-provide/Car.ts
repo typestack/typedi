@@ -1,7 +1,4 @@
-import {Service} from "../../src/index";
-import {Driver} from "../sample7-inherited-properties/Driver";
-import {Inject} from "../../src/decorators";
-import {Engine} from "../sample7-inherited-properties/Engine";
+import {Service} from "../../src/decorators/Service";
 
 @Service()
 export class Car {

@@ -1,6 +1,8 @@
 import "reflect-metadata";
-import {Inject, Require, Service} from "../../src/decorators";
 import {Container} from "../../src/Container";
+import {Service} from "../../src/decorators/Service";
+import {Inject} from "../../src/decorators/Inject";
+import {Require} from "../../src/decorators/Require";
 
 describe("Service Decorator", function() {
 

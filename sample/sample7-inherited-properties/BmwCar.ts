@@ -1,7 +1,7 @@
-import {Service} from "../../src/index";
 import {Car} from "./Car";
-import {Inject} from "../../src/decorators";
 import {Wheel} from "./Wheel";
+import {Inject} from "../../src/decorators/Inject";
+import {Service} from "../../src/decorators/Service";
 
 @Service()
 export class BmwCar extends Car {

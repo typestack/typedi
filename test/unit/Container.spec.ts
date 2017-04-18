@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import {Container} from "../../src/Container";
-import {Service} from "../../src/decorators";
-
+import {Service} from "../../src/decorators/Service";
 
 describe("Container", function() {
 
