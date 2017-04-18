@@ -69,14 +69,14 @@ describe("Container", function() {
             }
         }
 
-        Container.registerParamHandler({
-            type: ExtraService,
+        Container.registerHandler({
+            target: ExtraService,
             index: 0,
             getValue: () => 777
         });
 
-        Container.registerParamHandler({
-            type: ExtraService,
+        Container.registerHandler({
+            target: ExtraService,
             index: 1,
             getValue: () => "hello parameter"
         });
@@ -89,10 +89,10 @@ describe("Container", function() {
     it("should have ability to pre-specify initialized class properties", function() {
 
         function CustomInject(value: any) {
-            return function(target: any, key: string) {
-                Container.registerPropertyHandler({
+            return function(target: any, propertyName: string) {
+                Container.registerHandler({
                     target: target,
-                    key: key,
+                    propertyName: propertyName,
                     getValue: () => value
                 });
             };

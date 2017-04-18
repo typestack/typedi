@@ -1,7 +1,6 @@
 import {ServiceDescriptor} from "./types/ServiceDescriptor";
 import {ConstructorFunction} from "./types/ConstructorFunction";
-import {ParamHandler} from "./types/ParamHandler";
-import {PropertyHandler} from "./types/PropertyHandler";
+import {Handler} from "./types/Handler";
 
 /**
  * Service container.
@@ -13,8 +12,7 @@ export class Container {
     // -------------------------------------------------------------------------
 
     private static instances: { name: string, type: Function, instance: Object }[] = [];
-    private static paramHandlers: ParamHandler[] = [];
-    private static propertyHandlers: PropertyHandler[] = [];
+    private static handlers: Handler[] = [];
     private static registeredServices: ServiceDescriptor<any, any>[] = [];
 
     // -------------------------------------------------------------------------
@@ -24,15 +22,8 @@ export class Container {
     /**
      * Registers a new constructor parameter handler.
      */
-    static registerParamHandler(paramHandler: ParamHandler) {
-        this.paramHandlers.push(paramHandler);
-    }
-
-    /**
-     * Registers a new class property handler.
-     */
-    static registerPropertyHandler(propertyHandler: PropertyHandler) {
-        this.propertyHandlers.push(propertyHandler);
+    static registerHandler(handler: Handler) {
+        this.handlers.push(handler);
     }
 
     /**
@@ -159,8 +150,7 @@ export class Container {
      */
     static reset () {
         this.instances = [];
-        this.paramHandlers = [];
-        this.propertyHandlers = [];
+        this.handlers = [];
         this.registeredServices = [];
     }
 
@@ -169,14 +159,14 @@ export class Container {
     // -------------------------------------------------------------------------
 
     private static applyPropertyHandlers(target: Function) {
-        this.propertyHandlers
-            .filter(propertyHandler => propertyHandler.target.constructor === target || target.prototype instanceof propertyHandler.target.constructor)
-            .forEach(propertyHandler => {
-                Object.defineProperty(propertyHandler.target, propertyHandler.key, {
+        this.handlers
+            .filter(handler => handler.target.constructor === target || target.prototype instanceof handler.target.constructor)
+            .forEach(handler => {
+                Object.defineProperty(handler.target, handler.propertyName, {
                     enumerable: true,
                     writable: true,
                     configurable: true,
-                    value: propertyHandler.getValue()
+                    value: handler.getValue()
                 });
             });
     }
@@ -221,9 +211,9 @@ export class Container {
         }, undefined);
     }
 
-    private static findParamHandler(type: Function, index: number): ParamHandler {
-        return this.paramHandlers.reduce((found, param) => {
-            return param.type === type && param.index === index ? param : found;
+    private static findParamHandler(type: Function, index: number): Handler {
+        return this.handlers.reduce((found, handler) => {
+            return handler.target === type && handler.index === index ? handler : found;
         }, undefined);
     }
 
