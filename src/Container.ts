@@ -167,8 +167,8 @@ export class Container {
      * Removes services with a given service identifiers (tokens or types).
      */
     static remove(...ids: ServiceIdentifier[]) {
-        ids.forEach(token => {
-            const service = this.findService(token);
+        ids.forEach(id => {
+            const service = this.findService(id);
             if (service)
                 this.services.splice(this.services.indexOf(service), 1);
         });

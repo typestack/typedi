@@ -1,4 +1,4 @@
-import {Service, Inject} from "../../src/index";
+import {Inject, Service} from "../../src/index";
 import {Factory} from "./Factory";
 
 @Service("car.factory")

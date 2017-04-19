@@ -23,7 +23,7 @@ export interface ServiceMetadata<T, K extends keyof T> {
      * Can be regular function ("createCar" for example),
      * or other service which produces this instance ([CarFactory, "createCar"] for example).
      */
-    factory?: [ObjectType<T>, K]|((...params: any[]) => ObjectType<any>);
+    factory?: [ObjectType<T>, K]|((...params: any[]) => any);
 
     /**
      * Parameter types passed used to determine class dependencies of the service.

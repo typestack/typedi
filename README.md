@@ -1,6 +1,6 @@
 # TypeDI
 
-Simple but powerful dependency injection tool for Typescript.
+Simple yet powerful dependency injection tool for Typescript.
 
 ## Installation
 
@@ -405,6 +405,52 @@ export abstract class Car {
 export class Bus extends Car {
 
     // you can call this.engine in this class
+}
+```
+
+### Custom decorators
+
+You can create your own decorators which will inject your given values for your service dependencies.
+For example:
+
+```typescript
+// Logger.ts
+export function Logger() {
+    return function(object: Object, propertyName: string, index?: number) {
+        const logger = new ConsoleLogger();
+        Container.registerHandler({ object, propertyName, index, value: () => logger });
+    };
+}
+
+// LoggerInterface.ts
+export interface LoggerInterface {
+
+    log(message: string): void;
+
+}
+
+// ConsoleLogger.ts
+import {LoggerInterface} from "./LoggerInterface";
+
+export class ConsoleLogger implements LoggerInterface {
+
+    log(message: string) {
+        console.log(message);
+    }
+
+}
+
+// UserRepository.ts
+@Service()
+export class UserRepository {
+
+    constructor(@Logger() private logger: LoggerInterface) {
+    }
+
+    save(user: User) {
+        this.logger.log(`user ${user.firstName} ${user.secondName} has been saved.`);
+    }
+
 }
 ```
 
