@@ -8,8 +8,8 @@ import {Car} from "./Car";
 
 // provide fake implementations
 Container.provide([
-    { type: Bus, value: new FakeBus() },
-    { type: Car, value: new FakeCar() }
+    { id: Bus, value: new FakeBus() },
+    { id: Car, value: new FakeCar() }
 ]);
 
 // drive!
