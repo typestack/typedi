@@ -49,59 +49,63 @@ export class Container {
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
-    static get<T>(typeOrName: ObjectType<T>|string, params?: any[]): T {
+    static get<T>(identifier: ObjectType<T>|string, params?: any[]): T {
 
         // normalize parameters
         let type: Function;
         let name: string;
         let factory: Function|Array<any>;
 
-        if (typeof typeOrName === "string") {
-            name = typeOrName;
+        if (typeof identifier === "string") {
+            name = identifier;
         } else {
-            type = <Function> typeOrName;
+            type = identifier as Function;
         }
 
         // find if service was already registered
-        const serviceDescriptor = this.findRegisteredService(name, type);
+        const serviceDescriptor = this.findRegisteredService(identifier);
         if (serviceDescriptor) {
-            if (!type) {
+            if (!type)
                 type = serviceDescriptor.type;
-            }
-            if (!params) {
+
+            if (!params)
                 params = serviceDescriptor.params;
-            }
-            if (serviceDescriptor.factory) {
+
+            if (serviceDescriptor.factory)
                 factory = serviceDescriptor.factory;
-            }
         }
 
         // find if instance of this object already initialized in the container and return it if it is
-        const instance = this.findInstance(name, type);
+        const instance = this.findInstance(identifier);
         if (instance)
-            return <T> instance;
+            return instance.instance as T;
 
-        // if named service was requested but service was not registered we throw exception
-        if (!type && name)
-            throw new Error(`Service named ${name} was not found, probably it was not registered`);
-
-        let objectInstance: any;
+        // if instance was not found and named service was requested, this means service was not registered and we throw exception
+        if (identifier === "string")
+            throw new Error(`Service named "${identifier}" was not found, probably it was not registered`);
 
         // if params are given we need to go through each of them and initialize them all properly
         if (params) {
-            params = this.initializeParams(type, params);
+            params = this.initializeParams(identifier as Function, params);
             if (!factory) {
                 params.unshift(null);
             }
         }
 
+        // now we create service instance and
+        let objectInstance: any;
+
         // if factory is set then use it to create service instance
         if (factory) {
 
-            // filter out non-service parameters
+            // filter out non-service parameters from created service constructor
+            // non-service parameters can be, lets say Car(name: string, isNew: boolean, engine: Engine)
+            // where name and isNew are non-service parameters and engine is a service parameter
             params = params ? params.filter(param => param !== undefined) : [];
 
-            if (factory instanceof Array) { // special [Type, "method"] syntax to allow factory services
+            if (factory instanceof Array) {
+                // use special [Type, "create"] syntax to allow factory services
+                // in this case Type instance will be obtained from Container and its method "create" will be called
                 objectInstance = (this.get(factory[0]) as any)[factory[1]](...params);
 
             } else { // regular factory function
@@ -171,67 +175,52 @@ export class Container {
         this.registeredServices = [];
     }
 
+    static remove(...services: Function[]) {
+        services.forEach(service => {
+            this.set(service, undefined);
+        });
+    }
+
     // -------------------------------------------------------------------------
     // Private Static Methods
     // -------------------------------------------------------------------------
 
-    private static applyPropertyHandlers(target: Function) {
-        this.handlers
-            .filter(handler => handler.target.constructor === target || target.prototype instanceof handler.target.constructor)
-            .forEach(handler => {
-                Object.defineProperty(handler.target, handler.propertyName, {
-                    enumerable: true,
-                    writable: true,
-                    configurable: true,
-                    value: handler.getValue()
-                });
+    private static findInstance(identifier: string|Function) {
+        if (typeof identifier === "string") {
+            return this.instances.find(instance => instance.name === identifier);
+
+        } else if (identifier) {
+            return this.instances.find(instance => instance.type === identifier);
+        }
+    }
+
+    private static findRegisteredService(identifier: string|Function): ServiceDescriptor<any, any> {
+        if (typeof identifier === "string") {
+            return this.registeredServices.find(service => service.name === identifier);
+
+        } else {
+            return this.registeredServices.find(service => {
+                return service.type === identifier || identifier.prototype instanceof service.type;
             });
-    }
-
-    private static findInstance(name: string, type: Function) {
-        if (name) {
-            return this.findInstanceByName(name);
-        } else if (type) {
-            return this.findInstanceByType(type);
         }
-    }
-
-    private static findInstanceByName(name: string) {
-        return this.instances.reduce((found, typeInstance) => {
-            return typeInstance.name === name ? typeInstance.instance : found;
-        }, undefined);
-    }
-
-    private static findInstanceByType(type: Function) {
-        return this.instances.filter(instance => !instance.name).reduce((found, typeInstance) => {
-            return typeInstance.type === type ? typeInstance.instance : found;
-        }, undefined);
-    }
-
-    private static findRegisteredService(name: string, type: Function): ServiceDescriptor<any, any> {
-        if (name) {
-            return this.findRegisteredServiceByName(name);
-        } else if (type) {
-            return this.findRegisteredServiceByType(type);
-        }
-    }
-
-    private static findRegisteredServiceByType(type: Function): ServiceDescriptor<any, any> {
-        return this.registeredServices.filter(service => !service.name).reduce((found, service) => {
-            return service.type === type || type.prototype instanceof service.type ? service : found;
-        }, undefined);
-    }
-
-    private static findRegisteredServiceByName(name: string): ServiceDescriptor<any, any> {
-        return this.registeredServices.reduce((found, service) => {
-            return service.name === name ? service : found;
-        }, undefined);
     }
 
     private static findParamHandler(type: Function, index: number): Handler {
-        return this.handlers.reduce((found, handler) => {
-            return handler.target === type && handler.index === index ? handler : found;
-        }, undefined);
+        return this.handlers.find(handler => handler.target === type && handler.index === index);
+    }
+
+    private static applyPropertyHandlers(target: Function) {
+        this.handlers.forEach(handler => {
+            if (handler.target.constructor !== target && !(target.prototype instanceof handler.target.constructor))
+                return;
+
+            Object.defineProperty(handler.target, handler.propertyName, {
+                enumerable: true,
+                writable: true,
+                configurable: true,
+                value: handler.getValue()
+            });
+        });
     }
 
     private static initializeParams(type: Function, params: any[]): any[] {

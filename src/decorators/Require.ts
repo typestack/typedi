@@ -7,7 +7,7 @@ import {Container} from "../Container";
  * @experimental
  */
 export function Require(name: string) {
-    return function(target: Function|Object, propertyName: string, index?: number) {
+    return function(target: Object, propertyName: string, index?: number) {
         Container.registerHandler({
             target: target,
             propertyName: propertyName,

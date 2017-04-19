@@ -1,6 +1,6 @@
 export interface Handler {
 
-    target: Function|Object;
+    target: Object;
     propertyName?: string;
     index?: number;
     getValue: () => any;

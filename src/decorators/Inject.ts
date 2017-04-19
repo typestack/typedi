@@ -14,7 +14,7 @@ export function Inject(serviceName?: string): Function;
  * Injects a service into a class property or constructor parameter.
  */
 export function Inject(typeOrName?: ((type?: any) => Function)|string): Function {
-    return function(target: Function, propertyName: string, index?: number) {
+    return function(target: Object, propertyName: string, index?: number) {
 
         if (!typeOrName)
             typeOrName = () => (Reflect as any).getMetadata("design:type", target, propertyName);
