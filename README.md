@@ -1,6 +1,6 @@
 # TypeDI
 
-Dependency injection tool for Typescript.
+Simple but powerful dependency injection tool for Typescript.
 
 ## Installation
 
@@ -9,17 +9,27 @@ Dependency injection tool for Typescript.
 
     `npm install typedi --save`
 
-2. Use [typings](https://github.com/typings/typings) to install all required definition dependencies.
+2. You also need to install [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package.
 
-    `typings install`
-
-3. ES6 features are used, so you may want to install [es6-shim](https://github.com/paulmillr/es6-shim) too. You also
-need to install [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package.
-
-    `npm install es6-shim --save`
     `npm install reflect-metadata --save`
+    
+    and import it somewhere in the global place of your app (for example in `app.ts`):
+    
+    `import "reflect-metadata";`
 
-    if you are building nodejs app, you may want to `require("es6-shim");` and `require("reflect-metadata")` in your app.
+3. You may need to install node typings:
+
+    `npm install @types/node --save`
+    
+
+4. Also make sure you are using TypeScript compiler version > **2.1** 
+and you have enabled following settings in `tsconfig.json`:
+
+```json
+"lib": ["es6"],
+"emitDecoratorMetadata": true,
+"experimentalDecorators": true,
+```
 
 ## Usage
 
@@ -42,23 +52,27 @@ someClass.someMethod();
 If you want to inject other classes into your service you can do:
 
 ```typescript
-import {Container, Inject} from "typedi";
+import {Container, Inject, Service} from "typedi";
 
+@Service()
 class BeanFactory {
     create() {
     }
 }
 
+@Service()
 class SugarFactory {
     create() {
     }
 }
 
+@Service()
 class WaterFactory {
     create() {
     }
 }
 
+@Service()
 class CoffeeMaker {
 
     @Inject()
@@ -87,16 +101,19 @@ If you want to use constructor injection:
 ```typescript
 import {Container, Service} from "typedi";
 
+@Service()
 class BeanFactory {
     create() {
     }
 }
 
+@Service()
 class SugarFactory {
     create() {
     }
 }
 
+@Service()
 class WaterFactory {
     create() {
     }
@@ -128,10 +145,10 @@ coffeeMaker.make();
 ```
 
 > note: Your classes may not to have `@Service` decorator to use it with Container, however its recommended to add
-`@Service` decorator to all classes you are using with container, especially if you class injects other
-services
+`@Service` decorator to all classes you are using with container, because without `@Service` decorator applied
+constructor injection may not work properly in your classes.
 
-### Extra feature: Injecting third-party dependencies *(experimental)*
+### Injecting third-party dependencies *(experimental)*
 
 Also you can inject a modules that you want to `require`:
 
@@ -141,14 +158,14 @@ import {Container, Service, Require} from "typedi";
 @Service()
 class CoffeeMaker {
 
-    private gulp: any; // you can use type if you have definition for this package
+    private logger: any; // you can use type if you have definition for this package
 
-    constructor(@Require("gulp") gulp: any) {
-        this.gulp = gulp; // the same if you do this.gulp = require("gulp")
+    constructor(@Require("logger") logger: any) {
+        this.logger = logger; // the same if you do this.logger = require("logger")
     }
 
     make() {
-        console.log(this.gulp); // here you get console.logged gulp package =)
+        console.log(this.logger); // here you get console.logged logger package =)
     }
 }
 
@@ -212,9 +229,51 @@ let coffeeMaker = Container.get<CoffeeMaker>("coffee.maker");
 coffeeMaker.make();
 ```
 
+### Services with token name
+
+You can use a services with a `Token` instead of name or target class. 
+In this case you can use type safe interface-based services.
+
+```typescript
+import {Container, Service, Inject, Token} from "typedi";
+
+export interface Factory {
+    create(): void;
+}
+
+export const FactoryService = new Token<Factory>(); 
+
+@Service(FactoryService)
+export class BeanFactory implements Factory {
+    create() {
+    }
+}
+
+@Service()
+export class CoffeeMaker {
+    
+    private factory: Factory;
+
+    constructor(@Inject(FactoryService) factory: Factory) {
+        this.factory = factory;
+    }
+
+    make() {
+        this.factory.create();
+    }
+
+}
+
+let coffeeMaker = Container.get(CoffeeMaker);
+coffeeMaker.make();
+
+let factory = Container.get(FactoryService);
+factory.create();
+```
+
 ### Using factory function to create service
 
-You can register your services with the container using factory functions.
+You can create your services with the container using factory functions.
 
 This way, service instance will be created by calling your factory function instead of
 instantiating a class directly.
@@ -222,14 +281,11 @@ instantiating a class directly.
 ```typescript
 import {Container, Service} from "typedi";
 
-
-class CarFactory {
-    public static createCar(): Car {
-        return new Car("V8");
-    }
+function createCar() {
+    return new Car("V8");
 }
 
-@Service({ factory: CarFactory.createCar })
+@Service({ factory: createCar })
 class Car {
     constructor (public engineType: string) {
     }
@@ -242,6 +298,35 @@ const car = Container.get(Car);
 console.log(car.engineType); // > "V8"
 ```
 
+### Using factory class to create service
+
+You can also create your services using factory classes.
+
+This way, service instance will be created by calling given factory service's method factory instead of
+instantiating a class directly.
+
+```typescript
+import {Container, Service} from "typedi";
+
+@Service()
+class CarFactory {
+    
+    constructor(public logger: LoggerService) {
+    }
+    
+    create() {
+        return new Car("BMW", this.logger);
+    }
+    
+}
+
+@Service({ factory: [CarFactory, "create"] })
+class Car {
+    constructor(public model: string, public logger: LoggerInterface) {
+    }
+}
+```
+
 ### Providing values to the container
 
 If you are writing unit tests for you class, you may want to provide fakes to your classes. You can use `set` or
@@ -250,12 +335,12 @@ If you are writing unit tests for you class, you may want to provide fakes to yo
 ```typescript
 Container.set(CoffeeMaker, new FakeCoffeeMaker());
 
-// or alternatively:
+// or
 
 Container.provide([
-    { name: "bean.factory", type: BeanFactory, value: new FakeBeanFactory() },
-    { name: "sugar.factory", type: SugarFactory, value: new FakeSugarFactory() },
-    { name: "water.factory", type: WaterFactory, value: new FakeWaterFactory() }
+    { id: "bean.factory", value: new FakeBeanFactory() },
+    { id: "sugar.factory", value: new FakeSugarFactory() },
+    { id: "water.factory", value: new FakeWaterFactory() }
 ]);
 ```
 
@@ -280,7 +365,7 @@ export class Engine {
 ```
 
 This code will not work, because Engine has a reference to Car, and Car has a reference to Engine.
-One of them will be undefined and it will cause an errors. To fix them you need to specify a type in a function like this:
+One of them will be undefined and it cause errors. To fix them you need to specify a type in a function this way:
 
 ```typescript
 // Car.ts
@@ -323,10 +408,11 @@ export class Bus extends Car {
 }
 ```
 
-### Container reset
+### Remove registered services or reset container state
 
-You can reset the container by calling `Container.reset()` method.
-This will effectively remove references to all registered artifacts from it, making it pristine (empty). 
+If you need to remove registered service from container simply use `Container.remove(...)` method.
+Also you can completely reset the container by calling `Container.reset()` method.
+This will effectively remove all registered services from the container. 
 
 ## Samples
 
