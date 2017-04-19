@@ -1,6 +1,19 @@
 import {ObjectType} from "./ObjectType";
 
+/**
+ * Service options passed to the @Service() decorator.
+ * Allows to specify service id and/or factory used to create this service.
+ */
 export interface ServiceOptions<T, K extends keyof T> {
-  name?: string;
-  factory?: [ObjectType<T>, K]|((...params: any[]) => ObjectType<any>);
+
+    /**
+     * Unique service id.
+     */
+    id?: string;
+
+    /**
+     * Factory used to produce this service.
+     */
+    factory?: [ObjectType<T>, K]|((...params: any[]) => ObjectType<any>);
+
 }

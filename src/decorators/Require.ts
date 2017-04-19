@@ -12,7 +12,7 @@ export function Require(name: string) {
             target: target,
             propertyName: propertyName,
             index: index,
-            getValue: () => require(name)
+            value: () => require(name)
         });
     };
 }

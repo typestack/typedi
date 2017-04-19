@@ -23,7 +23,7 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string): Function
             target: target,
             propertyName: propertyName,
             index: index,
-            getValue: () => Container.get<any>(typeof typeOrName === "string" ? typeOrName : typeOrName() as any)
+            value: () => Container.get<any>(typeof typeOrName === "string" ? typeOrName : typeOrName() as any)
         });
     };
 }

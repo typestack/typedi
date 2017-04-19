@@ -50,9 +50,9 @@ describe("Container", function() {
         const test2Service = new TestService();
 
         Container.provide([
-            { type: TestService, value: testService },
-            { name: "test1-service", type: TestService, value: test1Service },
-            { name: "test2-service", type: TestService, value: test2Service },
+            { id: TestService, value: testService },
+            { id: "test1-service", value: test1Service },
+            { id: "test2-service", value: test2Service },
         ]);
 
         Container.get(TestService).should.be.equal(testService);
@@ -72,13 +72,13 @@ describe("Container", function() {
         Container.registerHandler({
             target: ExtraService,
             index: 0,
-            getValue: () => 777
+            value: () => 777
         });
 
         Container.registerHandler({
             target: ExtraService,
             index: 1,
-            getValue: () => "hello parameter"
+            value: () => "hello parameter"
         });
 
         Container.get(ExtraService).luckyNumber.should.be.equal(777);
@@ -93,7 +93,7 @@ describe("Container", function() {
                 Container.registerHandler({
                     target: target,
                     propertyName: propertyName,
-                    getValue: () => value
+                    value: () => value
                 });
             };
         }
