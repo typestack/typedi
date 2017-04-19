@@ -1,6 +1,6 @@
 # TypeDI
 
-Simple yet powerful dependency injection tool for Typescript.
+Simple yet powerful dependency injection tool for TypeScript.
 
 ## Installation
 
