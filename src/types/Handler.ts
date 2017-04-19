@@ -7,7 +7,7 @@ export interface Handler {
     /**
      * Service object used to apply handler to.
      */
-    target: Object;
+    object: Object;
 
     /**
      * Class property name to set/replace value of.

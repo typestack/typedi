@@ -20,7 +20,7 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string): Function
             typeOrName = () => (Reflect as any).getMetadata("design:type", target, propertyName);
 
         Container.registerHandler({
-            target: target,
+            object: target,
             propertyName: propertyName,
             index: index,
             value: () => Container.get<any>(typeof typeOrName === "string" ? typeOrName : typeOrName() as any)

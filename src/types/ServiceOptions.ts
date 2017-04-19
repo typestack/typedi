@@ -14,6 +14,6 @@ export interface ServiceOptions<T, K extends keyof T> {
     /**
      * Factory used to produce this service.
      */
-    factory?: [ObjectType<T>, K]|((...params: any[]) => ObjectType<any>);
+    factory?: [ObjectType<T>, K]|((...params: any[]) => any);
 
 }

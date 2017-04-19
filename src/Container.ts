@@ -206,7 +206,7 @@ export class Container {
      */
     private static initializeParams(type: Function, paramTypes: any[]): any[] {
         return paramTypes.map((paramType, index) => {
-            const paramHandler = this.handlers.find(handler => handler.target === type && handler.index === index);
+            const paramHandler = this.handlers.find(handler => handler.object === type && handler.index === index);
             if (paramHandler)
                 return paramHandler.value();
 
@@ -230,10 +230,10 @@ export class Container {
     private static applyPropertyHandlers(target: Function) {
         this.handlers.forEach(handler => {
             if (handler.index) return;
-            if (handler.target.constructor !== target && !(target.prototype instanceof handler.target.constructor))
+            if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor))
                 return;
 
-            Object.defineProperty(handler.target, handler.propertyName, {
+            Object.defineProperty(handler.object, handler.propertyName, {
                 enumerable: true,
                 writable: true,
                 configurable: true,

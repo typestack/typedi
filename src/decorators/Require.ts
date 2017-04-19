@@ -9,7 +9,7 @@ import {Container} from "../Container";
 export function Require(name: string) {
     return function(target: Object, propertyName: string, index?: number) {
         Container.registerHandler({
-            target: target,
+            object: target,
             propertyName: propertyName,
             index: index,
             value: () => require(name)

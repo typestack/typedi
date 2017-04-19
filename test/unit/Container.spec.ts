@@ -70,13 +70,13 @@ describe("Container", function() {
         }
 
         Container.registerHandler({
-            target: ExtraService,
+            object: ExtraService,
             index: 0,
             value: () => 777
         });
 
         Container.registerHandler({
-            target: ExtraService,
+            object: ExtraService,
             index: 1,
             value: () => "hello parameter"
         });
@@ -91,7 +91,7 @@ describe("Container", function() {
         function CustomInject(value: any) {
             return function(target: any, propertyName: string) {
                 Container.registerHandler({
-                    target: target,
+                    object: target,
                     propertyName: propertyName,
                     value: () => value
                 });
