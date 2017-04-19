@@ -129,6 +129,11 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
+    static set(token: Token<any>, value: any): Container;
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
     static set(identifier: ServiceIdentifier, value: any): Container {
         const service = this.findService(identifier);
         if (service) {

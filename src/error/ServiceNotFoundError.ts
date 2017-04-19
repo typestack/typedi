@@ -19,11 +19,10 @@ export class ServiceNotFoundError extends Error {
                 `Register it by calling Container.set before using service.`;
 
         } else if (identifier instanceof Token) {
-            this.message = `Service by a given token ${identifier.toString()} was not found, looks like it was not registered in the container. ` +
+            this.message = `Service with a given token was not found, looks like it was not registered in the container. ` +
                 `Register it by calling Container.set before using service.`;
         }
 
-        this.stack = new Error().stack;
         Object.setPrototypeOf(this, ServiceNotFoundError.prototype);
     }
 
