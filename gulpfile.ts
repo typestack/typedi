@@ -129,7 +129,7 @@ export class Gulpfile {
     publish() {
         return ["package", "npmPublish"];
     }
-    
+
     // -------------------------------------------------------------------------
     // Run tests tasks
     // -------------------------------------------------------------------------
@@ -155,7 +155,7 @@ export class Gulpfile {
     unit() {
         chai.should();
         chai.use(require("sinon-chai"));
-        return gulp.src("./build/compiled/test/unit/**/*.js")
+        return gulp.src("./build/compiled/test/**/*.js")
             .pipe(mocha());
     }
 
