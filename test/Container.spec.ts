@@ -264,6 +264,35 @@ describe("Container", function() {
 
         });
 
+        it("should support tokenized services from factories", function() {
+
+            interface Vehicle {
+                getColor(): string;
+            }
+
+            class Bus implements Vehicle {
+                getColor (): string {
+                    return "yellow";
+                }
+            }
+
+            class VehicleFactory {
+                createBus(): Vehicle {
+                    return new Bus();
+                }
+            }
+
+            const VehicleService = new Token<Vehicle>();
+
+            Container.registerService({
+                id: VehicleService,
+                factory: [VehicleFactory, "createBus"]
+            });
+
+            Container.get(VehicleService).getColor().should.be.equal("yellow");
+
+        });
+
     });
 
 });
