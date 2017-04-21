@@ -99,4 +99,29 @@ describe("Service Decorator", function() {
 
     });
 
+    it("should support factory function with arguments", function() {
+
+        @Service()
+        class Engine {
+            public type = "V8";
+        }
+
+        @Service()
+        class CarFactory {
+            createCar(engine: Engine) {
+                engine.type = "V6";
+                return new Car(engine);
+            }
+        }
+
+        @Service({ factory: [CarFactory, "createCar"] })
+        class Car {
+            constructor(public engine: Engine) {
+            }
+        }
+
+        Container.get(Car).engine.type.should.be.equal("V6");
+
+    });
+
 });
