@@ -26,11 +26,6 @@ export interface ServiceMetadata<T, K extends keyof T> {
     factory?: [ObjectType<T>, K]|((...params: any[]) => any);
 
     /**
-     * Parameter types passed used to determine class dependencies of the service.
-     */
-    paramTypes?: any[];
-
-    /**
      * Instance of the target class.
      */
     instance?: Object;

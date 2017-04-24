@@ -90,7 +90,8 @@ export class Container {
         }
 
         // setup constructor parameters for a newly initialized service
-        let params: any[] = service.paramTypes ? this.initializeParams(type, service.paramTypes) : [];
+        const paramTypes = Reflect && (Reflect as any).getMetadata ? (Reflect as any).getMetadata("design:paramtypes", type) : undefined;
+        let params: any[] = paramTypes ? this.initializeParams(type, paramTypes) : [];
 
         // if factory is set then use it to create service instance
         if (service.factory) {

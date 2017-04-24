@@ -30,8 +30,7 @@ export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOpti
     return function(target: Function) {
 
         const service: ServiceMetadata<T, K> = {
-            type: target,
-            paramTypes: (Reflect as any).getMetadata("design:paramtypes", target)
+            type: target
         };
 
         if (typeof optionsOrServiceName === "string" || optionsOrServiceName instanceof Token) {
