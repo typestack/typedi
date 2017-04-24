@@ -75,7 +75,9 @@ export class Container {
 
         // if named service was requested and its instance was not found plus there is not type to know what to initialize,
         // this means service was not pre-registered and we throw an exception
-        if ((!service || !service.type) && (typeof identifier === "string" || identifier instanceof Token))
+        if ((!service || !service.type) &&
+            (!service || !service.factory) &&
+            (typeof identifier === "string" || identifier instanceof Token))
             throw new ServiceNotFoundError(identifier);
 
         // at this point we either have type in service registered, either identifier is a target type
