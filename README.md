@@ -31,7 +31,6 @@ Simple yet powerful dependency injection tool for TypeScript.
 and you have enabled following settings in `tsconfig.json`:
 
 ```json
-"lib": ["es6"],
 "emitDecoratorMetadata": true,
 "experimentalDecorators": true,
 ```
