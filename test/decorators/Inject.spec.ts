@@ -2,6 +2,7 @@ import "reflect-metadata";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators/Service";
 import {Inject} from "../../src/decorators/Inject";
+import {Token} from "../../src/Token";
 
 describe("Inject Decorator", function() {
 
@@ -15,6 +16,23 @@ describe("Inject Decorator", function() {
         class SecondTestService {
             @Inject()
             testService: TestService;
+        }
+        Container.get(SecondTestService).testService.should.be.instanceOf(TestService);
+    });
+
+    it("should inject token service properly", function() {
+        interface Test {
+
+        }
+        const ServiceToken = new Token<Test>();
+
+        @Service(ServiceToken)
+        class TestService {
+        }
+        @Service()
+        class SecondTestService {
+            @Inject(ServiceToken)
+            testService: Test;
         }
         Container.get(SecondTestService).testService.should.be.instanceOf(TestService);
     });
