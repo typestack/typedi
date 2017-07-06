@@ -126,15 +126,9 @@ class WaterFactory {
 @Service()
 class CoffeeMaker {
 
-    private beanFactory: BeanFactory;
-    private sugarFactory: SugarFactory;
-    private waterFactory: WaterFactory;
-
-    constructor(beanFactory: BeanFactory, sugarFactory: SugarFactory, waterFactory: WaterFactory) {
-        this.beanFactory = beanFactory;
-        this.sugarFactory = sugarFactory;
-        this.waterFactory = waterFactory;
-    }
+    constructor(private beanFactory: BeanFactory,
+                private sugarFactory: SugarFactory,
+                private waterFactory: WaterFactory) {}
 
     make() {
         this.beanFactory.create();
