@@ -456,7 +456,23 @@ export class UserRepository {
 
 If you need to remove registered service from container simply use `Container.remove(...)` method.
 Also you can completely reset the container by calling `Container.reset()` method.
-This will effectively remove all registered services from the container. 
+This will effectively remove all registered services from the container.
+
+## Troubleshooting
+
+### Use TypeDI with routing-controllers and/or TypeORM
+
+In order to use typedi with routing-controllers and/or typeorm, it's **necessary** to tell these libs to use the typedi container.
+Otherwise you may face [this kind of issue](https://github.com/pleerock/typedi/issues/4).
+
+```Typescript
+import { useContainer as routingUseContainer } from 'routing-controllers';
+import { useContainer as ormUseContainer } from 'typeorm';
+import { Container } from "typedi";
+
+routingUseContainer(Container);
+ormUseContainer(Container);
+```
 
 ## Samples
 
