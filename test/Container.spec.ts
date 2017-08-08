@@ -9,6 +9,34 @@ describe("Container", function() {
 
     beforeEach(() => Container.reset());
 
+    describe("get", () => {
+
+        it("should be able to get a boolean", () => {
+            const booleanTrue = "boolean.true";
+            const booleanFalse = "boolean.false";
+            Container.set(booleanTrue, true);
+            Container.set(booleanFalse, false);
+
+            Container.get(booleanTrue).should.be.true;
+            Container.get(booleanFalse).should.be.false;
+        });
+
+        it("should be able to get an empty string", () => {
+            const emptyString = "emptyString";
+            Container.set(emptyString, "");
+
+            Container.get(emptyString).should.be.eq("");
+        });
+
+        it("should be able to get the 0 number", () => {
+            const zero = "zero";
+            Container.set(zero, 0);
+
+            Container.get(zero).should.be.eq(0);
+        });
+
+    });
+
     describe("set", function() {
 
         it("should be able to set a class into the container", function() {
