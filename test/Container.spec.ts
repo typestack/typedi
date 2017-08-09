@@ -1,9 +1,12 @@
 import "reflect-metadata";
 import {Container} from "../src/Container";
 import {Service} from "../src/decorators/Service";
+import {Inject} from "../src/decorators/Inject";
 import {Token} from "../src/Token";
 import {expect} from "chai";
 import {ServiceNotFoundError} from "../src/error/ServiceNotFoundError";
+import {ProviderUnknown} from "../src/error/ProviderUnknown";
+import {NoServiceIDSpecifiedError} from "../src/error/NoServiceIDSpecifiedError";
 
 describe("Container", function() {
 
@@ -99,6 +102,189 @@ describe("Container", function() {
             Container.get<TestService>("test1-service").should.be.equal(test1Service);
             Container.get<TestService>("test2-service").should.be.equal(test2Service);
 
+        });
+
+        describe("should be able to set a", () => {
+            
+            it("value provider", () => {
+                class TestService {}
+
+                const booleanValue = "boolean.value";
+                const stringValue = "string.value";
+                const numberValue = "number.value";
+                const functionValue = {id: "function.value", value: () => false};
+                const objectValue = {id: "object.value", value: {test: true}};
+                const instanceValue = {id: "instance.value", value: new (class TestService{})()};
+                const classValue = {id: "class.value", value: TestService};
+
+                Container.provide([
+                    {id: booleanValue, value: true},
+                    {id: stringValue, value: "value"},
+                    {id: numberValue, value: 1},
+                    functionValue,
+                    objectValue,
+                    instanceValue,
+                    classValue,
+                ]);
+
+                Container.get(booleanValue).should.be.true;
+                Container.get(stringValue).should.be.equal("value");
+                Container.get(numberValue).should.be.equal(1);
+                Container.get(functionValue.id).should.be.equal(functionValue.value);
+                Container.get(objectValue.id).should.be.equal(objectValue.value);
+                Container.get(instanceValue.id).should.be.equal(instanceValue.value);
+                Container.get(classValue.id).should.be.equal(classValue.value)
+                    .and.not.be.an.instanceOf(TestService);
+            });
+
+            describe("class provider", () => {
+                class TestService {}
+
+                it("using class shorthand", () => {
+                    Container.provide([
+                        TestService,
+                    ]);
+
+                    Container.get(TestService).should.be.an.instanceOf(TestService);
+                });
+                
+                it("using provider way", () => {
+                    const classID = "class";
+
+                    Container.provide([
+                        {id: TestService, class: TestService},
+                        {id: classID, class: TestService},
+                    ]);
+
+                    Container.get(TestService).should.be.an.instanceOf(TestService);
+                    Container.get(TestService).should.be.equal(Container.get(TestService));
+
+                    Container.get(classID).should.be.an.instanceOf(TestService);
+                    Container.get(classID).should.not.be.equal(Container.get(TestService));
+                });
+
+            });
+
+            describe("factory provider", () => {
+
+                class TestDependency {}
+
+
+                it("using class metadata", () => {
+
+                    class FactoryTest {
+                        constructor(@Inject("dep") depOne: string, depTwo: TestDependency) {}
+                    }
+
+                    Container.provide([
+                        {id: "dep", value: "depOne"},
+                        {id: FactoryTest, factory: (depOne, depTwo) => ({depOne, depTwo})},
+                    ]);
+
+                    const factoryTest = Container.get(FactoryTest);
+                    factoryTest.should.not.be.an.instanceOf(FactoryTest);
+                    factoryTest.should.have.property("depOne").and.be.equal("depOne");
+                    factoryTest.should.have.property("depTwo").and.be.an.instanceOf(TestDependency);
+
+                });
+                
+                it("using deps property", () => {
+                    class FactoryTest {
+                        constructor(@Inject("dep") depOne: string, depTwo: TestDependency) {}
+                    }
+
+                    Container.provide([
+                        {id: "anotherDep", value: "anotherDep"},
+                        {id: "anotherTestDependency", value: "anotherTestDependency"},
+                        {
+                            id: FactoryTest, 
+                            factory: (depOne, depTwo) => ({depOne, depTwo}), 
+                            deps: ["anotherDep", "anotherTestDependency"],
+                        },
+                    ]);
+
+                    const factoryTest = Container.get(FactoryTest);
+                    factoryTest.should.not.be.an.instanceOf(FactoryTest);
+                    factoryTest.should.have.property("depOne").and.be.equal("anotherDep");
+                    factoryTest.should.have.property("depTwo").and.not.be.an.instanceOf(TestDependency);
+                    factoryTest.should.have.property("depTwo").and.to.be.equal("anotherTestDependency");
+
+                });
+
+                it("and the deps property should not applied to other providers", () => {
+                    
+                    const iAmAFail = "IAmAFail";
+                    const classID = "class";
+                    const existing = "existing";
+                    const value = "value";
+
+                    class TestService {
+                        constructor(public dep: string = "default") {}
+                    }
+
+                    Container.provide([
+                        {id: iAmAFail, value: iAmAFail},
+                        {id: classID, class: TestService, deps: [iAmAFail]},
+                        {id: existing, existing: classID, deps: [iAmAFail]},
+                        {id: value, value: value, deps: [iAmAFail]},
+                    ]);
+
+                    Container.get<TestService>(classID).should.be.an.instanceOf(TestService);
+                    Container.get<TestService>(classID).dep.should.not.be.equal(iAmAFail);
+                    Container.get(existing).should.be.equal(Container.get(classID));
+                    Container.get(value).should.not.be.equal(iAmAFail);
+                });
+
+            });
+
+            describe("existing provider", () => {
+
+                class TestService {}
+                
+                it("should get the same instance", () => {
+
+                    const testService = {
+                        id: "testService",
+                        class: TestService,
+                    };
+                    const anotherService = "anotherService";                    
+
+                    Container.provide([
+                    testService,
+                        {id: anotherService, existing: testService.id},
+                    ]);
+
+                    Container.get(testService.id).should.be.equal(Container.get(anotherService));
+                });
+
+                it("should create the existing dependency if it does not exist yet", () => {
+                    const testService = {
+                        id: "testService",
+                        class: TestService,
+                    };
+                    const anotherService = "anotherService";
+
+                    Container.provide([
+                    testService,
+                        {id: anotherService, existing: testService.id},
+                    ]);
+
+                    Container.get(anotherService).should.be.eq(Container.get(testService.id));
+                });
+
+            });
+        });
+
+        it("should throw ProviderUnknown exception when provide a service only with id", () => {
+            expect(() => Container.provide([
+                {id: "ProviderUnknown"} as any,
+            ])).to.throw(ProviderUnknown);
+        });
+
+        it("should throw NoServiceIDSpecifiedError exception when provide a service without id", () => {
+            expect(() => Container.provide([
+                {value: "NoServiceIDSpecifiedError"} as any,
+            ])).to.throw(NoServiceIDSpecifiedError);
         });
 
     });

@@ -4,6 +4,9 @@ import {Handler} from "./types/Handler";
 import {Token} from "./Token";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceNotFoundError} from "./error/ServiceNotFoundError";
+import {Provider, isClassProvider, isExistingProvider, isFactoryProvider, isValueProvider} from "./types/Providers";
+import {NoServiceIDSpecifiedError} from "./error/NoServiceIDSpecifiedError";
+import {ProviderUnknown} from "./error/ProviderUnknown";
 
 /**
  * Service container.
@@ -69,6 +72,10 @@ export class Container {
         // find if service already was registered
         let service = this.findService(identifier);
 
+        if (service && service.aliasOf) {
+            return this.get(service.aliasOf as any);
+        }
+
         // find if instance of this object already initialized in the container and return it if it is
         if (service && service.instance)
             return service.instance as T;
@@ -89,12 +96,25 @@ export class Container {
             this.services.push(service);
         }
 
-        // setup constructor parameters for a newly initialized service
-        const paramTypes = Reflect && (Reflect as any).getMetadata ? (Reflect as any).getMetadata("design:paramtypes", type) : undefined;
-        let params: any[] = paramTypes ? this.initializeParams(type, paramTypes) : [];
+        let params: any[] = [];
+        // check if it is a factory and has deps defined.
+        // if it is not a factory, check if it is a class/function
+        if (
+            (service.factory && !service.deps && this.isFunction(type)) ||
+            (!service.factory && this.isFunction(type))
+        ) {
+            // setup constructor parameters for a newly initialized service
+            const paramTypes = Reflect && (Reflect as any).getMetadata ? (Reflect as any).getMetadata("design:paramtypes", type) : undefined;
+            params = paramTypes ? this.initializeParams(type, paramTypes) : [];
+        }
 
         // if factory is set then use it to create service instance
         if (service.factory) {
+            
+            // fill the params array with the deps defined
+            if (service.deps) {
+                params = service.deps.map(dep => this.get(dep as any));
+            }
 
             // filter out non-service parameters from created service constructor
             // non-service parameters can be, lets say Car(name: string, isNew: boolean, engine: Engine)
@@ -162,8 +182,45 @@ export class Container {
     /**
      * Provides a set of values to be saved in the container.
      */
-    static provide(values: { id: ServiceIdentifier, value: any }[]) {
-        values.forEach((v: any) => this.set(v.id, v.value));
+    static provide(providers: (Provider | ObjectType<any>)[]) {
+        providers.forEach(provider => {
+            // if it is a function/class, it can be registered
+            if (this.isFunction(provider)) {
+                this.registerService({
+                    type: provider,
+                });
+
+                return;
+            }
+
+            if (provider.id == null) {
+                throw new NoServiceIDSpecifiedError();
+            }
+
+            const { id } = provider;
+
+            if (isClassProvider(provider)) {
+                this.registerService({
+                    id,
+                    type: provider.class,
+                });
+            } else if (isValueProvider(provider)) {
+                this.set(id as any, provider.value);
+            } else if (isExistingProvider(provider)) {
+                this.registerService({
+                    id,
+                    aliasOf: provider.existing,
+                });
+            } else if (isFactoryProvider(provider)) {
+                this.registerService({
+                    id,
+                    factory: provider.factory,
+                    deps: provider.deps,
+                });
+            } else {
+                throw new ProviderUnknown(provider);
+            }
+        });
     }
 
     /**
@@ -225,6 +282,13 @@ export class Container {
      */
     private static isTypePrimitive(param: string): boolean {
         return ["string", "boolean", "number", "object"].indexOf(param.toLowerCase()) !== -1;
+    }
+
+    /**
+     * Check if given type is a function/class
+     */
+    private static isFunction(fn: any): fn is Function {
+        return !this.isTypePrimitive(typeof fn);
     }
 
     /**
