@@ -70,7 +70,7 @@ export class Container {
         let service = this.findService(identifier);
 
         // find if instance of this object already initialized in the container and return it if it is
-        if (service && service.instance !== null)
+        if (service && service.instance !== null && service.instance !== undefined)
             return service.instance as T;
 
         // if named service was requested and its instance was not found plus there is not type to know what to initialize,
