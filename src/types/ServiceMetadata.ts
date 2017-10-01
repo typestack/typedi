@@ -19,6 +19,11 @@ export interface ServiceMetadata<T, K extends keyof T> {
     id?: Token<any>|string;
 
     /**
+     * Tags denoting this service
+     */
+    tags?: Array<Token<any>|string>;
+
+    /**
      * Factory function used to initialize this service.
      * Can be regular function ("createCar" for example),
      * or other service which produces this instance ([CarFactory, "createCar"] for example).

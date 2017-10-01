@@ -39,6 +39,7 @@ export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOpti
         } else if (optionsOrServiceName) { // ServiceOptions
             service.id = (optionsOrServiceName as ServiceOptions<T, K>).id;
             service.factory = (optionsOrServiceName as ServiceOptions<T, K>).factory;
+            service.tags = (optionsOrServiceName as ServiceOptions<T, K>).tags;
         }
 
         Container.registerService(service);

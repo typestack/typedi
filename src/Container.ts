@@ -119,6 +119,13 @@ export class Container {
         return service.instance as T;
     }
 
+    static getAllByTag<T>(tag: string|Token<T>): Array<T> {
+        return this.services
+          .filter(service => service.tags && service.tags.find(availableTag => availableTag === tag))
+          .map(service => this.get(service.type) as T)
+          ;
+    }
+
     /**
      * Sets a value for the given type or service name in the container.
      */

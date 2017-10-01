@@ -45,3 +45,23 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>
         });
     };
 }
+
+/**
+ * Injects a service into a class property or constructor parameter.
+ */
+export function InjectTagged(tokenOrName?: string|Token<any>): Function {
+    return function(target: Object, propertyName: string, index?: number) {
+
+        if (!tokenOrName)
+            throw new Error("@InjectTagged must be called with a tag as argument");
+
+        Container.registerHandler({
+            object: target,
+            propertyName: propertyName,
+            index: index,
+            value: () => {
+                return Container.getAllByTag<any>(tokenOrName) || [];
+            }
+        });
+    };
+}

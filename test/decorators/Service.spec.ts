@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators/Service";
+import {Token} from "../../src/Token";
 
 describe("Service Decorator", function() {
 
@@ -26,6 +27,40 @@ describe("Service Decorator", function() {
         }
         Container.get("super.service").should.be.instanceOf(NamedService);
         Container.get("super.service").should.not.be.instanceOf(TestService);
+    });
+
+    it("should register classes in the container with string tags, and their instance should be retrievable", function() {
+        @Service({tags: ["test1"]})
+        class TestService1 {
+        }
+        @Service({tags: ["test1", "test2"]})
+        class TestService2 {
+        }
+
+        const testService1 = Container.get(TestService1);
+        const testService2 = Container.get(TestService2);
+        Container.getAllByTag("test1").should.have.members([testService1, testService2]);
+        Container.getAllByTag("test2").should.have.members([testService2]);
+    });
+
+    it("should register classes in the container with token tags, and their instance should be retrievable", function() {
+        interface TagInterface1 {}
+        interface TagInterface2 {}
+        const Tag1 = new Token<TagInterface1>();
+        const Tag2 = new Token<TagInterface2>();
+
+        @Service({tags: [Tag1]})
+        class TestService1 {
+        }
+
+        @Service({tags: [Tag1, Tag2]})
+        class TestService2 {
+        }
+
+        const testService1 = Container.get(TestService1);
+        const testService2 = Container.get(TestService2);
+        Container.getAllByTag(Tag1).should.have.members([testService1, testService2]);
+        Container.getAllByTag(Tag2).should.have.members([testService2]);
     });
 
     it("should register class in the container, and its parameter dependencies should be properly initialized", function() {

@@ -1,4 +1,5 @@
 import {ObjectType} from "./ObjectType";
+import {Token} from "../Token";
 
 /**
  * Service options passed to the @Service() decorator.
@@ -16,4 +17,8 @@ export interface ServiceOptions<T, K extends keyof T> {
      */
     factory?: [ObjectType<T>, K]|((...params: any[]) => any);
 
+    /**
+     * Tags denoting this service
+     */
+    tags?: Array<Token<any>|string>;
 }
