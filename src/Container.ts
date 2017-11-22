@@ -115,7 +115,7 @@ export class Container {
             service.instance = new (type.bind.apply(type, params))();
         }
 
-        this.applyPropertyHandlers(type);
+        this.applyPropertyHandlers(type, service.instance);
         return service.instance as T;
     }
 
@@ -230,18 +230,13 @@ export class Container {
     /**
      * Applies all registered handlers on a given target class.
      */
-    private static applyPropertyHandlers(target: Function) {
+    private static applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
         this.handlers.forEach(handler => {
-            if (handler.index) return;
+            if (typeof handler.index === "number") return;
             if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor))
                 return;
 
-            Object.defineProperty(handler.object, handler.propertyName, {
-                enumerable: true,
-                writable: true,
-                configurable: true,
-                value: handler.value()
-            });
+            instance[handler.propertyName] = handler.value();
         });
     }
 
