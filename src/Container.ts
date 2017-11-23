@@ -137,7 +137,7 @@ export class Container {
      */
     static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>, value?: any): Container {
 
-        const newService: ServiceMetadata<any, any> = arguments.length === 1 && identifierOrServiceMetadata instanceof Object ? identifierOrServiceMetadata : undefined;
+        const newService: ServiceMetadata<any, any> = arguments.length === 1 && typeof identifierOrServiceMetadata === "object"  && !(identifierOrServiceMetadata instanceof Token) ? identifierOrServiceMetadata : undefined;
         if (newService) {
             const service = this.findService(newService.id);
             if (service) {

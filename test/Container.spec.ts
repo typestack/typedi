@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "chai";
 import {Container} from "../src/Container";
 import {Service} from "../src/decorators/Service";
 import {Token} from "../src/Token";
