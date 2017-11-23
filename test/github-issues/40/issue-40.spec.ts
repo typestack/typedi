@@ -8,7 +8,7 @@ describe("github issues > #40 Constructor inject not working", function() {
 
     beforeEach(() => Container.reset());
 
-    it("should be able to set a class into the container", function() {
+    it("should work properly", function() {
 
         @Service("AccessTokenService")
         class AccessTokenService {
