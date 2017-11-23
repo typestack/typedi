@@ -1,5 +1,6 @@
 import {ObjectType} from "./ObjectType";
 import {Token} from "../Token";
+import {ServiceIdentifier} from "./ServiceIdentifier";
 
 /**
  * Service metadata is used to initialize service and store its state.
@@ -30,4 +31,13 @@ export interface ServiceMetadata<T, K extends keyof T> {
      */
     instance?: Object;
 
+    /**
+     * 
+     */
+    aliasOf?: ServiceIdentifier;
+
+    /**
+     * 
+     */
+    deps?: ServiceIdentifier[];
 }
