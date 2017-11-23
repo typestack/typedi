@@ -1,4 +1,5 @@
 import {ObjectType} from "./ObjectType";
+import {Token} from "../Token";
 
 /**
  * Service options passed to the @Service() decorator.
@@ -9,7 +10,7 @@ export interface ServiceOptions<T, K extends keyof T> {
     /**
      * Unique service id.
      */
-    id?: string;
+    id?: string|Token<any>;
 
     /**
      * Factory used to produce this service.
