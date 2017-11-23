@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators/Service";
-import {Inject} from "../../src/decorators/Inject";
+import {Inject, InjectTagged} from "../../src/decorators/Inject";
 import {Token} from "../../src/Token";
 
 describe("Inject Decorator", function() {
@@ -71,6 +71,19 @@ describe("Inject Decorator", function() {
         Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
         Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
         Container.get(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
+    });
+
+
+    it("should inject tagged service into class property", function() {
+        @Service({tags: ["test"]})
+        class TaggedService {
+        }
+        @Service()
+        class SecondTestService {
+            @InjectTagged("test")
+            taggedServices: any[];
+        }
+        Container.get(SecondTestService).taggedServices[0].should.be.instanceOf(TaggedService);
     });
 
 });

@@ -17,4 +17,8 @@ export interface ServiceOptions<T, K extends keyof T> {
      */
     factory?: [ObjectType<T>, K]|((...params: any[]) => any);
 
+    /**
+     * Tags denoting this service
+     */
+    tags?: Array<Token<any>|string>;
 }
