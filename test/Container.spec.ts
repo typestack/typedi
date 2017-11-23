@@ -105,7 +105,7 @@ describe("Container", function() {
 
     });
 
-    describe("provide", function() {
+    describe("set multiple", function() {
 
         it("should be able to provide a list of values", function() {
 
@@ -118,7 +118,7 @@ describe("Container", function() {
             const test1Service = new TestService();
             const test2Service = new TestService();
 
-            Container.provide([
+            Container.set([
                 { id: TestService, value: testService },
                 { id: "test1-service", value: test1Service },
                 { id: "test2-service", value: test2Service },
@@ -145,7 +145,7 @@ describe("Container", function() {
             const test1Service = new TestService();
             const test2Service = new TestService();
 
-            Container.provide([
+            Container.set([
                 { id: TestService, value: testService },
                 { id: "test1-service", value: test1Service },
                 { id: "test2-service", value: test2Service },

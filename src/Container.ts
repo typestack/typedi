@@ -135,7 +135,16 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
-    static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>, value?: any): Container {
+    static set(values: { id: ServiceIdentifier, value: any }[]): Container;
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
+    static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>|({ id: ServiceIdentifier, value: any }[]), value?: any): Container {
+        if (identifierOrServiceMetadata instanceof Array) {
+            identifierOrServiceMetadata.forEach((v: any) => this.set(v.id, v.value));
+            return this;
+        }
 
         const newService: ServiceMetadata<any, any> = arguments.length === 1 && typeof identifierOrServiceMetadata === "object"  && !(identifierOrServiceMetadata instanceof Token) ? identifierOrServiceMetadata : undefined;
         if (newService) {
@@ -168,13 +177,6 @@ export class Container {
         }
 
         return this;
-    }
-
-    /**
-     * Provides a set of values to be saved in the container.
-     */
-    static provide(values: { id: ServiceIdentifier, value: any }[]) {
-        values.forEach((v: any) => this.set(v.id, v.value));
     }
 
     /**

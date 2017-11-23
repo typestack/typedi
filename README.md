@@ -310,7 +310,7 @@ Container.set(CoffeeMaker, new FakeCoffeeMaker());
 
 // or
 
-Container.provide([
+Container.set([
     { id: "bean.factory", value: new FakeBeanFactory() },
     { id: "sugar.factory", value: new FakeSugarFactory() },
     { id: "water.factory", value: new FakeWaterFactory() }

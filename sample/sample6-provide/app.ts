@@ -7,7 +7,7 @@ import {Bus} from "./Bus";
 import {Car} from "./Car";
 
 // provide fake implementations
-Container.provide([
+Container.set([
     { id: Bus, value: new FakeBus() },
     { id: Car, value: new FakeCar() }
 ]);
