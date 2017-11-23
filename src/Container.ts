@@ -4,6 +4,7 @@ import {Handler} from "./types/Handler";
 import {Token} from "./Token";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceNotFoundError} from "./error/ServiceNotFoundError";
+import {MissingProvidedServiceTypeError} from "./error/MissingProvidedServiceTypeError";
 
 /**
  * Service container.
@@ -88,7 +89,7 @@ export class Container {
         // if service was not found then create a new one and register it
         if (!service) {
             if (!type)
-                throw new Error(`Cannot determine a class of the requesting service "${identifier}"`);
+                throw new MissingProvidedServiceTypeError(identifier);
 
             service = { type: type };
             this.services.push(service);
@@ -117,7 +118,7 @@ export class Container {
 
         } else {  // otherwise simply create a new object instance
             if (!type)
-                throw new Error(`Cannot determine a class of the requesting service "${identifier}"`);
+                throw new MissingProvidedServiceTypeError(identifier);
 
             params.unshift(null);
             service.value = new (type.bind.apply(type, params))();

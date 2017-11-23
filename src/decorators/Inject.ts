@@ -1,5 +1,6 @@
 import {Container} from "../Container";
 import {Token} from "../Token";
+import {CannotInjectError} from "../error/CannotInjectError";
 
 /**
  * Injects a service into a class property or constructor parameter.
@@ -40,6 +41,10 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>
                 } else {
                     identifier = typeOrName();
                 }
+
+                if (identifier === Object)
+                    throw new CannotInjectError(target, propertyName);
+
                 return Container.get<any>(identifier);
             }
         });
