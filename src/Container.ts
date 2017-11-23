@@ -36,13 +36,6 @@ export class Container {
     }
 
     /**
-     * Registers a new service.
-     */
-    static registerService<T, K extends keyof T>(descriptor: ServiceMetadata<T, K>) {
-        this.services.push(descriptor);
-    }
-
-    /**
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
@@ -122,6 +115,11 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
+    static set<T, K extends keyof T>(service: ServiceMetadata<T, K>): Container;
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
     static set(type: Function, value: any): Container;
 
     /**
@@ -137,23 +135,36 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
-    static set(identifier: ServiceIdentifier, value: any): Container {
-        const service = this.findService(identifier);
-        if (service) {
-            service.instance = value;
+    static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>, value?: any): Container {
 
-        } else {
-            const service: ServiceMetadata<any, any> = {
-                instance: value
-            };
-            if (identifier instanceof Token || typeof identifier === "string") {
-                service.id = identifier;
-
+        const newService: ServiceMetadata<any, any> = arguments.length === 1 && identifierOrServiceMetadata instanceof Object ? identifierOrServiceMetadata : undefined;
+        if (newService) {
+            const service = this.findService(newService.id);
+            if (service) {
+                Object.assign(service, newService);
             } else {
-                service.type = identifier;
+                this.services.push(newService);
             }
 
-            this.services.push(service);
+        } else {
+            const identifier = identifierOrServiceMetadata as ServiceIdentifier;
+            const service = this.findService(identifier);
+            if (service) {
+                service.instance = value;
+
+            } else {
+                const service: ServiceMetadata<any, any> = {
+                    instance: value
+                };
+                if (identifier instanceof Token || typeof identifier === "string") {
+                    service.id = identifier;
+
+                } else {
+                    service.type = identifier;
+                }
+
+                this.services.push(service);
+            }
         }
 
         return this;
@@ -244,5 +255,4 @@ export class Container {
             });
         });
     }
-
 }

@@ -237,7 +237,7 @@ describe("Container", function() {
 
     });
 
-    describe("registerService", function() {
+    describe("set with ServiceMetadata passed", function() {
 
         it("should support factory functions", function() {
 
@@ -250,7 +250,7 @@ describe("Container", function() {
                 }
             }
 
-            Container.registerService({
+            Container.set({
                 type: Car,
                 factory: () => new Car(new Engine())
             });
@@ -283,7 +283,7 @@ describe("Container", function() {
 
             }
 
-            Container.registerService({
+            Container.set({
                 type: Car,
                 factory: [CarFactory, "createCar"]
             });
@@ -312,7 +312,7 @@ describe("Container", function() {
 
             const VehicleService = new Token<Vehicle>();
 
-            Container.registerService({
+            Container.set({
                 id: VehicleService,
                 factory: [VehicleFactory, "createBus"]
             });

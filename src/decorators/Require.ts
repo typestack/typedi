@@ -5,6 +5,7 @@ import {Container} from "../Container";
  *
  * @param name The name of the package to require
  * @experimental
+ * @deprecated This decorator was experimental and now its time to remove it. Use es6 imports instead.
  */
 export function Require(name: string) {
     return function(target: Object, propertyName: string, index?: number) {

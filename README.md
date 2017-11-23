@@ -146,31 +146,6 @@ coffeeMaker.make();
 `@Service` decorator to all classes you are using with container, because without `@Service` decorator applied
 constructor injection may not work properly in your classes.
 
-### Injecting third-party dependencies *(experimental)*
-
-Also you can inject a modules that you want to `require`:
-
-```typescript
-import {Container, Service, Require} from "typedi";
-
-@Service()
-class CoffeeMaker {
-
-    private logger: any; // you can use type if you have definition for this package
-
-    constructor(@Require("logger") logger: any) {
-        this.logger = logger; // the same if you do this.logger = require("logger")
-    }
-
-    make() {
-        console.log(this.logger); // here you get console.logged logger package =)
-    }
-}
-
-let coffeeMaker = Container.get(CoffeeMaker);
-coffeeMaker.make();
-```
-
 ### Named services
 
 You can use a named services. In this case you can use interface-based services.

@@ -41,6 +41,6 @@ export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOpti
             service.factory = (optionsOrServiceName as ServiceOptions<T, K>).factory;
         }
 
-        Container.registerService(service);
+        Container.set(service);
     };
 }
