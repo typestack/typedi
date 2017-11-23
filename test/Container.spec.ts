@@ -114,6 +114,12 @@ describe("Container", function() {
                 }
             }
 
+            class TestServiceFactory {
+                create() {
+                    return "test3-service-created-by-factory";
+                }
+            }
+
             const testService = new TestService();
             const test1Service = new TestService();
             const test2Service = new TestService();
@@ -122,11 +128,13 @@ describe("Container", function() {
                 { id: TestService, value: testService },
                 { id: "test1-service", value: test1Service },
                 { id: "test2-service", value: test2Service },
+                { id: "test3-service", factory: [TestServiceFactory, "create"] },
             ]);
 
             Container.get(TestService).should.be.equal(testService);
             Container.get<TestService>("test1-service").should.be.equal(test1Service);
             Container.get<TestService>("test2-service").should.be.equal(test2Service);
+            Container.get<string>("test3-service").should.be.equal("test3-service-created-by-factory");
 
         });
 
@@ -252,7 +260,7 @@ describe("Container", function() {
             }
 
             Container.set({
-                type: Car,
+                id: Car,
                 factory: () => new Car(new Engine())
             });
 
@@ -285,7 +293,7 @@ describe("Container", function() {
             }
 
             Container.set({
-                type: Car,
+                id: Car,
                 factory: [CarFactory, "createCar"]
             });
 

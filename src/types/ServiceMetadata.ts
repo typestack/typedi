@@ -16,7 +16,7 @@ export interface ServiceMetadata<T, K extends keyof T> {
     /**
      * Service unique identifier.
      */
-    id?: Token<any>|string;
+    id?: Token<any>|string|Function;
 
     /**
      * Factory function used to initialize this service.
@@ -28,6 +28,6 @@ export interface ServiceMetadata<T, K extends keyof T> {
     /**
      * Instance of the target class.
      */
-    instance?: Object;
+    value?: Object;
 
 }

@@ -63,8 +63,8 @@ export class Container {
         let service = this.findService(identifier);
 
         // find if instance of this object already initialized in the container and return it if it is
-        if (service && service.instance !== null && service.instance !== undefined)
-            return service.instance as T;
+        if (service && service.value !== null && service.value !== undefined)
+            return service.value as T;
 
         // if named service was requested and its instance was not found plus there is not type to know what to initialize,
         // this means service was not pre-registered and we throw an exception
@@ -74,16 +74,28 @@ export class Container {
             throw new ServiceNotFoundError(identifier);
 
         // at this point we either have type in service registered, either identifier is a target type
-        const type = service && service.type ? service.type : identifier as Function;
+        let type = undefined;
+        if (service && service.type) {
+            type = service.type;
+
+        } else if (service && service.id instanceof Function) {
+            type = service.id;
+
+        } else if (identifier instanceof Function) {
+            type = identifier;
+        }
 
         // if service was not found then create a new one and register it
         if (!service) {
+            if (!type)
+                throw new Error(`Cannot determine a class of the requesting service "${identifier}"`);
+
             service = { type: type };
             this.services.push(service);
         }
 
         // setup constructor parameters for a newly initialized service
-        const paramTypes = Reflect && (Reflect as any).getMetadata ? (Reflect as any).getMetadata("design:paramtypes", type) : undefined;
+        const paramTypes = type && Reflect && (Reflect as any).getMetadata ? (Reflect as any).getMetadata("design:paramtypes", type) : undefined;
         let params: any[] = paramTypes ? this.initializeParams(type, paramTypes) : [];
 
         // if factory is set then use it to create service instance
@@ -97,19 +109,23 @@ export class Container {
             if (service.factory instanceof Array) {
                 // use special [Type, "create"] syntax to allow factory services
                 // in this case Type instance will be obtained from Container and its method "create" will be called
-                service.instance = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
+                service.value = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
 
             } else { // regular factory function
-                service.instance = service.factory(...params);
+                service.value = service.factory(...params);
             }
 
         } else {  // otherwise simply create a new object instance
+            if (!type)
+                throw new Error(`Cannot determine a class of the requesting service "${identifier}"`);
+
             params.unshift(null);
-            service.instance = new (type.bind.apply(type, params))();
+            service.value = new (type.bind.apply(type, params))();
         }
 
-        this.applyPropertyHandlers(type);
-        return service.instance as T;
+        if (type)
+            this.applyPropertyHandlers(type);
+        return service.value as T;
     }
 
     /**
@@ -135,45 +151,30 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
-    static set(values: { id: ServiceIdentifier, value: any }[]): Container;
+    static set<T, K extends keyof T>(values: ServiceMetadata<T, K>[]): Container;
 
     /**
      * Sets a value for the given type or service name in the container.
      */
-    static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>|({ id: ServiceIdentifier, value: any }[]), value?: any): Container {
+    static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>|(ServiceMetadata<any, any>[]), value?: any): Container {
         if (identifierOrServiceMetadata instanceof Array) {
-            identifierOrServiceMetadata.forEach((v: any) => this.set(v.id, v.value));
+            identifierOrServiceMetadata.forEach((v: any) => this.set(v));
             return this;
         }
+        if (typeof identifierOrServiceMetadata === "string" || identifierOrServiceMetadata instanceof Token) {
+            return this.set({ id: identifierOrServiceMetadata, value: value });
+        }
+        if (identifierOrServiceMetadata instanceof Function) {
+            return this.set({ type: identifierOrServiceMetadata, id: identifierOrServiceMetadata, value: value });
+        }
 
-        const newService: ServiceMetadata<any, any> = arguments.length === 1 && typeof identifierOrServiceMetadata === "object"  && !(identifierOrServiceMetadata instanceof Token) ? identifierOrServiceMetadata : undefined;
-        if (newService) {
-            const service = this.findService(newService.id);
-            if (service) {
-                Object.assign(service, newService);
-            } else {
-                this.services.push(newService);
-            }
-
+        // const newService: ServiceMetadata<any, any> = arguments.length === 1 && typeof identifierOrServiceMetadata === "object"  && !(identifierOrServiceMetadata instanceof Token) ? identifierOrServiceMetadata : undefined;
+        const newService: ServiceMetadata<any, any> = identifierOrServiceMetadata;
+        const service = this.findService(newService.id);
+        if (service) {
+            Object.assign(service, newService);
         } else {
-            const identifier = identifierOrServiceMetadata as ServiceIdentifier;
-            const service = this.findService(identifier);
-            if (service) {
-                service.instance = value;
-
-            } else {
-                const service: ServiceMetadata<any, any> = {
-                    instance: value
-                };
-                if (identifier instanceof Token || typeof identifier === "string") {
-                    service.id = identifier;
-
-                } else {
-                    service.type = identifier;
-                }
-
-                this.services.push(service);
-            }
+            this.services.push(newService);
         }
 
         return this;
