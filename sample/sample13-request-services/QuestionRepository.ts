@@ -1,6 +1,6 @@
 import {Service} from "../../src/decorators/Service";
 
-@Service({ scope: "request" })
+@Service()
 export class QuestionRepository {
     userName: string;
 

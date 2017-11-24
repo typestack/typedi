@@ -8,12 +8,12 @@ Container.import([
     QuestionRepository,
 ]);
 const request1 = { param: "Timber" };
-const controller1 = Container.getFromRequest(request1, QuestionController);
+const controller1 = Container.of(request1).get(QuestionController);
 controller1.save("Timber");
-Container.removeFromRequest(request1, QuestionController);
+Container.reset(request1);
+// Container.removeFromRequest(request1, QuestionController);
 
 const request2 = { param: "Guest" };
-const controller2 = Container.getFromRequest(request2, QuestionController);
+const controller2 = Container.of(request2).get(QuestionController);
 controller2.save("");
-
-console.log((Container as any)["services"]);
+Container.reset(request2);

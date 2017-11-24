@@ -1,7 +1,7 @@
 import {Service} from "../../src/decorators/Service";
 import {QuestionRepository} from "./QuestionRepository";
 
-@Service({ scope: "request" })
+@Service()
 export class QuestionController {
 
     constructor(protected questionRepository: QuestionRepository) {

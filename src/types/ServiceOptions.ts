@@ -8,15 +8,14 @@ import {Token} from "../Token";
 export interface ServiceOptions<T, K extends keyof T> {
 
     /**
-     * Service scope.
-     *
-     * - "singleton" means container will create a single (global) instance of this class.
-     * - "prototype" means you can have multiple instances the different classes under a single service id string or token.
-     * - "request" - means you'll have different instances of the same class per user request. Implementation depends on http (or other) framework you are using.
-     *
-     * Default is "singleton".
+     * Indicates if this service must be global and same instance must be used across all containers.
      */
-    scope?: "singleton"|"prototype"|"request";
+    global?: boolean;
+
+    /**
+     * Allows to setup multiple instances the different classes under a single service id string or token.
+     */
+    multiple?: boolean;
 
     /**
      * Unique service id.
