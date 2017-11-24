@@ -1,9 +1,9 @@
 # TypeDI
 
-[![Build Status](https://travis-ci.org/pleerock/typedi.svg?branch=master)](https://travis-ci.org/pleerock/typedi)
+[![Build Status](https://travis-ci.org/typestack/typedi.svg?branch=master)](https://travis-ci.org/typestack/typedi)
 [![npm version](https://badge.fury.io/js/typedi.svg)](https://badge.fury.io/js/typedi)
-[![Dependency Status](https://david-dm.org/pleerock/typedi.svg)](https://david-dm.org/pleerock/typedi)
-[![Join the chat at https://gitter.im/pleerock/typedi](https://badges.gitter.im/pleerock/typedi.svg)](https://gitter.im/pleerock/typedi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Dependency Status](https://david-dm.org/typestack/typedi.svg)](https://david-dm.org/typestack/typedi)
+[![Join the chat at https://gitter.im/typestack/typedi](https://badges.gitter.im/typestack/typedi.svg)](https://gitter.im/typestack/typedi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for TypeScript.
 Using TypeDI you can build well-structured and easily tested applications.
