@@ -35,12 +35,16 @@ export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOpti
 
         if (typeof optionsOrServiceName === "string" || optionsOrServiceName instanceof Token) {
             service.id = optionsOrServiceName;
+            service.multiple = (optionsOrServiceName as ServiceOptions<T, K>).multiple;
+            service.global = (optionsOrServiceName as ServiceOptions<T, K>).global;
 
         } else if (optionsOrServiceName) { // ServiceOptions
             service.id = (optionsOrServiceName as ServiceOptions<T, K>).id;
             service.factory = (optionsOrServiceName as ServiceOptions<T, K>).factory;
+            service.multiple = (optionsOrServiceName as ServiceOptions<T, K>).multiple;
+            service.global = (optionsOrServiceName as ServiceOptions<T, K>).global;
         }
 
-        Container.registerService(service);
+        Container.set(service);
     };
 }

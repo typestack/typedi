@@ -3,7 +3,7 @@ import {ObjectType} from "./types/ObjectType";
 import {Handler} from "./types/Handler";
 import {Token} from "./Token";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
-import {ServiceNotFoundError} from "./error/ServiceNotFoundError";
+import {ContainerInstance} from "./ContainerInstance";
 
 /**
  * Service container.
@@ -15,31 +15,38 @@ export class Container {
     // -------------------------------------------------------------------------
 
     /**
-     * All registered services.
+     * Global container instance.
      */
-    private static services: ServiceMetadata<any, any>[] = [];
+    private static readonly globalInstance: ContainerInstance = new ContainerInstance(undefined);
+
+    /**
+     * Other containers created using Container.of method.
+     */
+    private static readonly instances: ContainerInstance[] = [];
 
     /**
      * All registered handlers.
      */
-    private static handlers: Handler[] = [];
+    static readonly handlers: Handler[] = [];
 
     // -------------------------------------------------------------------------
     // Public Static Methods
     // -------------------------------------------------------------------------
 
     /**
-     * Registers a new handler.
+     * Gets a separate container instance for the given instance id.
      */
-    static registerHandler(handler: Handler) {
-        this.handlers.push(handler);
-    }
+    static of(instanceId: any): ContainerInstance {
+        if (instanceId === undefined)
+            return this.globalInstance;
 
-    /**
-     * Registers a new service.
-     */
-    static registerService<T, K extends keyof T>(descriptor: ServiceMetadata<T, K>) {
-        this.services.push(descriptor);
+        let container = this.instances.find(instance => instance.id === instanceId);
+        if (!container) {
+            container = new ContainerInstance(instanceId);
+            this.instances.push(container);
+        }
+
+        return container;
     }
 
     /**
@@ -65,59 +72,33 @@ export class Container {
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
     static get<T>(identifier: ServiceIdentifier): T {
-
-        // find if service already was registered
-        let service = this.findService(identifier);
-
-        // find if instance of this object already initialized in the container and return it if it is
-        if (service && service.instance !== null && service.instance !== undefined)
-            return service.instance as T;
-
-        // if named service was requested and its instance was not found plus there is not type to know what to initialize,
-        // this means service was not pre-registered and we throw an exception
-        if ((!service || !service.type) &&
-            (!service || !service.factory) &&
-            (typeof identifier === "string" || identifier instanceof Token))
-            throw new ServiceNotFoundError(identifier);
-
-        // at this point we either have type in service registered, either identifier is a target type
-        const type = service && service.type ? service.type : identifier as Function;
-
-        // if service was not found then create a new one and register it
-        if (!service) {
-            service = { type: type };
-            this.services.push(service);
-        }
-
-        // setup constructor parameters for a newly initialized service
-        const paramTypes = Reflect && (Reflect as any).getMetadata ? (Reflect as any).getMetadata("design:paramtypes", type) : undefined;
-        let params: any[] = paramTypes ? this.initializeParams(type, paramTypes) : [];
-
-        // if factory is set then use it to create service instance
-        if (service.factory) {
-
-            // filter out non-service parameters from created service constructor
-            // non-service parameters can be, lets say Car(name: string, isNew: boolean, engine: Engine)
-            // where name and isNew are non-service parameters and engine is a service parameter
-            params = params.filter(param => param !== undefined);
-
-            if (service.factory instanceof Array) {
-                // use special [Type, "create"] syntax to allow factory services
-                // in this case Type instance will be obtained from Container and its method "create" will be called
-                service.instance = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
-
-            } else { // regular factory function
-                service.instance = service.factory(...params);
-            }
-
-        } else {  // otherwise simply create a new object instance
-            params.unshift(null);
-            service.instance = new (type.bind.apply(type, params))();
-        }
-
-        this.applyPropertyHandlers(type, service.instance);
-        return service.instance as T;
+        return this.globalInstance.get(identifier as any);
     }
+
+    /**
+     * Gets all instances registered in the container of the given service identifier.
+     * Used when service defined with multiple: true flag.
+     */
+    static getMany<T>(id: string): T[];
+
+    /**
+     * Gets all instances registered in the container of the given service identifier.
+     * Used when service defined with multiple: true flag.
+     */
+    static getMany<T>(id: Token<T>): T[];
+
+    /**
+     * Gets all instances registered in the container of the given service identifier.
+     * Used when service defined with multiple: true flag.
+     */
+    static getMany<T>(id: string|Token<T>): T[] {
+        return this.globalInstance.getMany(id as any);
+    }
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
+    static set<T, K extends keyof T>(service: ServiceMetadata<T, K>): Container;
 
     /**
      * Sets a value for the given type or service name in the container.
@@ -137,107 +118,55 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
-    static set(identifier: ServiceIdentifier, value: any): Container {
-        const service = this.findService(identifier);
-        if (service) {
-            service.instance = value;
-
-        } else {
-            const service: ServiceMetadata<any, any> = {
-                instance: value
-            };
-            if (identifier instanceof Token || typeof identifier === "string") {
-                service.id = identifier;
-
-            } else {
-                service.type = identifier;
-            }
-
-            this.services.push(service);
-        }
-
-        return this;
-    }
+    static set<T, K extends keyof T>(values: ServiceMetadata<T, K>[]): Container;
 
     /**
-     * Provides a set of values to be saved in the container.
+     * Sets a value for the given type or service name in the container.
      */
-    static provide(values: { id: ServiceIdentifier, value: any }[]) {
-        values.forEach((v: any) => this.set(v.id, v.value));
+    static set(identifierOrServiceMetadata: ServiceIdentifier|ServiceMetadata<any, any>|(ServiceMetadata<any, any>[]), value?: any): Container {
+        this.globalInstance.set(identifierOrServiceMetadata as any, value);
+        return this;
     }
 
     /**
      * Removes services with a given service identifiers (tokens or types).
      */
-    static remove(...ids: ServiceIdentifier[]) {
-        ids.forEach(id => {
-            const service = this.findService(id);
-            if (service)
-                this.services.splice(this.services.indexOf(service), 1);
-        });
+    static remove(...ids: ServiceIdentifier[]): Container {
+        this.globalInstance.remove(...ids);
+        return this;
     }
 
     /**
      * Completely resets the container by removing all previously registered services and handlers from it.
      */
-    static reset() {
-        this.handlers = [];
-        this.services = [];
-    }
+    static reset(containerId?: any): Container {
+        if (containerId) {
+            const instance = this.instances.find(instance => instance.id === containerId);
+            if (instance) {
+                instance.reset();
+                this.instances.splice(this.instances.indexOf(instance), 1);
+            }
 
-    // -------------------------------------------------------------------------
-    // Private Static Methods
-    // -------------------------------------------------------------------------
-
-    /**
-     * Finds registered service in the with a given service identifier.
-     */
-    private static findService(identifier: ServiceIdentifier): ServiceMetadata<any, any>|undefined {
-        return this.services.find(service => {
-            if (service.id)
-                return service.id === identifier;
-
-            if (service.type && identifier instanceof Function)
-                return service.type === identifier || identifier.prototype instanceof service.type;
-
-            return false;
-        });
+        } else {
+            this.globalInstance.reset();
+            this.instances.forEach(instance => instance.reset());
+        }
+        return this;
     }
 
     /**
-     * Initializes all parameter types for a given target service class.
+     * Registers a new handler.
      */
-    private static initializeParams(type: Function, paramTypes: any[]): any[] {
-        return paramTypes.map((paramType, index) => {
-            const paramHandler = this.handlers.find(handler => handler.object === type && handler.index === index);
-            if (paramHandler)
-                return paramHandler.value();
-
-            if (paramType && paramType.name && !this.isTypePrimitive(paramType.name))
-                return Container.get(paramType);
-
-            return undefined;
-        });
+    static registerHandler(handler: Handler): Container {
+        this.handlers.push(handler);
+        return this;
     }
 
     /**
-     * Checks if given type is primitive (e.g. string, boolean, number, object).
+     * Helper method that imports given services.
      */
-    private static isTypePrimitive(param: string): boolean {
-        return ["string", "boolean", "number", "object"].indexOf(param.toLowerCase()) !== -1;
-    }
-
-    /**
-     * Applies all registered handlers on a given target class.
-     */
-    private static applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
-        this.handlers.forEach(handler => {
-            if (typeof handler.index === "number") return;
-            if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor))
-                return;
-
-            instance[handler.propertyName] = handler.value();
-        });
+    static import(services: Function[]): Container {
+        return this;
     }
 
 }

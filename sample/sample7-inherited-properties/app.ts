@@ -5,6 +5,7 @@ import {PorsheCar} from "./PorsheCar";
 
 // drive bmw
 let bmwCar = Container.get(BmwCar);
+console.log(bmwCar);
 bmwCar.drive();
 
 // drive porshe

@@ -14,9 +14,19 @@ export interface ServiceMetadata<T, K extends keyof T> {
     type?: Function;
 
     /**
+     * Indicates if this service must be global and same instance must be used across all containers.
+     */
+    global?: boolean;
+
+    /**
+     * Allows to setup multiple instances the different classes under a single service id string or token.
+     */
+    multiple?: boolean;
+
+    /**
      * Service unique identifier.
      */
-    id?: Token<any>|string;
+    id?: Token<any>|string|Function;
 
     /**
      * Factory function used to initialize this service.
@@ -28,6 +38,6 @@ export interface ServiceMetadata<T, K extends keyof T> {
     /**
      * Instance of the target class.
      */
-    instance?: Object;
+    value?: any;
 
 }

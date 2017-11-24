@@ -1,9 +1,5 @@
 import "reflect-metadata";
 import {Container} from "../../src/index";
-import "./BodyFactory";
-import "./WheelFactory";
-import "./EngineFactory";
-import "./CarFactory";
 import {ReaderService, StoreService} from "./Tokens";
 import {FtpStore} from "./FtpStore";
 import {FtpReader} from "./FtpReader";
