@@ -282,7 +282,7 @@ export class ContainerInstance {
         return paramTypes.map((paramType, index) => {
             const paramHandler = Container.handlers.find(handler => handler.object === type && handler.index === index);
             if (paramHandler)
-                return paramHandler.value();
+                return paramHandler.value(this);
 
             if (paramType && paramType.name && !this.isTypePrimitive(paramType.name)) {
                 return this.get(paramType);
@@ -312,7 +312,7 @@ export class ContainerInstance {
                 enumerable: true,
                 writable: true,
                 configurable: true,
-                value: handler.value()
+                value: handler.value(this)
             });
         });
     }

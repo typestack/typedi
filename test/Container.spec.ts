@@ -202,13 +202,13 @@ describe("Container", function() {
             Container.registerHandler({
                 object: ExtraService,
                 index: 0,
-                value: () => 777
+                value: containerInstance => 777
             });
 
             Container.registerHandler({
                 object: ExtraService,
                 index: 1,
-                value: () => "hello parameter"
+                value: containerInstance => "hello parameter"
             });
 
             Container.get(ExtraService).luckyNumber.should.be.equal(777);
@@ -223,7 +223,7 @@ describe("Container", function() {
                     Container.registerHandler({
                         object: target,
                         propertyName: propertyName,
-                        value: () => value
+                        value: containerInstance => value
                     });
                 };
             }

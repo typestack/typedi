@@ -13,7 +13,7 @@ export function Require(name: string) {
             object: target,
             propertyName: propertyName,
             index: index,
-            value: () => require(name)
+            value: containerInstance => require(name)
         });
     };
 }

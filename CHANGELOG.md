@@ -8,3 +8,4 @@
 * deprecated `Require` decorator. Use es6 imports instead or named services
 * inherited classes don't need to be decorated with `@Service` decorator
 * other small api changes
+* now `Handler`'s `value` accepts a container which requests the value

@@ -30,7 +30,7 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>
             object: target,
             propertyName: propertyName,
             index: index,
-            value: () => {
+            value: containerInstance => {
                 let identifier: any;
                 if (typeof typeOrName === "string") {
                     identifier = typeOrName;
@@ -45,7 +45,7 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>
                 if (identifier === Object)
                     throw new CannotInjectError(target, propertyName);
 
-                return Container.get<any>(identifier);
+                return containerInstance.get<any>(identifier);
             }
         });
     };

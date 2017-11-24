@@ -1,3 +1,5 @@
+import {ContainerInstance} from "../ContainerInstance";
+
 /**
  * Used to register special "handler" which will be executed on a service class during its initialization.
  * It can be used to create custom decorators and set/replace service class properties and constructor parameters.
@@ -23,7 +25,8 @@ export interface Handler {
 
     /**
      * Factory function that produces value that will be set to class property or constructor parameter.
+     * Accepts container instance which requested the value.
      */
-    value: () => any;
+    value: (container: ContainerInstance) => any;
 
 }
