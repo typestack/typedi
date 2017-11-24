@@ -5,7 +5,8 @@
 [![Dependency Status](https://david-dm.org/pleerock/typedi.svg)](https://david-dm.org/pleerock/typedi)
 [![Join the chat at https://gitter.im/pleerock/typedi](https://badges.gitter.im/pleerock/typedi.svg)](https://gitter.im/pleerock/typedi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Simple yet powerful dependency injection tool for TypeScript.
+TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for TypeScript.
+Using TypeDI you can build well-structured and easily tested applications.
 
 ## Installation
 
@@ -37,7 +38,7 @@ and you have enabled following settings in `tsconfig.json`:
 
 ## Usage
 
-If you simply want to use a container:
+The most simple usage example is:
 
 ```typescript
 import {Container} from "typedi";
@@ -53,7 +54,26 @@ let someClass = Container.get(SomeClass);
 someClass.someMethod();
 ```
 
-If you want to inject other classes into your service you can do:
+Then you can call `Container.get(SomeClass)` from anywhere in your application
+ and you'll always have the same instance of `SomeClass`.
+ 
+If you want to use more advanced functionality you need to mark your class with `@Service` decorator:
+
+```typescript
+import {Service} from "typedi";
+
+@Service()
+class SomeClass {
+
+    someMethod() {
+    }
+
+}
+```
+
+Its recommended to always use `@Service` decorator on your service classes.
+
+You can services into your class using `@Inject` decorator:
 
 ```typescript
 import {Container, Inject, Service} from "typedi";
@@ -100,7 +120,7 @@ let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
 
-If you want to use constructor injection:
+You can also use a constructor injection:
 
 ```typescript
 import {Container, Service} from "typedi";
@@ -142,13 +162,25 @@ let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
 
-> note: Your classes may not to have `@Service` decorator to use it with Container, however its recommended to add
-`@Service` decorator to all classes you are using with container, because without `@Service` decorator applied
-constructor injection may not work properly in your classes.
+## Advanced usage
+
+* [Named services](#named-services)
+* [Services with token name](#services-with-token-name) 
+* [Using factory function to create service](#using-factory-function-to-create-service) 
+* [Using factory class to create service](#using-factory-class-to-create-service) 
+* [Providing values to the container](#providing-values-to-the-container) 
+* [Problem with circular references](#problem-with-circular-references) 
+* [Inherited injections](#inherited-injections) 
+* [Custom decorators](#custom-decorators) 
+* [Using service groups](#using-service-groups) 
+* [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers) 
+* [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state) 
+
 
 ### Named services
 
-You can use a named services. In this case you can use interface-based services.
+You can use a named services. 
+This feature is especially useful when you want to create a service for the interface.
 
 ```typescript
 import {Container, Service, Inject} from "typedi";
@@ -202,6 +234,24 @@ let coffeeMaker = Container.get<CoffeeMaker>("coffee.maker");
 coffeeMaker.make();
 ```
 
+This feature is also useful if you want to store (and inject later on) some settings or configuration options. 
+For example:
+
+```typescript
+import {Container, Service, Inject} from "typedi";
+
+// somewhere in your global app parameters
+Container.set("authorization-token", "RVT9rVjSVN");
+
+@Service()
+class UserRepository {
+
+    @Inject("authorization-token")
+    authorizationToken: string;
+
+}
+```
+
 ### Services with token name
 
 You can use a services with a `Token` instead of name or target class. 
@@ -240,7 +290,7 @@ export class CoffeeMaker {
 let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 
-let factory = Container.get(FactoryService);
+let factory = Container.get(FactoryService); // factory is instance of Factory
 factory.create();
 ```
 
@@ -356,7 +406,7 @@ export class Engine {
 }
 ```
 
-And that's all. Same for injects for constructor injection.
+And that's all. Same for constructor injections.
 
 ### Inherited injections
 
@@ -368,7 +418,7 @@ For example:
 @Service()
 export abstract class Car {
 
-    @Inject(type => Engine)
+    @Inject()
     engine: Engine;
 
 }
@@ -427,6 +477,116 @@ export class UserRepository {
 }
 ```
 
+### Using service groups
+
+You can group multiple services into single group tagged with service id or token.
+For example:
+
+```typescript
+// Factory.ts
+export interface Factory {
+    create(): any;
+}
+
+// FactoryToken.ts
+export const FactoryToken = new Token<Factory>("factories");
+
+// BeanFactory.ts
+@Service({ id: FactoryToken, multiple: true })
+export class BeanFactory implements Factory {
+
+    create() {
+        console.log("bean created");
+    }
+
+}
+
+// SugarFactory.ts
+@Service({ id: FactoryToken, multiple: true })
+export class SugarFactory implements Factory {
+
+    create() {
+        console.log("sugar created");
+    }
+
+}
+
+// WaterFactory.ts
+@Service({ id: FactoryToken, multiple: true })
+export class WaterFactory implements Factory {
+
+    create() {
+        console.log("water created");
+    }
+
+}
+
+// app.ts
+// now you can get all factories in a single array 
+const factories = Container.getMany(FactoryToken); // factories is Factory[]
+factories.forEach(factory => factory.create());
+``` 
+
+### Using multiple containers and scoped containers
+
+By default all services are stored in the global service container,
+and this global service container holds all unique instances of each service you have.
+
+If you want your services to behave and store data inside differently,
+based on some user context (http request for example) - 
+you can use different containers for different contexts. 
+For example:
+
+```typescript
+// QuestionController.ts
+@Service()
+export class QuestionController {
+
+    constructor(protected questionRepository: QuestionRepository) {
+    }
+
+    save() {
+        this.questionRepository.save();
+    }
+}
+
+// QuestionRepository.ts
+@Service()
+export class QuestionRepository {
+
+    save() {
+    }
+
+}
+
+// app.ts
+const request1 = { param: "question1" };
+const controller1 = Container.of(request1).get(QuestionController);
+controller1.save("Timber");
+Container.reset(request1);
+
+const request2 = { param: "question2" };
+const controller2 = Container.of(request2).get(QuestionController);
+controller2.save("");
+Container.reset(request2);
+```
+
+In this example `controller1` and `controller2` are completely different instances,
+and `QuestionRepository` used in those controllers are different instances as well.
+
+`Container.reset` removes container with the given context identifier.
+If you want your services to be completely global and not be container-specific, 
+you can mark them as global:
+
+```typescript
+@Service({ global: true })
+export class QuestionUtils {
+  
+}
+```
+
+And this global service will be the same instance across all containers.
+
 ### Remove registered services or reset container state
 
 If you need to remove registered service from container simply use `Container.remove(...)` method.
@@ -441,9 +601,9 @@ In order to use typedi with routing-controllers and/or typeorm, it's **necessary
 Otherwise you may face [this kind of issue](https://github.com/pleerock/typedi/issues/4).
 
 ```Typescript
-import { useContainer as routingUseContainer } from 'routing-controllers';
-import { useContainer as ormUseContainer } from 'typeorm';
-import { Container } from "typedi";
+import {useContainer as routingUseContainer} from "routing-controllers";
+import {useContainer as ormUseContainer} from "typeorm";
+import {Container} from "typedi";
 
 routingUseContainer(Container);
 ormUseContainer(Container);
