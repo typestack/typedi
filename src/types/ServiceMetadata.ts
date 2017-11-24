@@ -14,6 +14,17 @@ export interface ServiceMetadata<T, K extends keyof T> {
     type?: Function;
 
     /**
+     * Service scope.
+     *
+     * - "singleton" means container will create a single (global) instance of this class.
+     * - "prototype" means you can have multiple instances the different classes under a single service id string or token.
+     * - "request" - means you'll have different instances of the same class per user request. Implementation depends on http (or other) framework you are using.
+     *
+     * Default is "singleton".
+     */
+    scope?: "singleton"|"prototype"|"request";
+
+    /**
      * Service unique identifier.
      */
     id?: Token<any>|string|Function;
@@ -28,6 +39,6 @@ export interface ServiceMetadata<T, K extends keyof T> {
     /**
      * Instance of the target class.
      */
-    value?: Object;
+    value?: any;
 
 }

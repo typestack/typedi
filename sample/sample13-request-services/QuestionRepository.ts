@@ -1,0 +1,11 @@
+import {Service} from "../../src/decorators/Service";
+
+@Service({ scope: "request" })
+export class QuestionRepository {
+    userName: string;
+
+    save() {
+        console.log(`saving question. author is ${this.userName}`);
+    }
+
+}
