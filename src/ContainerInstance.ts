@@ -20,7 +20,7 @@ export class ContainerInstance {
      * Container instance id.
      */
     id: any;
-    
+
     // -------------------------------------------------------------------------
     // Private Properties
     // -------------------------------------------------------------------------
@@ -37,7 +37,7 @@ export class ContainerInstance {
     constructor(id: any) {
         this.id = id;
     }
-    
+
     // -------------------------------------------------------------------------
     // Public Methods
     // -------------------------------------------------------------------------
@@ -270,7 +270,7 @@ export class ContainerInstance {
         }
 
         if (type)
-            this.applyPropertyHandlers(type);
+            this.applyPropertyHandlers(type, service.value);
 
         return service.value;
     }
@@ -302,18 +302,13 @@ export class ContainerInstance {
     /**
      * Applies all registered handlers on a given target class.
      */
-    private applyPropertyHandlers(target: Function) {
+    private applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
         Container.handlers.forEach(handler => {
-            if (handler.index) return;
+            if (typeof handler.index === "number") return;
             if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor))
                 return;
 
-            Object.defineProperty(handler.object, handler.propertyName, {
-                enumerable: true,
-                writable: true,
-                configurable: true,
-                value: handler.value(this)
-            });
+            instance[handler.propertyName] = handler.value(this);
         });
     }
 
