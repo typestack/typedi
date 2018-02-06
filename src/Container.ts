@@ -50,6 +50,32 @@ export class Container {
     }
 
     /**
+     * Checks if the service with given name or type is registered service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
+    static has<T>(type: ObjectType<T>): boolean;
+
+    /**
+     * Checks if the service with given name or type is registered service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
+    static has<T>(id: string): boolean;
+
+    /**
+     * Checks if the service with given name or type is registered service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
+    static has<T>(id: Token<T>): boolean;
+
+    /**
+     * Checks if the service with given name or type is registered service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
+    static has<T>(identifier: ServiceIdentifier): boolean {
+        return this.globalInstance.has(identifier as any);
+    }
+
+    /**
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */

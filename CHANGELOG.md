@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+* added `Container.has` method
+
 ## 0.6.0
 
 * added multiple containers support
