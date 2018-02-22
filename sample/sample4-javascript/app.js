@@ -1,6 +1,5 @@
-import "reflect-metadata";
-import {Container} from "../../src/index";
-import {CoffeeMaker} from "./CoffeeMaker";
+var Container = require("../../build/compiled/src/index").Container;
+var CoffeeMaker = require("./CoffeeMaker").CoffeeMaker;
 
 Container.of("my-container").set("authorizationToken", "!@#$%^&*");
 let coffeeMaker = Container.of("my-container").get(CoffeeMaker);

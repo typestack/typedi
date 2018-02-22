@@ -25,8 +25,8 @@ class SomeClass {
 
 }
 
-var Container = require("typedi");
-let someClass = Container.get(SomeClass);
+var Container = require("typedi").Container;
+var someClass = Container.get(SomeClass);
 someClass.someMethod();
 ```
 
@@ -67,9 +67,91 @@ class CoffeeMaker {
 
 }
 
-var container = require("typedi");
-var coffeeMaker = container.get(CoffeeMaker);
+var Container = require("typedi").Container;
+var coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
+```
+
+With TypeDI you can use a named services. Example:
+
+```typescript
+var Container = require("typedi").Container;
+
+class BeanFactory implements Factory {
+    create() {
+    }
+}
+
+class SugarFactory implements Factory {
+    create() {
+    }
+}
+
+class WaterFactory implements Factory {
+    create() {
+    }
+}
+
+class CoffeeMaker {
+
+    beanFactory: Factory;
+    sugarFactory: Factory;
+    waterFactory: Factory;
+
+    constructor(container) {
+        this.beanFactory = container.get("bean.factory");
+        this.sugarFactory = container.get("sugar.factory");
+        this.waterFactory = container.get("water.factory");
+    }
+
+    make() {
+        this.beanFactory.create();
+        this.sugarFactory.create();
+        this.waterFactory.create();
+    }
+
+}
+
+Container.set("bean.factory", new BeanFactory(Container));
+Container.set("sugar.factory", new SugarFactory(Container));
+Container.set("water.factory", new WaterFactory(Container));
+Container.set("coffee.factory", new CoffeeMaker(Container));
+
+var coffeeMaker = Container.get("coffee.maker");
+coffeeMaker.make();
+```
+
+This feature especially useful if you want to store (and inject later on) some settings or configuration options.
+For example:
+
+```typescript
+var Container = require("typedi").Container;
+
+// somewhere in your global app parameters
+Container.set("authorization-token", "RVT9rVjSVN");
+
+class UserRepository {
+
+    constructor(container) {
+        this.authorizationToken = container.get("authorization-token");
+    }
+
+}
+```
+
+When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method:
+`provide` methods of the container:
+
+```typescript
+Container.set(CoffeeMaker, new FakeCoffeeMaker());
+
+// or for named services
+
+Container.set([
+    { id: "bean.factory", value: new FakeBeanFactory() },
+    { id: "sugar.factory", value: new FakeSugarFactory() },
+    { id: "water.factory", value: new FakeWaterFactory() }
+]);
 ```
 
 ## Usage with TypeScript
@@ -209,25 +291,7 @@ let coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
 
-## Advanced usage
-
-* [Named services](#named-services)
-* [Services with token name](#services-with-token-name) 
-* [Using factory function to create service](#using-factory-function-to-create-service) 
-* [Using factory class to create service](#using-factory-class-to-create-service) 
-* [Providing values to the container](#providing-values-to-the-container) 
-* [Problem with circular references](#problem-with-circular-references) 
-* [Inherited injections](#inherited-injections) 
-* [Custom decorators](#custom-decorators) 
-* [Using service groups](#using-service-groups) 
-* [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers) 
-* [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state) 
-
-
-### Named services
-
-You can use a named services. 
-This feature is especially useful when you want to create a service for the interface.
+With TypeDI you can use a named services. Example:
 
 ```typescript
 import {Container, Service, Inject} from "typedi";
@@ -281,7 +345,7 @@ let coffeeMaker = Container.get<CoffeeMaker>("coffee.maker");
 coffeeMaker.make();
 ```
 
-This feature is also useful if you want to store (and inject later on) some settings or configuration options. 
+This feature especially useful if you want to store (and inject later on) some settings or configuration options.
 For example:
 
 ```typescript
@@ -298,6 +362,33 @@ class UserRepository {
 
 }
 ```
+
+When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method:
+`provide` methods of the container:
+
+```typescript
+Container.set(CoffeeMaker, new FakeCoffeeMaker());
+
+// or for named services
+
+Container.set([
+    { id: "bean.factory", value: new FakeBeanFactory() },
+    { id: "sugar.factory", value: new FakeSugarFactory() },
+    { id: "water.factory", value: new FakeWaterFactory() }
+]);
+```
+
+## TypeScript Advanced Usage Examples
+
+* [Services with token name](#services-with-token-name) 
+* [Using factory function to create service](#using-factory-function-to-create-service) 
+* [Using factory class to create service](#using-factory-class-to-create-service)
+* [Problem with circular references](#problem-with-circular-references) 
+* [Inherited injections](#inherited-injections) 
+* [Custom decorators](#custom-decorators) 
+* [Using service groups](#using-service-groups) 
+* [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers) 
+* [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state) 
 
 ### Services with token name
 
@@ -395,23 +486,6 @@ class Car {
     constructor(public model: string, public logger: LoggerInterface) {
     }
 }
-```
-
-### Providing values to the container
-
-If you are writing unit tests for you class, you may want to provide fakes to your classes. You can use `set` or
-`provide` methods of the container:
-
-```typescript
-Container.set(CoffeeMaker, new FakeCoffeeMaker());
-
-// or
-
-Container.set([
-    { id: "bean.factory", value: new FakeBeanFactory() },
-    { id: "sugar.factory", value: new FakeSugarFactory() },
-    { id: "water.factory", value: new FakeWaterFactory() }
-]);
 ```
 
 ### Problem with circular references
@@ -658,5 +732,4 @@ ormUseContainer(Container);
 
 ## Samples
 
-Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for more examples of
-usages.
+Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for examples of usage.

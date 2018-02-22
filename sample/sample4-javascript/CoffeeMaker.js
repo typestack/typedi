@@ -1,8 +1,8 @@
-import {BeanFactory} from "./BeanFactory";
-import {SugarFactory} from "./SugarFactory";
-import {WaterFactory} from "./WaterFactory";
+let BeanFactory = require("./BeanFactory").BeanFactory;
+let SugarFactory = require("./SugarFactory").SugarFactory;
+let WaterFactory = require("./WaterFactory").WaterFactory;
 
-export class CoffeeMaker {
+class CoffeeMaker {
 
     constructor(container) {
         this.beanFactory  = container.get(BeanFactory);
@@ -20,3 +20,5 @@ export class CoffeeMaker {
     }
 
 }
+
+module.exports = { CoffeeMaker: CoffeeMaker };
