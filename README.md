@@ -5,44 +5,107 @@
 [![Dependency Status](https://david-dm.org/typestack/typedi.svg)](https://david-dm.org/typestack/typedi)
 [![Join the chat at https://gitter.im/typestack/typedi](https://badges.gitter.im/typestack/typedi.svg)](https://gitter.im/typestack/typedi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for TypeScript.
+TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for JavaScript and TypeScript.
 Using TypeDI you can build well-structured and easily tested applications.
 
-## Installation
+## Usage with JavaScript
 
+Install the module:
+
+`npm install typedi --save`
+
+Now you can use TypeDI.
+The most simple usage example is:
+
+```javascript
+class SomeClass {
+
+    someMethod() {
+    }
+
+}
+
+var Container = require("typedi");
+let someClass = Container.get(SomeClass);
+someClass.someMethod();
+```
+
+Then you can call `Container.get(SomeClass)` from anywhere in your application
+ and you'll always have the same instance of `SomeClass`.
+
+In your class's constructor you always recieve as a last argument a container which you can use to get other dependencies.
+
+```javascript
+class BeanFactory {
+    create() {
+    }
+}
+
+class SugarFactory {
+    create() {
+    }
+}
+
+class WaterFactory {
+    create() {
+    }
+}
+
+class CoffeeMaker {
+
+    constructor(container) {
+        this.beanFactory = container.get(BeanFactory);
+        this.beanFactory = container.get(SugarFactory);
+        this.beanFactory = container.get(WaterFactory);
+    }
+
+    make() {
+        this.beanFactory.create();
+        this.sugarFactory.create();
+        this.waterFactory.create();
+    }
+
+}
+
+var container = require("typedi");
+var coffeeMaker = container.get(CoffeeMaker);
+coffeeMaker.make();
+```
+
+## Usage with TypeScript
 
 1. Install module:
 
     `npm install typedi --save`
 
-2. You also need to install [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package.
+2. Install [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package:
 
     `npm install reflect-metadata --save`
-    
-    and import it somewhere in the global place of your app (for example in `app.ts`):
-    
+
+    and import it somewhere in the global place of your app before any service declaration or import (for example in `app.ts`):
+
     `import "reflect-metadata";`
 
 3. You may need to install node typings:
 
     `npm install @types/node --save`
-    
 
-4. Also make sure you are using TypeScript compiler version > **2.1** 
-and you have enabled following settings in `tsconfig.json`:
+
+4. Enabled following settings in `tsconfig.json`:
 
 ```json
 "emitDecoratorMetadata": true,
 "experimentalDecorators": true,
 ```
 
-## Usage
-
+Now you can use TypeDI.
 The most simple usage example is:
 
 ```typescript
-import {Container} from "typedi";
+import "reflect-metadata";
+import {Service, Container} from "typedi";
 
+@Service()
 class SomeClass {
 
     someMethod() {
@@ -56,24 +119,8 @@ someClass.someMethod();
 
 Then you can call `Container.get(SomeClass)` from anywhere in your application
  and you'll always have the same instance of `SomeClass`.
- 
-If you want to use more advanced functionality you need to mark your class with `@Service` decorator:
 
-```typescript
-import {Service} from "typedi";
-
-@Service()
-class SomeClass {
-
-    someMethod() {
-    }
-
-}
-```
-
-Its recommended to always use `@Service` decorator on your service classes.
-
-You can services into your class using `@Inject` decorator:
+You can use **property injection** and inject services into your class using `@Inject` decorator:
 
 ```typescript
 import {Container, Inject, Service} from "typedi";

@@ -13,6 +13,12 @@ export interface ServiceOptions<T, K extends keyof T> {
     global?: boolean;
 
     /**
+     * Indicates if instance of this class must be created on each its request.
+     * Global option is ignored when this option is used.
+     */
+    transient?: boolean;
+
+    /**
      * Allows to setup multiple instances the different classes under a single service id string or token.
      */
     multiple?: boolean;

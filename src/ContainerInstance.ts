@@ -91,14 +91,11 @@ export class ContainerInstance {
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
     get<T>(identifier: ServiceIdentifier): T {
-        let service = this.findService(identifier);
 
-        // in the case if service was not found registered we search in the global container for this service
-        if (!service) {
-            const globalService = Container.of(undefined).findService(identifier);
-            if (globalService && globalService.global === true)
-                service = globalService;
-        }
+        const globalContainer = Container.of(undefined);
+        let service = globalContainer.findService(identifier);
+        if ((!service || service.global !== true) && globalContainer !== this)
+            service = this.findService(identifier);
 
         return this.getServiceValue(identifier, service);
     }
@@ -271,6 +268,7 @@ export class ContainerInstance {
         let params: any[] = paramTypes ? this.initializeParams(type, paramTypes) : [];
 
         // if factory is set then use it to create service instance
+        let value: any;
         if (service.factory) {
 
             // filter out non-service parameters from created service constructor
@@ -281,10 +279,10 @@ export class ContainerInstance {
             if (service.factory instanceof Array) {
                 // use special [Type, "create"] syntax to allow factory services
                 // in this case Type instance will be obtained from Container and its method "create" will be called
-                service.value = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
+                value = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
 
             } else { // regular factory function
-                service.value = service.factory(...params);
+                value = service.factory(...params);
             }
 
         } else {  // otherwise simply create a new object instance
@@ -293,19 +291,21 @@ export class ContainerInstance {
 
             params.unshift(null);
 
-            // if there are no constructor parameters in the class then pass a container instance into it
+            // "extra feature" - always pass container instance as the last argument to the service function
             // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
             // need to be injected, and user can use provided container to get instances he needs
-            if (params.length === 1)
-                params.push(this);
+            params.push(this);
 
-            service.value = new (type.bind.apply(type, params))();
+            value = new (type.bind.apply(type, params))();
         }
 
-        if (type)
-            this.applyPropertyHandlers(type, service.value);
+        if (service && !service.transient && value)
+            service.value = value;
 
-        return service.value;
+        if (type)
+            this.applyPropertyHandlers(type, value);
+
+        return value;
     }
 
     /**

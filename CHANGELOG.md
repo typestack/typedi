@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0
+
+* added javascript support
+* removed deprecated `@Require` decorator
+* added support for transient services
+* now service constructors cannot accept non-service arguments
+* added `@InjectMany` decorator to support injection of "many" values
+* fixed the way how global services work
+
 ## 0.6.1
 
 * added `Container.has` method

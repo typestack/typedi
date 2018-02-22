@@ -175,10 +175,13 @@ describe("Container", function() {
 
     describe("reset", function() {
         it("should support container reset", () => {
+
+            @Service()
             class TestService {
                 constructor(public name: string = "frank") {
                 }
             }
+
             const testService = new TestService("john");
             Container.set(TestService, testService);
             Container.get(TestService).should.be.equal(testService);

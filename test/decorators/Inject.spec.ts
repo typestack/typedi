@@ -3,6 +3,7 @@ import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators/Service";
 import {Inject} from "../../src/decorators/Inject";
 import {Token} from "../../src/Token";
+import {InjectMany} from "../../src/decorators/InjectMany";
 
 describe("Inject Decorator", function() {
 
@@ -71,6 +72,36 @@ describe("Inject Decorator", function() {
         Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
         Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
         Container.get(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
+    });
+
+    it("should inject service should work with 'many' instances", function() {
+        interface Car {
+            name: string;
+        }
+        @Service({ id: "cars", multiple: true })
+        class Bmw implements Car {
+            name = "BMW";
+        }
+        @Service({ id: "cars", multiple: true })
+        class Mercedes implements Car {
+            name = "Mercedes";
+        }
+        @Service({ id: "cars", multiple: true })
+        class Toyota implements Car {
+            name = "Toyota";
+        }
+        @Service()
+        class TestServiceWithParameters {
+            constructor(@InjectMany("cars") public cars: Car[]) {
+            }
+        }
+
+        Container.get(TestServiceWithParameters).cars.length.should.be.equal(3);
+
+        const carNames = Container.get(TestServiceWithParameters).cars.map(car => car.name);
+        carNames.should.contain("BMW");
+        carNames.should.contain("Mercedes");
+        carNames.should.contain("Toyota");
     });
 
 });

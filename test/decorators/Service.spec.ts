@@ -124,4 +124,63 @@ describe("Service Decorator", function() {
 
     });
 
+    it("should support transient services", function() {
+
+        @Service()
+        class Car {
+            public serial = Math.random();
+        }
+
+        @Service({ transient: true })
+        class Engine {
+            public serial = Math.random();
+        }
+
+        const car1Serial = Container.get(Car).serial;
+        const car2Serial = Container.get(Car).serial;
+        const car3Serial = Container.get(Car).serial;
+
+        const engine1Serial = Container.get(Engine).serial;
+        const engine2Serial = Container.get(Engine).serial;
+        const engine3Serial = Container.get(Engine).serial;
+
+        car1Serial.should.be.equal(car2Serial);
+        car1Serial.should.be.equal(car3Serial);
+
+        engine1Serial.should.not.be.equal(engine2Serial);
+        engine2Serial.should.not.be.equal(engine3Serial);
+        engine3Serial.should.not.be.equal(engine1Serial);
+    });
+
+    it("should support global services", function() {
+
+        @Service()
+        class Engine {
+            public name = "sporty";
+        }
+
+        @Service({ global: true })
+        class Car {
+            public name = "SportCar";
+        }
+
+        const globalContainer = Container;
+        const scopedContainer = Container.of("enigma");
+
+        globalContainer.get(Car).name.should.be.equal("SportCar");
+        scopedContainer.get(Car).name.should.be.equal("SportCar");
+
+        globalContainer.get(Engine).name.should.be.equal("sporty");
+        scopedContainer.get(Engine).name.should.be.equal("sporty");
+
+        globalContainer.get(Car).name = "MyCar";
+        globalContainer.get(Engine).name = "regular";
+
+        globalContainer.get(Car).name.should.be.equal("MyCar");
+        scopedContainer.get(Car).name.should.be.equal("MyCar");
+
+        globalContainer.get(Engine).name.should.be.equal("regular");
+        scopedContainer.get(Engine).name.should.be.equal("sporty");
+    });
+
 });
