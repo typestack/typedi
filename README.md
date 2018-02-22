@@ -8,6 +8,9 @@
 TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for JavaScript and TypeScript.
 Using TypeDI you can build well-structured and easily tested applications.
 
+* [Usage with JavaScript](#usage-with-javascript)
+* [Usage with TypeScript](#usage-with-typescript)
+
 ## Usage with JavaScript
 
 Install the module:
@@ -115,7 +118,7 @@ class CoffeeMaker {
 Container.set("bean.factory", new BeanFactory(Container));
 Container.set("sugar.factory", new SugarFactory(Container));
 Container.set("water.factory", new WaterFactory(Container));
-Container.set("coffee.factory", new CoffeeMaker(Container));
+Container.set("coffee.maker", new CoffeeMaker(Container));
 
 var coffeeMaker = Container.get("coffee.maker");
 coffeeMaker.make();
