@@ -292,6 +292,13 @@ export class ContainerInstance {
                 throw new MissingProvidedServiceTypeError(identifier);
 
             params.unshift(null);
+
+            // if there are no constructor parameters in the class then pass a container instance into it
+            // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
+            // need to be injected, and user can use provided container to get instances he needs
+            if (params.length === 1)
+                params.push(this);
+
             service.value = new (type.bind.apply(type, params))();
         }
 
