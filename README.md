@@ -143,7 +143,6 @@ class UserRepository {
 ```
 
 When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method:
-`provide` methods of the container:
 
 ```typescript
 Container.set(CoffeeMaker, new FakeCoffeeMaker());
