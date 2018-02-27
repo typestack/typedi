@@ -94,8 +94,19 @@ export class ContainerInstance {
 
         const globalContainer = Container.of(undefined);
         let service = globalContainer.findService(identifier);
-        if ((!service || service.global !== true) && globalContainer !== this)
-            service = this.findService(identifier);
+        let scopedService = this.findService(identifier);
+
+        if (service && service.global === true)
+            return this.getServiceValue(identifier, service);
+
+        if (scopedService)
+            return this.getServiceValue(identifier, scopedService);
+
+        if (service && this !== globalContainer) {
+            const clonedService = Object.assign({}, service);
+            clonedService.value = undefined;
+            return this.getServiceValue(identifier, clonedService);
+        }
 
         return this.getServiceValue(identifier, service);
     }
