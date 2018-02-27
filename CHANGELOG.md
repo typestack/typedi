@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+* fixed the way how global services work
+
 ## 0.7.0
 
 * added javascript support
