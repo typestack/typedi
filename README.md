@@ -58,8 +58,8 @@ class CoffeeMaker {
 
     constructor(container) {
         this.beanFactory = container.get(BeanFactory);
-        this.beanFactory = container.get(SugarFactory);
-        this.beanFactory = container.get(WaterFactory);
+        this.sugarFactory = container.get(SugarFactory);
+        this.waterFactory = container.get(WaterFactory);
     }
 
     make() {
