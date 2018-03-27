@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.2
+
+* fixed bug with inherited services
+
 ## 0.7.1
 
 * fixed the way how global services work
