@@ -231,7 +231,7 @@ export class ContainerInstance {
                 return service.id === identifier;
 
             if (service.type && identifier instanceof Function)
-                return service.type === identifier || identifier.prototype instanceof service.type;
+                return service.type === identifier; // todo: not sure why it was here || identifier.prototype instanceof service.type;
 
             return false;
         });
