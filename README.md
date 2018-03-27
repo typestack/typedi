@@ -645,7 +645,12 @@ export class WaterFactory implements Factory {
 }
 
 // app.ts
-// now you can get all factories in a single array 
+// now you can get all factories in a single array
+Container.import([
+    BeanFactory,
+    SugarFactory,
+    WaterFactory,
+]);
 const factories = Container.getMany(FactoryToken); // factories is Factory[]
 factories.forEach(factory => factory.create());
 ``` 
