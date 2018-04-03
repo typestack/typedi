@@ -105,7 +105,9 @@ export class ContainerInstance {
         if (service && this !== globalContainer) {
             const clonedService = Object.assign({}, service);
             clonedService.value = undefined;
-            return this.getServiceValue(identifier, clonedService);
+            const value = this.getServiceValue(identifier, clonedService);
+            this.set(identifier, value);
+            return value;
         }
 
         return this.getServiceValue(identifier, service);
@@ -150,6 +152,11 @@ export class ContainerInstance {
      * Sets a value for the given type or service name in the container.
      */
     set(token: Token<any>, value: any): this;
+
+    /**
+     * Sets a value for the given type or service name in the container.
+     */
+    set(token: ServiceIdentifier, value: any): this;
 
     /**
      * Sets a value for the given type or service name in the container.
