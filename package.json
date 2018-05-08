@@ -1,6 +1,6 @@
 {
   "name": "typedi",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Dependency injection for TypeScript",
   "license": "MIT",
   "readmeFilename": "README.md",
