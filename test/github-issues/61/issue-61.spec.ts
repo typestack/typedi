@@ -32,6 +32,8 @@ describe("github issues > #61 Scoped container creates new instance of service e
         car1Serial.should.not.be.equal(fooCar1Serial);
         car1Serial.should.not.be.equal(barCar1Serial);
         fooCar1Serial.should.not.be.equal(barCar1Serial);
+
+        (Container.of({}).get(Car).serial === Container.of({}).get(Car).serial).should.be.false;
     });
 
 });
