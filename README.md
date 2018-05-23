@@ -36,7 +36,7 @@ someClass.someMethod();
 Then you can call `Container.get(SomeClass)` from anywhere in your application
  and you'll always have the same instance of `SomeClass`.
 
-In your class's constructor you always recieve as a last argument a container which you can use to get other dependencies.
+In your class's constructor you always receive as a last argument a container which you can use to get other dependencies.
 
 ```javascript
 class BeanFactory {
