@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+* added new type of dependency injection - function DI
+
 ## 0.7.2
 
 * fixed bug with inherited services
