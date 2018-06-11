@@ -250,7 +250,7 @@ export class ContainerInstance {
     private getServiceValue(identifier: ServiceIdentifier, service: ServiceMetadata<any, any>|undefined): any {
 
         // find if instance of this object already initialized in the container and return it if it is
-        if (service && service.value !== null && service.value !== undefined)
+        if (service && service.value !== undefined)
             return service.value;
 
         // if named service was requested and its instance was not found plus there is not type to know what to initialize,
