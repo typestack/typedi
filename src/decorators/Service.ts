@@ -1,7 +1,8 @@
-import {ServiceMetadata} from "../types/ServiceMetadata";
-import {Container} from "../Container";
-import {ServiceOptions} from "../types/ServiceOptions";
-import {Token} from "../Token";
+import { ServiceMetadata } from "../types/ServiceMetadata";
+import { Container } from "../Container";
+import { ServiceOptions } from "../types/ServiceOptions";
+import { Token } from "../Token";
+import { createHash } from "crypto";
 
 /**
  * Marks class as a service that can be injected using Container.
@@ -26,8 +27,13 @@ export function Service<T, K extends keyof T>(options?: ServiceOptions<T, K>): F
 /**
  * Marks class as a service that can be injected using container.
  */
-export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOptions<T, K>|Token<any>|string): Function {
-    return function(target: Function) {
+export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOptions<T, K> | Token<any> | string): Function {
+    return function (target: Function) {
+
+        const targetSymbol = Symbol.for(<any>target);
+        const targetUniqueHash = createHash('md5').update(Symbol.keyFor(targetSymbol)).digest("hex");
+        Object.defineProperty(target, 'originalName', { value: target.name || target.constructor.name, writable: false });
+        Object.defineProperty(target, 'name', { value: targetUniqueHash, writable: true });
 
         const service: ServiceMetadata<T, K> = {
             type: target
