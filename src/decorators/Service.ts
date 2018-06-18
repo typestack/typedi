@@ -31,9 +31,9 @@ export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOpti
     return function (target: Function) {
 
         const targetSymbol = Symbol.for(<any>target);
-        const targetUniqueHash = createHash('md5').update(Symbol.keyFor(targetSymbol)).digest("hex");
-        Object.defineProperty(target, 'originalName', { value: target.name || target.constructor.name, writable: false });
-        Object.defineProperty(target, 'name', { value: targetUniqueHash, writable: true });
+        const targetUniqueHash = createHash("md5").update(Symbol.keyFor(targetSymbol)).digest("hex");
+        Object.defineProperty(target, "originalName", { value: target.name || target.constructor.name, writable: false });
+        Object.defineProperty(target, "name", { value: targetUniqueHash, writable: true });
 
         const service: ServiceMetadata<T, K> = {
             type: target
