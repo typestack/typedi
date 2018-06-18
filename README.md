@@ -715,6 +715,27 @@ export class QuestionUtils {
 
 And this global service will be the same instance across all containers.
 
+
+### Container hooks:
+
+```typescript
+@Service()
+export class QuestionUtils implements OnBefore, OnInit {
+  
+  constructor() {
+      // 2
+  }
+
+  OnInit() {
+      // 3 
+  }
+
+  OnBefore() {
+      // 1
+  }
+}
+```
+
 ### Remove registered services or reset container state
 
 If you need to remove registered service from container simply use `Container.remove(...)` method.
