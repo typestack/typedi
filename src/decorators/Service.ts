@@ -30,10 +30,8 @@ export function Service<T, K extends keyof T>(options?: ServiceOptions<T, K>): F
 export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOptions<T, K> | Token<any> | string): Function {
     return function (target: Function) {
 
-        const targetSymbol = Symbol.for(<any>target);
-        const targetUniqueHash = createHash("md5").update(Symbol.keyFor(targetSymbol)).digest("hex");
         Object.defineProperty(target, "originalName", { value: target.name || target.constructor.name, writable: false });
-        Object.defineProperty(target, "name", { value: targetUniqueHash, writable: true });
+        Object.defineProperty(target, "name", { value: createHash("md5").update(`${target}`).digest("hex"), writable: true });
 
         const service: ServiceMetadata<T, K> = {
             type: target
