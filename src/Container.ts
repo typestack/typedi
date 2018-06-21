@@ -1,9 +1,9 @@
-import {ServiceMetadata} from "./types/ServiceMetadata";
-import {ObjectType} from "./types/ObjectType";
-import {Handler} from "./types/Handler";
-import {Token} from "./Token";
-import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ContainerInstance} from "./ContainerInstance";
+import {Token} from "./Token";
+import {Handler} from "./types/Handler";
+import {ObjectType} from "./types/ObjectType";
+import {ServiceIdentifier} from "./types/ServiceIdentifier";
+import {ServiceMetadata} from "./types/ServiceMetadata";
 
 /**
  * Service container.
@@ -97,7 +97,13 @@ export class Container {
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
-    static get<T>(identifier: ServiceIdentifier): T {
+    static get<T>(service: { service: T }): T;
+
+    /**
+     * Retrieves the service with given name or type from the service container.
+     * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+     */
+    static get<T>(identifier: ServiceIdentifier<T>): T {
         return this.globalInstance.get(identifier as any);
     }
 

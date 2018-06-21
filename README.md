@@ -77,7 +77,7 @@ coffeeMaker.make();
 
 With TypeDI you can use a named services. Example:
 
-```typescript
+```javascript
 var Container = require("typedi").Container;
 
 class BeanFactory implements Factory {
@@ -127,7 +127,7 @@ coffeeMaker.make();
 This feature especially useful if you want to store (and inject later on) some settings or configuration options.
 For example:
 
-```typescript
+```javascript
 var Container = require("typedi").Container;
 
 // somewhere in your global app parameters
@@ -144,7 +144,7 @@ class UserRepository {
 
 When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method:
 
-```typescript
+```javascript
 Container.set(CoffeeMaker, new FakeCoffeeMaker());
 
 // or for named services
@@ -154,6 +154,47 @@ Container.set([
     { id: "sugar.factory", value: new FakeSugarFactory() },
     { id: "water.factory", value: new FakeWaterFactory() }
 ]);
+```
+
+TypeDI also supports a function dependency injection. Here is how it looks like:
+
+
+```javascript
+var Service = require("typedi").Service;
+var Container = require("typedi").Container;
+
+var PostRepository = Service(() => ({
+    getName() {
+        return "hello from post repository";
+    }
+}));
+
+var PostManager = Service(() => ({
+    getId() {
+        return "some post id";
+    }
+}));
+
+class PostQueryBuilder {
+    build() {
+        return "SUPER * QUERY";
+    }
+}
+
+var PostController = Service([
+    PostManager,
+    PostRepository,
+    PostQueryBuilder
+], (manager, repository, queryBuilder) => {
+    return {
+        id: manager.getId(),
+        name: repository.getName(),
+        query: queryBuilder.build()
+    };
+});
+
+var postController = Container.get(PostController);
+console.log(postController);
 ```
 
 ## Usage with TypeScript
@@ -715,6 +756,43 @@ export class QuestionUtils {
 
 And this global service will be the same instance across all containers.
 
+TypeDI also supports a function dependency injection. Here is how it looks like:
+
+
+```javascript
+export const PostRepository = Service(() => ({
+    getName() {
+        return "hello from post repository";
+    }
+}));
+
+export const PostManager = Service(() => ({
+    getId() {
+        return "some post id";
+    }
+}));
+
+export class PostQueryBuilder {
+    build() {
+        return "SUPER * QUERY";
+    }
+}
+
+export const PostController = Service([
+    PostManager,
+    PostRepository,
+    PostQueryBuilder
+], (manager, repository, queryBuilder) => {
+    return {
+        id: manager.getId(),
+        name: repository.getName(),
+        query: queryBuilder.build()
+    };
+});
+
+const postController = Container.get(PostController);
+console.log(postController);
+```
 
 ### Container hooks:
 
