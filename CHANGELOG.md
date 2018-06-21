@@ -3,6 +3,7 @@
 ## 0.8.0
 
 * added new type of dependency injection - function DI
+* now null can be stored in the container for values
 
 ## 0.7.2
 
