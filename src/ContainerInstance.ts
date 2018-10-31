@@ -316,10 +316,12 @@ export class ContainerInstance {
             if (service.factory instanceof Array) {
                 // use special [Type, "create"] syntax to allow factory services
                 // in this case Type instance will be obtained from Container and its method "create" will be called
-                value = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
+                value = (this.get(service.factory[0]) as any)[service.factory[1]](...params, this, identifier);
 
             } else { // regular factory function
-                value = service.factory(...params, this);
+                // Passing identifier to allow factory function to get a reference to token. This is useful for factory
+                // functions that handles the creation of multiple types of services
+                value = service.factory(...params, this, identifier);
             }
 
         } else {  // otherwise simply create a new object instance
@@ -331,7 +333,7 @@ export class ContainerInstance {
             // "extra feature" - always pass container instance as the last argument to the service function
             // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
             // need to be injected, and user can use provided container to get instances he needs
-            params.push(this);
+            params.push(this, identifier);
 
             value = new (type.bind.apply(type, params))();
         }
