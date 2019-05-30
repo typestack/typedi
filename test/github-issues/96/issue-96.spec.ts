@@ -1,6 +1,6 @@
 import "reflect-metadata";
-import {Container} from "../../../src/Container";
-import {expect} from "chai";
+import { Container } from "../../../src/Container";
+import { expect } from "chai";
 import { A } from "./A";
 import { CircularImportError } from "../../../src/error/CircularImportError";
 

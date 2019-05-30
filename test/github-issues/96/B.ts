@@ -13,6 +13,7 @@ import { C } from "./A";
 // A imports B
 // A is defined and has metadata for :paramtypes [B]
 // A is exported
+// C is exported
 //
 // Later when typedi resolves A, then B, then C it silently will fail to resolve C
 // and B will end up with a null reference to C which can end up failing much later
