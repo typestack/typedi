@@ -5,6 +5,7 @@ import {Token} from "./Token";
 import {ObjectType} from "./types/ObjectType";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceMetadata} from "./types/ServiceMetadata";
+import { CircularImportError } from "./error/CircularImportError";
 
 /**
  * TypeDI can have multiple containers.
@@ -350,6 +351,9 @@ export class ContainerInstance {
      */
     private initializeParams(type: Function, paramTypes: any[]): any[] {
         return paramTypes.map((paramType, index) => {
+            if (paramType === undefined) {
+                throw new CircularImportError(type, index);
+            }
             const paramHandler = Container.handlers.find(handler => handler.object === type && handler.index === index);
             if (paramHandler)
                 return paramHandler.value(this);
