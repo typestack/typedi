@@ -183,7 +183,7 @@ export class ContainerInstance {
         if (typeof identifierOrServiceMetadata === "object" && (identifierOrServiceMetadata as { service: Token<any> }).service) {
             return this.set({ id: (identifierOrServiceMetadata as { service: Token<any> }).service, value: value });
         }
-        if (identifierOrServiceMetadata instanceof Function) {
+        if (typeof identifierOrServiceMetadata === 'function') {
             return this.set({ type: identifierOrServiceMetadata, id: identifierOrServiceMetadata, value: value });
         }
 
@@ -231,7 +231,7 @@ export class ContainerInstance {
             if (service.id)
                 return service.id === identifier;
 
-            if (service.type && identifier instanceof Function)
+            if (service.type && typeof identifier === 'function')
                 return service.type === identifier || identifier.prototype instanceof service.type;
 
             return false;
@@ -253,7 +253,7 @@ export class ContainerInstance {
                 return service.id === identifier;
             }
 
-            if (service.type && identifier instanceof Function)
+            if (service.type && typeof identifier === 'function')
                 return service.type === identifier; // todo: not sure why it was here || identifier.prototype instanceof service.type;
 
             return false;
@@ -281,10 +281,10 @@ export class ContainerInstance {
         if (service && service.type) {
             type = service.type;
 
-        } else if (service && service.id instanceof Function) {
+        } else if (service && typeof service.id === 'function') {
             type = service.id;
 
-        } else if (identifier instanceof Function) {
+        } else if (typeof identifier === 'function') {
             type = identifier;
 
         // } else if (identifier instanceof Object && (identifier as { service: Token<any> }).service instanceof Token) {
