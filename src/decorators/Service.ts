@@ -75,7 +75,7 @@ export function Service<T, K extends keyof T>(options?: ServiceOptions<T, K>): F
  * Marks class as a service that can be injected using container.
  */
 export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOptions<T, K>|Token<any>|string|any[]|(() => any), maybeFactory?: (...args: any[]) => any): any {
-    if (arguments.length === 2 || (optionsOrServiceName instanceof Function)) {
+    if (arguments.length === 2 || typeof optionsOrServiceName === "function") {
         const serviceId = { service: new Token<T>() };
         const dependencies = arguments.length === 2 ? optionsOrServiceName as any[] : [];
         const factory = arguments.length === 2 ? maybeFactory : optionsOrServiceName as Function;
