@@ -5,7 +5,7 @@ import {ServiceMetadata} from "../types/ServiceMetadata";
 import {ServiceOptions} from "../types/ServiceOptions";
 
 
-export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 };
+export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 } | Token<T1>;
 
 export function Service<R>(
     factory: () => R

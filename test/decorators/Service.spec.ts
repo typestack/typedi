@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import {Container} from "../../src/Container";
 import {Service} from "../../src/decorators/Service";
+import {Token} from "../../src/Token";
 
 describe("Service Decorator", function() {
 
@@ -181,6 +182,20 @@ describe("Service Decorator", function() {
 
         globalContainer.get(Engine).name.should.be.equal("regular");
         scopedContainer.get(Engine).name.should.be.equal("sporty");
+    });
+
+    it("should support function injection with Token dependencies", function() {
+        const token: Token<string> = new Token<string>("token");
+
+        Container.set(token, "test_string");
+
+        const TestService = Service([
+            token
+        ], function (s: string): string {
+            return s.toUpperCase();
+        });
+
+        Container.get(TestService).should.be.equal("TEST_STRING");
     });
 
 });
