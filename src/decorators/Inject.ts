@@ -1,6 +1,7 @@
 import {Container} from "../Container";
 import {Token} from "../Token";
 import {CannotInjectError} from "../error/CannotInjectError";
+import {ServiceDefinition} from "../types/ServiceDefinition";
 
 /**
  * Injects a service into a class property or constructor parameter.
@@ -20,7 +21,7 @@ export function Inject(token: Token<any>): Function;
 /**
  * Injects a service into a class property or constructor parameter.
  */
-export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>): Function {
+export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>|ServiceDefinition<any>): Function {
     return function(target: Object, propertyName: string, index?: number) {
 
         if (!typeOrName)
@@ -38,8 +39,12 @@ export function Inject(typeOrName?: ((type?: any) => Function)|string|Token<any>
                 } else if (typeOrName instanceof Token) {
                     identifier = typeOrName;
 
-                } else {
+                } else if (typeOrName instanceof Function) {
                     identifier = typeOrName();
+
+                } else {
+                    identifier = typeOrName.service;
+
                 }
 
                 if (identifier === Object)

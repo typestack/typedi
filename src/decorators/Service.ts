@@ -3,53 +3,54 @@ import {ContainerInstance} from "../ContainerInstance";
 import {Token} from "../Token";
 import {ServiceMetadata} from "../types/ServiceMetadata";
 import {ServiceOptions} from "../types/ServiceOptions";
+import {ServiceDefinition} from "../types/ServiceDefinition";
+import {ObjectType} from "../types/ObjectType";
 
-
-export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 };
+export type Dependency<T1> = ObjectType<T1> | ServiceDefinition<T1>;
 
 export function Service<R>(
     factory: () => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1>(
-    dependencies: [ObjectType<T1>],
+    dependencies: [Dependency<T1>],
     factory: (dependency1: T1) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>],
+    dependencies: [Dependency<T1>, Dependency<T2>],
     factory: (dependency1: T1, dependency2: T2) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4, T5>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>, ObjectType<T5>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>, Dependency<T5>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4, dependency5: T5) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4, T5, T6>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>, ObjectType<T5>, ObjectType<T6>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>, Dependency<T5>, Dependency<T6>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4, dependency5: T5, dependency6: T6) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4, T5, T6, T7>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>, ObjectType<T5>, ObjectType<T6>, ObjectType<T7>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>, Dependency<T5>, Dependency<T6>, Dependency<T7>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4, dependency5: T5, dependency6: T6, dependency7: T7) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4, T5, T6, T7, T8>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>, ObjectType<T5>, ObjectType<T6>, ObjectType<T7>, ObjectType<T8>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>, Dependency<T5>, Dependency<T6>, Dependency<T7>, Dependency<T8>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4, dependency5: T5, dependency6: T6, dependency7: T7, dependency8: T8) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4, T5, T6, T7, T8, T9>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>, ObjectType<T5>, ObjectType<T6>, ObjectType<T7>, ObjectType<T8>, ObjectType<T9>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>, Dependency<T5>, Dependency<T6>, Dependency<T7>, Dependency<T8>, Dependency<T9>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4, dependency5: T5, dependency6: T6, dependency7: T7, dependency8: T8, dependency9: T9) => R
-): { service: R };
+): ServiceDefinition<R>;
 export function Service<R, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
-    dependencies: [ObjectType<T1>, ObjectType<T2>, ObjectType<T3>, ObjectType<T4>, ObjectType<T5>, ObjectType<T6>, ObjectType<T7>, ObjectType<T8>, ObjectType<T9>, ObjectType<T10>],
+    dependencies: [Dependency<T1>, Dependency<T2>, Dependency<T3>, Dependency<T4>, Dependency<T5>, Dependency<T6>, Dependency<T7>, Dependency<T8>, Dependency<T9>, Dependency<T10>],
     factory: (dependency1: T1, dependency2: T2, dependency3: T3, dependency4: T4, dependency5: T5, dependency6: T6, dependency7: T7, dependency8: T8, dependency9: T9, dependency10: T10) => R
-): { service: R };
+): ServiceDefinition<R>;
 
 /**
  * Marks class as a service that can be injected using Container.

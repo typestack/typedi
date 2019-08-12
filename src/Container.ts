@@ -4,6 +4,7 @@ import {Handler} from "./types/Handler";
 import {ObjectType} from "./types/ObjectType";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceMetadata} from "./types/ServiceMetadata";
+import { ServiceDefinition } from "./types/ServiceDefinition";
 
 /**
  * Service container.
@@ -97,7 +98,7 @@ export class Container {
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
-    static get<T>(service: { service: T }): T;
+    static get<T>(service: ServiceDefinition<T>): T;
 
     /**
      * Retrieves the service with given name or type from the service container.

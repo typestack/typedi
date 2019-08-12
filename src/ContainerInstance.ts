@@ -5,6 +5,7 @@ import {Token} from "./Token";
 import {ObjectType} from "./types/ObjectType";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceMetadata} from "./types/ServiceMetadata";
+import { ServiceDefinition } from "./types/ServiceDefinition";
 
 /**
  * TypeDI can have multiple containers.
@@ -90,7 +91,7 @@ export class ContainerInstance {
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
      */
-    get<T>(id: { service: T }): T;
+    get<T>(id: ServiceDefinition<T>): T;
 
     /**
      * Retrieves the service with given name or type from the service container.
@@ -180,8 +181,8 @@ export class ContainerInstance {
         if (typeof identifierOrServiceMetadata === "string" || identifierOrServiceMetadata instanceof Token) {
             return this.set({ id: identifierOrServiceMetadata, value: value });
         }
-        if (typeof identifierOrServiceMetadata === "object" && (identifierOrServiceMetadata as { service: Token<any> }).service) {
-            return this.set({ id: (identifierOrServiceMetadata as { service: Token<any> }).service, value: value });
+        if (typeof identifierOrServiceMetadata === "object" && (identifierOrServiceMetadata as ServiceDefinition<Token<any>>).service) {
+            return this.set({ id: (identifierOrServiceMetadata as ServiceDefinition<Token<any>>).service, value: value });
         }
         if (identifierOrServiceMetadata instanceof Function) {
             return this.set({ type: identifierOrServiceMetadata, id: identifierOrServiceMetadata, value: value });
@@ -287,8 +288,8 @@ export class ContainerInstance {
         } else if (identifier instanceof Function) {
             type = identifier;
 
-        // } else if (identifier instanceof Object && (identifier as { service: Token<any> }).service instanceof Token) {
-        //     type = (identifier as { service: Token<any> }).service;
+        // } else if (identifier instanceof Object && (identifier as ServiceDefinition<Token<any>>).service instanceof Token) {
+        //     type = (identifier as ServiceDefinition<Token<any>>).service;
         }
 
         // if service was not found then create a new one and register it
