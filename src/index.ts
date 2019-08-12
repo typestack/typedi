@@ -10,6 +10,7 @@ export {Handler} from "./types/Handler";
 export {ServiceOptions} from "./types/ServiceOptions";
 export {ServiceIdentifier} from "./types/ServiceIdentifier";
 export {ServiceMetadata} from "./types/ServiceMetadata";
+export {ServiceDefinition} from "./types/ServiceDefinition";
 export {ObjectType} from "./types/ObjectType";
 
 export default Container;
