@@ -43,6 +43,10 @@ export class Container {
         let container = this.instances.find(instance => instance.id === instanceId);
         if (!container) {
             container = new ContainerInstance(instanceId);
+            container.services.push(...this.globalInstance.services.map(s => ({
+                ...s,
+                value: s.global ? s.value : undefined
+            })));
             this.instances.push(container);
         }
 

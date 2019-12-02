@@ -28,7 +28,7 @@ export class ContainerInstance {
     /**
      * All registered services.
      */
-    private services: ServiceMetadata<any, any>[] = [];
+    public services: ServiceMetadata<any, any>[] = [];
 
     // -------------------------------------------------------------------------
     // Constructor
@@ -287,8 +287,8 @@ export class ContainerInstance {
         } else if (identifier instanceof Function) {
             type = identifier;
 
-        // } else if (identifier instanceof Object && (identifier as { service: Token<any> }).service instanceof Token) {
-        //     type = (identifier as { service: Token<any> }).service;
+            // } else if (identifier instanceof Object && (identifier as { service: Token<any> }).service instanceof Token) {
+            //     type = (identifier as { service: Token<any> }).service;
         }
 
         // if service was not found then create a new one and register it
