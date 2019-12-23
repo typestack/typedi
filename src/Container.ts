@@ -145,7 +145,7 @@ export class Container {
     /**
      * Sets a value for the given type or service name in the container.
      */
-    static set(token: Token<any>, value: any): Container;
+    static set<T>(token: Token<T>, value: T): Container;
 
     /**
      * Sets a value for the given type or service name in the container.
