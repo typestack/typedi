@@ -73,4 +73,30 @@ describe("Inject Decorator", function() {
         Container.get(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
     });
 
+    it("should inject service via constructor with anonymous classes", function() {
+        const ExampleDecorator = (target: any): any => class extends target {};
+
+        @Service()
+        class TestService {
+        }
+        @Service()
+        class SecondTestService {
+        }
+        @Service("mega.service")
+        class NamedService {
+        }
+        @Service()
+        @ExampleDecorator
+        class TestServiceWithParameters {
+            constructor(
+                public testClass: TestService,
+                @Inject(type => SecondTestService) public secondTest: any,
+                @Inject("mega.service") public megaService: any
+            ) {
+            }
+        }
+        Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
+        Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
+        Container.get(TestServiceWithParameters).megaService.should.be.instanceOf(NamedService);
+    });
 });

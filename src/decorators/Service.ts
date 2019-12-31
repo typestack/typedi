@@ -27,10 +27,14 @@ export function Service<T, K extends keyof T>(options?: ServiceOptions<T, K>): F
  * Marks class as a service that can be injected using container.
  */
 export function Service<T, K extends keyof T>(optionsOrServiceName?: ServiceOptions<T, K>|Token<any>|string): Function {
+
+    const getNamedClass: Function = (target: Function) => /^(function|class)\s+(class_\d+|extends)/.test(target.toString())
+        ? getNamedClass(Object.getPrototypeOf(target)) : target;
+
     return function(target: Function) {
 
         const service: ServiceMetadata<T, K> = {
-            type: target
+            type: getNamedClass(target)
         };
 
         if (typeof optionsOrServiceName === "string" || optionsOrServiceName instanceof Token) {
