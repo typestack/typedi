@@ -2,7 +2,7 @@ import {Container} from "./Container";
 import {MissingProvidedServiceTypeError} from "./error/MissingProvidedServiceTypeError";
 import {ServiceNotFoundError} from "./error/ServiceNotFoundError";
 import {Token} from "./Token";
-import {ObjectType} from "./types/ObjectType";
+import {ObjectType, AbstractObjectType} from "./types/ObjectType";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceMetadata} from "./types/ServiceMetadata";
 
@@ -68,6 +68,12 @@ export class ContainerInstance {
         return !!this.findService(identifier);
     }
 
+    /**
+    * Retrieves the service with given name or type from the service container.
+    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+    */
+    get<T>(id: AbstractObjectType<T>): T;
+    
     /**
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.

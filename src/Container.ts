@@ -1,7 +1,7 @@
 import {ContainerInstance} from "./ContainerInstance";
 import {Token} from "./Token";
 import {Handler} from "./types/Handler";
-import {ObjectType} from "./types/ObjectType";
+import {ObjectType, AbstractObjectType} from "./types/ObjectType";
 import {ServiceIdentifier} from "./types/ServiceIdentifier";
 import {ServiceMetadata} from "./types/ServiceMetadata";
 
@@ -75,6 +75,12 @@ export class Container {
         return this.globalInstance.has(identifier as any);
     }
 
+    /**
+    * Retrieves the service with given name or type from the service container.
+    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
+    */
+    static get<T>(id: AbstractObjectType<T>): T;
+    
     /**
      * Retrieves the service with given name or type from the service container.
      * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
