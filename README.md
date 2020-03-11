@@ -462,7 +462,7 @@ export class CoffeeMaker {
     
     private factory: Factory;
 
-    constructor(@Inject(type => FactoryService) factory: Factory) {
+    constructor(@Inject(FactoryService) factory: Factory) {
         this.factory = factory;
     }
 
