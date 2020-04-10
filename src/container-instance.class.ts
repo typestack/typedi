@@ -5,6 +5,9 @@ import { Token } from './token.class';
 import { Constructable } from './types/constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface.';
+import { AsyncInitializedService } from './types/AsyncInitializedService';
+import { MissingInitializedPromiseError } from './error/MissingInitializedPromiseError';
+
 
 /**
  * TypeDI can have multiple containers.
@@ -113,6 +116,74 @@ export class ContainerInstance {
     }
 
     return this.getServiceValue(identifier, service);
+  }
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  getAsync<T>(type: ObjectType<T>): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  getAsync<T>(id: string): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  getAsync<T>(id: Token<T>): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  getAsync<T>(id: { service: T }): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  getAsync<T>(identifier: ServiceIdentifier<T>): Promise<T> {
+    const globalContainer = Container.of(undefined);
+    const service = globalContainer.findService(identifier);
+    const scopedService = this.findService(identifier);
+
+    if (service && service.global === true) return this.getServiceValueAsync(identifier, service);
+
+    if (scopedService) return this.getServiceValueAsync(identifier, scopedService);
+
+    if (service && this !== globalContainer) {
+      const clonedService = Object.assign({}, service);
+      clonedService.value = undefined;
+      const value = this.getServiceValueAsync(identifier, clonedService);
+      this.set(identifier, value);
+      return value;
+    }
+
+    return this.getServiceValueAsync(identifier, service);
+  }
+
+  /**
+   * Like getMany, but returns a promise that recursively resolves async properties on all services.
+   * Used when services defined with multiple: true and asyncInitialization: true flags.
+   */
+  getManyAsync<T>(id: string): T[];
+
+  /**
+   * Like getMany, but returns a promise that recursively resolves async properties on all services.
+   * Used when services defined with multiple: true and asyncInitialization: true flags.
+   */
+  getManyAsync<T>(id: Token<T>): T[];
+
+  /**
+   * Like getMany, but returns a promise that recursively resolves async properties on all services.
+   * Used when services defined with multiple: true and asyncInitialization: true flags.
+   */
+  getManyAsync<T>(id: string | Token<T>): Promise<T>[] {
+    return this.filterServices(id).map(service => this.getServiceValueAsync(id, service));
   }
 
   /**
@@ -345,6 +416,100 @@ export class ContainerInstance {
   }
 
   /**
+   * Gets a promise of an initialized AsyncService value.
+   */
+  private async getServiceValueAsync(
+    identifier: ServiceIdentifier,
+    service: ServiceMetadata<any, any> | undefined
+  ): Promise<any> {
+    // find if instance of this object already initialized in the container and return it if it is
+    if (service && service.value !== undefined) return service.value;
+
+    // if named service was requested and its instance was not found plus there is not type to know what to initialize,
+    // this means service was not pre-registered and we throw an exception
+    if (
+      (!service || !service.type) &&
+      (!service || !service.factory) &&
+      (typeof identifier === 'string' || identifier instanceof Token)
+    )
+      throw new ServiceNotFoundError(identifier);
+
+    // at this point we either have type in service registered, either identifier is a target type
+    let type = undefined;
+    if (service && service.type) {
+      type = service.type;
+    } else if (service && service.id instanceof Function) {
+      type = service.id;
+    } else if (identifier instanceof Function) {
+      type = identifier;
+
+      // } else if (identifier instanceof Object && (identifier as { service: Token<any> }).service instanceof Token) {
+      //     type = (identifier as { service: Token<any> }).service;
+    }
+
+    // if service was not found then create a new one and register it
+    if (!service) {
+      if (!type) throw new MissingProvidedServiceTypeError(identifier);
+
+      service = { type: type };
+      this.services.push(service);
+    }
+
+    // setup constructor parameters for a newly initialized service
+    const paramTypes =
+      type && Reflect && (Reflect as any).getMetadata
+        ? (Reflect as any).getMetadata('design:paramtypes', type)
+        : undefined;
+    let params: any[] = paramTypes ? await Promise.all(this.initializeParamsAsync(type, paramTypes)) : [];
+
+    // if factory is set then use it to create service instance
+    let value: any;
+    if (service.factory) {
+      // filter out non-service parameters from created service constructor
+      // non-service parameters can be, lets say Car(name: string, isNew: boolean, engine: Engine)
+      // where name and isNew are non-service parameters and engine is a service parameter
+      params = params.filter(param => param !== undefined);
+
+      if (service.factory instanceof Array) {
+        // use special [Type, "create"] syntax to allow factory services
+        // in this case Type instance will be obtained from Container and its method "create" will be called
+        value = (await this.getAsync(service.factory[0]))[service.factory[1]](...params);
+      } else {
+        // regular factory function
+        value = service.factory(...params, this);
+      }
+    } else {
+      // otherwise simply create a new object instance
+      if (!type) throw new MissingProvidedServiceTypeError(identifier);
+
+      params.unshift(null);
+
+      // "extra feature" - always pass container instance as the last argument to the service function
+      // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
+      // need to be injected, and user can use provided container to get instances he needs
+      params.push(this);
+
+      // eslint-disable-next-line prefer-spread
+      value = new (type.bind.apply(type, params))();
+    }
+
+    if (service && !service.transient && value) service.value = value;
+
+    if (type) this.applyPropertyHandlers(type, value);
+
+    if (value instanceof AsyncInitializedService || service.asyncInitialization) {
+      return new Promise((resolve) => {
+        if (!(value.initialized instanceof Promise) && service.asyncInitialization) {
+            throw new MissingInitializedPromiseError(service.value);
+        }
+
+        value.initialized.then(() => resolve(value));
+      });
+    }
+    return Promise.resolve(value);
+  }
+
+  /**
    * Initializes all parameter types for a given target service class.
    */
   private initializeParams(type: Function, paramTypes: any[]): any[] {
@@ -354,6 +519,22 @@ export class ContainerInstance {
 
       if (paramType && paramType.name && !this.isTypePrimitive(paramType.name)) {
         return this.get(paramType);
+      }
+
+      return undefined;
+    });
+  }
+
+  /**
+   * Returns array of promises for all initialized parameter types for a given target service class.
+   */
+  private initializeParamsAsync(type: Function, paramTypes: any[]): Array<Promise<any> | undefined> {
+    return paramTypes.map((paramType, index) => {
+      const paramHandler = Container.handlers.find(handler => handler.object === type && handler.index === index);
+      if (paramHandler) return Promise.resolve(paramHandler.value(this));
+
+      if (paramType && paramType.name && !this.isTypePrimitive(paramType.name)) {
+        return this.getAsync(paramType);
       }
 
       return undefined;

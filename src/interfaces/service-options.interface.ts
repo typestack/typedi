@@ -31,4 +31,9 @@ export interface ServiceOptions<T, K extends keyof T> {
    * Factory used to produce this service.
    */
   factory?: [Constructable<T>, K] | ((...params: any[]) => any);
+
+  /**
+   * Will call instance's #initialize method and resolve the promise it returns when getting with Container.getAsync() and Container.getManyAsync().
+   */
+  asyncInitialization?: boolean;
 }
