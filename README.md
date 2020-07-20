@@ -80,10 +80,6 @@ With TypeDI you can use a named services. Example:
 ```javascript
 var Container = require("typedi").Container;
 
-interface Factory {
-    create(): void;
-}
-
 class BeanFactory implements Factory {
     create() {
     }
