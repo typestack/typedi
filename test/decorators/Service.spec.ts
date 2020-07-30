@@ -1,186 +1,163 @@
-import "reflect-metadata";
-import {Container} from "../../src/Container";
-import {Service} from "../../src/decorators/Service";
+import 'reflect-metadata';
+import { Container } from '../../src/Container';
+import { Service } from '../../src/decorators/Service';
 
-describe("Service Decorator", function() {
+describe('Service Decorator', function () {
+  beforeEach(() => Container.reset());
 
-    beforeEach(() => Container.reset());
+  it('should register class in the container, and its instance should be retrievable', function () {
+    @Service()
+    class TestService {}
+    @Service('super.service')
+    class NamedService {}
+    expect(Container.get(TestService)).toBeInstanceOf(TestService);
+    expect(Container.get(TestService)).not.toBeInstanceOf(NamedService);
+  });
 
-    it("should register class in the container, and its instance should be retrievable", function() {
-        @Service()
-        class TestService {
-        }
-        @Service("super.service")
-        class NamedService {
-        }
-        Container.get(TestService).should.be.instanceOf(TestService);
-        Container.get(TestService).should.not.be.instanceOf(NamedService);
-    });
+  it('should register class in the container with given name, and its instance should be retrievable', function () {
+    @Service()
+    class TestService {}
+    @Service('super.service')
+    class NamedService {}
+    expect(Container.get('super.service')).toBeInstanceOf(NamedService);
+    expect(Container.get('super.service')).not.toBeInstanceOf(TestService);
+  });
 
-    it("should register class in the container with given name, and its instance should be retrievable", function() {
-        @Service()
-        class TestService {
-        }
-        @Service("super.service")
-        class NamedService {
-        }
-        Container.get("super.service").should.be.instanceOf(NamedService);
-        Container.get("super.service").should.not.be.instanceOf(TestService);
-    });
+  it('should register class in the container, and its parameter dependencies should be properly initialized', function () {
+    @Service()
+    class TestService {}
+    @Service()
+    class SecondTestService {}
+    @Service()
+    class TestServiceWithParameters {
+      constructor(public testClass: TestService, public secondTest: SecondTestService) {}
+    }
+    expect(Container.get(TestServiceWithParameters)).toBeInstanceOf(TestServiceWithParameters);
+    expect(Container.get(TestServiceWithParameters).testClass).toBeInstanceOf(TestService);
+    expect(Container.get(TestServiceWithParameters).secondTest).toBeInstanceOf(SecondTestService);
+  });
 
-    it("should register class in the container, and its parameter dependencies should be properly initialized", function() {
-        @Service()
-        class TestService {
-        }
-        @Service()
-        class SecondTestService {
-        }
-        @Service()
-        class TestServiceWithParameters {
-            constructor(public testClass: TestService, public secondTest: SecondTestService) {
-            }
-        }
-        Container.get(TestServiceWithParameters).should.be.instanceOf(TestServiceWithParameters);
-        Container.get(TestServiceWithParameters).testClass.should.be.instanceOf(TestService);
-        Container.get(TestServiceWithParameters).secondTest.should.be.instanceOf(SecondTestService);
-    });
+  it('should support factory functions', function () {
+    class Engine {
+      constructor(public serialNumber: string) {}
+    }
 
-    it("should support factory functions", function() {
+    function createCar() {
+      return new Car('BMW', new Engine('A-123'));
+    }
 
-        class Engine {
-            constructor(public serialNumber: string) {
-            }
-        }
+    @Service({ factory: createCar })
+    class Car {
+      constructor(public name: string, public engine: Engine) {}
+    }
 
-        function createCar() {
-            return new Car("BMW", new Engine("A-123"));
-        }
+    expect(Container.get(Car).name).toBe('BMW');
+    expect(Container.get(Car).engine.serialNumber).toBe('A-123');
+  });
 
-        @Service({ factory: createCar })
-        class Car {
-            constructor(public name: string, public engine: Engine) {
-            }
-        }
+  it('should support factory classes', function () {
+    @Service()
+    class Engine {
+      public serialNumber = 'A-123';
+    }
 
-        Container.get(Car).name.should.be.equal("BMW");
-        Container.get(Car).engine.serialNumber.should.be.equal("A-123");
+    @Service()
+    class CarFactory {
+      constructor(public engine: Engine) {}
 
-    });
+      createCar() {
+        return new Car('BMW', this.engine);
+      }
+    }
 
-    it("should support factory classes", function() {
+    @Service({ factory: [CarFactory, 'createCar'] })
+    class Car {
+      name: string;
+      constructor(name: string, public engine: Engine) {
+        this.name = name;
+      }
+    }
 
-        @Service()
-        class Engine {
-            public serialNumber = "A-123";
-        }
+    expect(Container.get(Car).name).toBe('BMW');
+    expect(Container.get(Car).engine.serialNumber).toBe('A-123');
+  });
 
-        @Service()
-        class CarFactory {
+  it('should support factory function with arguments', function () {
+    @Service()
+    class Engine {
+      public type = 'V8';
+    }
 
-            constructor(public engine: Engine) {
-            }
+    @Service()
+    class CarFactory {
+      createCar(engine: Engine) {
+        engine.type = 'V6';
+        return new Car(engine);
+      }
+    }
 
-            createCar() {
-                return new Car("BMW", this.engine);
-            }
+    @Service({ factory: [CarFactory, 'createCar'] })
+    class Car {
+      constructor(public engine: Engine) {}
+    }
 
-        }
+    expect(Container.get(Car).engine.type).toBe('V6');
+  });
 
-        @Service({ factory: [CarFactory, "createCar"] })
-        class Car {
-            name: string;
-            constructor(name: string, public engine: Engine) {
-                this.name = name;
-            }
-        }
+  it('should support transient services', function () {
+    @Service()
+    class Car {
+      public serial = Math.random();
+    }
 
-        Container.get(Car).name.should.be.equal("BMW");
-        Container.get(Car).engine.serialNumber.should.be.equal("A-123");
+    @Service({ transient: true })
+    class Engine {
+      public serial = Math.random();
+    }
 
-    });
+    const car1Serial = Container.get(Car).serial;
+    const car2Serial = Container.get(Car).serial;
+    const car3Serial = Container.get(Car).serial;
 
-    it("should support factory function with arguments", function() {
+    const engine1Serial = Container.get(Engine).serial;
+    const engine2Serial = Container.get(Engine).serial;
+    const engine3Serial = Container.get(Engine).serial;
 
-        @Service()
-        class Engine {
-            public type = "V8";
-        }
+    expect(car1Serial).toBe(car2Serial);
+    expect(car1Serial).toBe(car3Serial);
 
-        @Service()
-        class CarFactory {
-            createCar(engine: Engine) {
-                engine.type = "V6";
-                return new Car(engine);
-            }
-        }
+    expect(engine1Serial).not.toBe(engine2Serial);
+    expect(engine2Serial).not.toBe(engine3Serial);
+    expect(engine3Serial).not.toBe(engine1Serial);
+  });
 
-        @Service({ factory: [CarFactory, "createCar"] })
-        class Car {
-            constructor(public engine: Engine) {
-            }
-        }
+  it('should support global services', function () {
+    @Service()
+    class Engine {
+      public name = 'sporty';
+    }
 
-        Container.get(Car).engine.type.should.be.equal("V6");
+    @Service({ global: true })
+    class Car {
+      public name = 'SportCar';
+    }
 
-    });
+    const globalContainer = Container;
+    const scopedContainer = Container.of('enigma');
 
-    it("should support transient services", function() {
+    expect(globalContainer.get(Car).name).toBe('SportCar');
+    expect(scopedContainer.get(Car).name).toBe('SportCar');
 
-        @Service()
-        class Car {
-            public serial = Math.random();
-        }
+    expect(globalContainer.get(Engine).name).toBe('sporty');
+    expect(scopedContainer.get(Engine).name).toBe('sporty');
 
-        @Service({ transient: true })
-        class Engine {
-            public serial = Math.random();
-        }
+    globalContainer.get(Car).name = 'MyCar';
+    globalContainer.get(Engine).name = 'regular';
 
-        const car1Serial = Container.get(Car).serial;
-        const car2Serial = Container.get(Car).serial;
-        const car3Serial = Container.get(Car).serial;
+    expect(globalContainer.get(Car).name).toBe('MyCar');
+    expect(scopedContainer.get(Car).name).toBe('MyCar');
 
-        const engine1Serial = Container.get(Engine).serial;
-        const engine2Serial = Container.get(Engine).serial;
-        const engine3Serial = Container.get(Engine).serial;
-
-        car1Serial.should.be.equal(car2Serial);
-        car1Serial.should.be.equal(car3Serial);
-
-        engine1Serial.should.not.be.equal(engine2Serial);
-        engine2Serial.should.not.be.equal(engine3Serial);
-        engine3Serial.should.not.be.equal(engine1Serial);
-    });
-
-    it("should support global services", function() {
-
-        @Service()
-        class Engine {
-            public name = "sporty";
-        }
-
-        @Service({ global: true })
-        class Car {
-            public name = "SportCar";
-        }
-
-        const globalContainer = Container;
-        const scopedContainer = Container.of("enigma");
-
-        globalContainer.get(Car).name.should.be.equal("SportCar");
-        scopedContainer.get(Car).name.should.be.equal("SportCar");
-
-        globalContainer.get(Engine).name.should.be.equal("sporty");
-        scopedContainer.get(Engine).name.should.be.equal("sporty");
-
-        globalContainer.get(Car).name = "MyCar";
-        globalContainer.get(Engine).name = "regular";
-
-        globalContainer.get(Car).name.should.be.equal("MyCar");
-        scopedContainer.get(Car).name.should.be.equal("MyCar");
-
-        globalContainer.get(Engine).name.should.be.equal("regular");
-        scopedContainer.get(Engine).name.should.be.equal("sporty");
-    });
-
+    expect(globalContainer.get(Engine).name).toBe('regular');
+    expect(scopedContainer.get(Engine).name).toBe('sporty');
+  });
 });

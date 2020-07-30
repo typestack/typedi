@@ -1,39 +1,36 @@
-import "reflect-metadata";
-import {Container} from "../../../src/Container";
-import {Service} from "../../../src/decorators/Service";
+import 'reflect-metadata';
+import { Container } from '../../../src/Container';
+import { Service } from '../../../src/decorators/Service';
 
-describe("github issues > #61 Scoped container creates new instance of service every time", function() {
+describe('github issues > #61 Scoped container creates new instance of service every time', function () {
+  beforeEach(() => Container.reset());
 
-    beforeEach(() => Container.reset());
+  it('should work properly', function () {
+    @Service()
+    class Car {
+      public serial = Math.random();
+    }
 
-    it("should work properly", function() {
+    const fooContainer = Container.of('foo');
+    const barContainer = Container.of('bar');
 
-        @Service()
-        class Car {
-            public serial = Math.random();
-        }
+    const car1Serial = Container.get(Car).serial;
+    const car2Serial = Container.get(Car).serial;
 
-        const fooContainer = Container.of("foo");
-        const barContainer = Container.of("bar");
+    const fooCar1Serial = fooContainer.get(Car).serial;
+    const fooCar2Serial = fooContainer.get(Car).serial;
 
-        const car1Serial = Container.get(Car).serial;
-        const car2Serial = Container.get(Car).serial;
+    const barCar1Serial = barContainer.get(Car).serial;
+    const barCar2Serial = barContainer.get(Car).serial;
 
-        const fooCar1Serial = fooContainer.get(Car).serial;
-        const fooCar2Serial = fooContainer.get(Car).serial;
+    expect(car1Serial).toEqual(car2Serial);
+    expect(fooCar1Serial).toEqual(fooCar2Serial);
+    expect(barCar1Serial).toEqual(barCar2Serial);
 
-        const barCar1Serial = barContainer.get(Car).serial;
-        const barCar2Serial = barContainer.get(Car).serial;
+    expect(car1Serial).not.toEqual(fooCar1Serial);
+    expect(car1Serial).not.toEqual(barCar1Serial);
+    expect(fooCar1Serial).not.toEqual(barCar1Serial);
 
-        car1Serial.should.be.equal(car2Serial);
-        fooCar1Serial.should.be.equal(fooCar2Serial);
-        barCar1Serial.should.be.equal(barCar2Serial);
-
-        car1Serial.should.not.be.equal(fooCar1Serial);
-        car1Serial.should.not.be.equal(barCar1Serial);
-        fooCar1Serial.should.not.be.equal(barCar1Serial);
-
-        (Container.of({}).get(Car).serial === Container.of({}).get(Car).serial).should.be.false;
-    });
-
+    expect(Container.of({}).get(Car).serial === Container.of({}).get(Car).serial).toBe(false);
+  });
 });
