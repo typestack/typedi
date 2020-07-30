@@ -1,5 +1,3 @@
 export interface Store {
-
-    save(): string;
-
+  save(): string;
 }

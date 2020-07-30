@@ -1,4 +1,4 @@
-import {Token} from "../../src/Token";
-import {Factory} from "./Factory";
+import { Token } from '../../src/Token';
+import { Factory } from './Factory';
 
-export const FactoryToken = new Token<Factory>("factories");
+export const FactoryToken = new Token<Factory>('factories');

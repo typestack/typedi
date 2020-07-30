@@ -1,22 +1,21 @@
-import {Inject, Service} from "../../src/index";
-import {Factory} from "./Factory";
+import { Inject, Service } from '../../src/index';
+import { Factory } from './Factory';
 
-@Service("car.factory")
+@Service('car.factory')
 export class CarFactory {
+  @Inject('wheel.factory')
+  wheelFactory: Factory;
 
-    @Inject("wheel.factory")
-    wheelFactory: Factory;
+  constructor(
+    @Inject('engine.factory') private engineFactory: Factory,
+    @Inject('body.factory') private bodyFactory: Factory
+  ) {}
 
-    constructor(@Inject("engine.factory") private engineFactory: Factory,
-                @Inject("body.factory") private bodyFactory: Factory) {
-    }
-
-    create() {
-        console.log("Creating a car:");
-        this.engineFactory.create();
-        this.bodyFactory.create();
-        this.wheelFactory.create();
-        console.log("car created");
-    }
-
+  create() {
+    console.log('Creating a car:');
+    this.engineFactory.create();
+    this.bodyFactory.create();
+    this.wheelFactory.create();
+    console.log('car created');
+  }
 }

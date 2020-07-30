@@ -1,10 +1,8 @@
-import {Service} from "../../src/index";
+import { Service } from '../../src/index';
 
 @Service()
 export class FakeBus {
-
-    drive(): void {
-        console.log("This is a fake bus. Im driving fake bus");
-    }
-
+  drive(): void {
+    console.log('This is a fake bus. Im driving fake bus');
+  }
 }

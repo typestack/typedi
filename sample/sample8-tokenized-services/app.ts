@@ -1,8 +1,8 @@
-import "reflect-metadata";
-import {Container} from "../../src/index";
-import {ReaderService, StoreService} from "./Tokens";
-import {FtpStore} from "./FtpStore";
-import {FtpReader} from "./FtpReader";
+import 'reflect-metadata';
+import { Container } from '../../src/index';
+import { ReaderService, StoreService } from './Tokens';
+import { FtpStore } from './FtpStore';
+import { FtpReader } from './FtpReader';
 
 Container.set(StoreService, new FtpStore());
 Container.set(ReaderService, new FtpReader());
