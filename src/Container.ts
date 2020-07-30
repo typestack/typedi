@@ -14,6 +14,11 @@ export class Container {
   // -------------------------------------------------------------------------
 
   /**
+   * All registered handlers.
+   */
+  static readonly handlers: Handler[] = [];
+
+  /**
    * Global container instance.
    */
   private static readonly globalInstance: ContainerInstance = new ContainerInstance(undefined);
@@ -22,11 +27,6 @@ export class Container {
    * Other containers created using Container.of method.
    */
   private static readonly instances: ContainerInstance[] = [];
-
-  /**
-   * All registered handlers.
-   */
-  static readonly handlers: Handler[] = [];
 
   // -------------------------------------------------------------------------
   // Public Static Methods
@@ -197,6 +197,7 @@ export class Container {
   /**
    * Helper method that imports given services.
    */
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   static import(services: Function[]): Container {
     return this;
   }

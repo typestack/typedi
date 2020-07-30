@@ -97,8 +97,8 @@ export class ContainerInstance {
    */
   get<T>(identifier: ServiceIdentifier<T>): T {
     const globalContainer = Container.of(undefined);
-    let service = globalContainer.findService(identifier);
-    let scopedService = this.findService(identifier);
+    const service = globalContainer.findService(identifier);
+    const scopedService = this.findService(identifier);
 
     if (service && service.global === true) return this.getServiceValue(identifier, service);
 
@@ -317,7 +317,7 @@ export class ContainerInstance {
       if (service.factory instanceof Array) {
         // use special [Type, "create"] syntax to allow factory services
         // in this case Type instance will be obtained from Container and its method "create" will be called
-        value = (this.get(service.factory[0]) as any)[service.factory[1]](...params);
+        value = this.get(service.factory[0])[service.factory[1]](...params);
       } else {
         // regular factory function
         value = service.factory(...params, this);
@@ -333,6 +333,7 @@ export class ContainerInstance {
       // need to be injected, and user can use provided container to get instances he needs
       params.push(this);
 
+      // eslint-disable-next-line prefer-spread
       value = new (type.bind.apply(type, params))();
     }
 
