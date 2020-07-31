@@ -1,5 +1,3 @@
 export interface Reader {
-
-    read(): string;
-
+  read(): string;
 }

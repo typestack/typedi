@@ -1,8 +1,6 @@
-import {Service} from "../../src/index";
+import { Service } from '../../src/index';
 
 @Service()
 export class Wheel {
-
-    count: number = 4;
-
+  count: number = 4;
 }

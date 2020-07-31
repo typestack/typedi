@@ -1,13 +1,11 @@
-import {Service} from "../../src/index";
-import {Factory} from "./Factory";
+import { Service } from '../../src/index';
+import { Factory } from './Factory';
 
-@Service("wheel.factory")
+@Service('wheel.factory')
 export class WheelFactory implements Factory {
+  size: number;
 
-    size: number;
-
-    create(): void {
-        console.log("wheel with size " + this.size + " is created");
-    }
-
+  create(): void {
+    console.log('wheel with size ' + this.size + ' is created');
+  }
 }

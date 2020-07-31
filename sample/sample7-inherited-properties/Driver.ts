@@ -1,8 +1,6 @@
-import {Service} from "../../src/index";
+import { Service } from '../../src/index';
 
 @Service()
 export class Driver {
-
-    name: string = "Umed";
-
+  name: string = 'Umed';
 }

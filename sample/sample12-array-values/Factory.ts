@@ -1,5 +1,3 @@
 export interface Factory {
-
-    create(): any;
-
+  create(): any;
 }

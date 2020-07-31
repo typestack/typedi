@@ -1,15 +1,15 @@
 # TypeDI
 
-[![Build Status](https://travis-ci.org/typestack/typedi.svg?branch=master)](https://travis-ci.org/typestack/typedi)
+![Build Status](https://github.com/typestack/typedi/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/typestack/typedi/branch/master/graph/badge.svg)](https://codecov.io/gh/typestack/typedi)
 [![npm version](https://badge.fury.io/js/typedi.svg)](https://badge.fury.io/js/typedi)
 [![Dependency Status](https://david-dm.org/typestack/typedi.svg)](https://david-dm.org/typestack/typedi)
-[![Join the chat at https://gitter.im/typestack/typedi](https://badges.gitter.im/typestack/typedi.svg)](https://gitter.im/typestack/typedi?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for JavaScript and TypeScript.
 Using TypeDI you can build well-structured and easily tested applications.
 
-* [Usage with JavaScript](#usage-with-javascript)
-* [Usage with TypeScript](#usage-with-typescript)
+- [Usage with JavaScript](#usage-with-javascript)
+- [Usage with TypeScript](#usage-with-typescript)
 
 ## Usage with JavaScript
 
@@ -22,55 +22,47 @@ The most simple usage example is:
 
 ```javascript
 class SomeClass {
-
-    someMethod() {
-    }
-
+  someMethod() {}
 }
 
-var Container = require("typedi").Container;
+var Container = require('typedi').Container;
 var someClass = Container.get(SomeClass);
 someClass.someMethod();
 ```
 
 Then you can call `Container.get(SomeClass)` from anywhere in your application
- and you'll always have the same instance of `SomeClass`.
+and you'll always have the same instance of `SomeClass`.
 
 In your class's constructor you always receive as a last argument a container which you can use to get other dependencies.
 
 ```javascript
 class BeanFactory {
-    create() {
-    }
+  create() {}
 }
 
 class SugarFactory {
-    create() {
-    }
+  create() {}
 }
 
 class WaterFactory {
-    create() {
-    }
+  create() {}
 }
 
 class CoffeeMaker {
+  constructor(container) {
+    this.beanFactory = container.get(BeanFactory);
+    this.sugarFactory = container.get(SugarFactory);
+    this.waterFactory = container.get(WaterFactory);
+  }
 
-    constructor(container) {
-        this.beanFactory = container.get(BeanFactory);
-        this.sugarFactory = container.get(SugarFactory);
-        this.waterFactory = container.get(WaterFactory);
-    }
-
-    make() {
-        this.beanFactory.create();
-        this.sugarFactory.create();
-        this.waterFactory.create();
-    }
-
+  make() {
+    this.beanFactory.create();
+    this.sugarFactory.create();
+    this.waterFactory.create();
+  }
 }
 
-var Container = require("typedi").Container;
+var Container = require('typedi').Container;
 var coffeeMaker = Container.get(CoffeeMaker);
 coffeeMaker.make();
 ```
@@ -78,53 +70,44 @@ coffeeMaker.make();
 With TypeDI you can use a named services. Example:
 
 ```javascript
-var Container = require("typedi").Container;
-
-interface Factory {
-    create(): void;
-}
+var Container = require('typedi').Container;
 
 class BeanFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
 class SugarFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
 class WaterFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
 class CoffeeMaker {
+  beanFactory: Factory;
+  sugarFactory: Factory;
+  waterFactory: Factory;
 
-    beanFactory: Factory;
-    sugarFactory: Factory;
-    waterFactory: Factory;
+  constructor(container) {
+    this.beanFactory = container.get('bean.factory');
+    this.sugarFactory = container.get('sugar.factory');
+    this.waterFactory = container.get('water.factory');
+  }
 
-    constructor(container) {
-        this.beanFactory = container.get("bean.factory");
-        this.sugarFactory = container.get("sugar.factory");
-        this.waterFactory = container.get("water.factory");
-    }
-
-    make() {
-        this.beanFactory.create();
-        this.sugarFactory.create();
-        this.waterFactory.create();
-    }
-
+  make() {
+    this.beanFactory.create();
+    this.sugarFactory.create();
+    this.waterFactory.create();
+  }
 }
 
-Container.set("bean.factory", new BeanFactory(Container));
-Container.set("sugar.factory", new SugarFactory(Container));
-Container.set("water.factory", new WaterFactory(Container));
-Container.set("coffee.maker", new CoffeeMaker(Container));
+Container.set('bean.factory', new BeanFactory(Container));
+Container.set('sugar.factory', new SugarFactory(Container));
+Container.set('water.factory', new WaterFactory(Container));
+Container.set('coffee.maker', new CoffeeMaker(Container));
 
-var coffeeMaker = Container.get("coffee.maker");
+var coffeeMaker = Container.get('coffee.maker');
 coffeeMaker.make();
 ```
 
@@ -132,17 +115,15 @@ This feature especially useful if you want to store (and inject later on) some s
 For example:
 
 ```javascript
-var Container = require("typedi").Container;
+var Container = require('typedi').Container;
 
 // somewhere in your global app parameters
-Container.set("authorization-token", "RVT9rVjSVN");
+Container.set('authorization-token', 'RVT9rVjSVN');
 
 class UserRepository {
-
-    constructor(container) {
-        this.authorizationToken = container.get("authorization-token");
-    }
-
+  constructor(container) {
+    this.authorizationToken = container.get('authorization-token');
+  }
 }
 ```
 
@@ -154,47 +135,42 @@ Container.set(CoffeeMaker, new FakeCoffeeMaker());
 // or for named services
 
 Container.set([
-    { id: "bean.factory", value: new FakeBeanFactory() },
-    { id: "sugar.factory", value: new FakeSugarFactory() },
-    { id: "water.factory", value: new FakeWaterFactory() }
+  { id: 'bean.factory', value: new FakeBeanFactory() },
+  { id: 'sugar.factory', value: new FakeSugarFactory() },
+  { id: 'water.factory', value: new FakeWaterFactory() },
 ]);
 ```
 
 TypeDI also supports a function dependency injection. Here is how it looks like:
 
-
 ```javascript
-var Service = require("typedi").Service;
-var Container = require("typedi").Container;
+var Service = require('typedi').Service;
+var Container = require('typedi').Container;
 
 var PostRepository = Service(() => ({
-    getName() {
-        return "hello from post repository";
-    }
+  getName() {
+    return 'hello from post repository';
+  },
 }));
 
 var PostManager = Service(() => ({
-    getId() {
-        return "some post id";
-    }
+  getId() {
+    return 'some post id';
+  },
 }));
 
 class PostQueryBuilder {
-    build() {
-        return "SUPER * QUERY";
-    }
+  build() {
+    return 'SUPER * QUERY';
+  }
 }
 
-var PostController = Service([
-    PostManager,
-    PostRepository,
-    PostQueryBuilder
-], (manager, repository, queryBuilder) => {
-    return {
-        id: manager.getId(),
-        name: repository.getName(),
-        query: queryBuilder.build()
-    };
+var PostController = Service([PostManager, PostRepository, PostQueryBuilder], (manager, repository, queryBuilder) => {
+  return {
+    id: manager.getId(),
+    name: repository.getName(),
+    query: queryBuilder.build(),
+  };
 });
 
 var postController = Container.get(PostController);
@@ -205,22 +181,21 @@ console.log(postController);
 
 1. Install module:
 
-    `npm install typedi --save`
+   `npm install typedi --save`
 
 2. Install [reflect-metadata](https://www.npmjs.com/package/reflect-metadata) package:
 
-    `npm install reflect-metadata --save`
+   `npm install reflect-metadata --save`
 
-    and import it somewhere in the global place of your app before any service declaration or import (for example in `app.ts`):
+   and import it somewhere in the global place of your app before any service declaration or import (for example in `app.ts`):
 
-    `import "reflect-metadata";`
+   `import "reflect-metadata";`
 
 3. You may need to install node typings:
 
-    `npm install @types/node --save-dev`
+   `npm install @types/node --save-dev`
 
-
-4. Enabled following settings in `tsconfig.json`:
+4) Enabled following settings in `tsconfig.json`:
 
 ```json
 "emitDecoratorMetadata": true,
@@ -231,15 +206,12 @@ Now you can use TypeDI.
 The most simple usage example is:
 
 ```typescript
-import "reflect-metadata";
-import {Service, Container} from "typedi";
+import 'reflect-metadata';
+import { Service, Container } from 'typedi';
 
 @Service()
 class SomeClass {
-
-    someMethod() {
-    }
-
+  someMethod() {}
 }
 
 let someClass = Container.get(SomeClass);
@@ -247,49 +219,44 @@ someClass.someMethod();
 ```
 
 Then you can call `Container.get(SomeClass)` from anywhere in your application
- and you'll always have the same instance of `SomeClass`.
+and you'll always have the same instance of `SomeClass`.
 
 You can use **property injection** and inject services into your class using `@Inject` decorator:
 
 ```typescript
-import {Container, Inject, Service} from "typedi";
+import { Container, Inject, Service } from 'typedi';
 
 @Service()
 class BeanFactory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 class SugarFactory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 class WaterFactory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 class CoffeeMaker {
+  @Inject()
+  beanFactory: BeanFactory;
 
-    @Inject()
-    beanFactory: BeanFactory;
-    
-    @Inject()
-    sugarFactory: SugarFactory;
-    
-    @Inject()
-    waterFactory: WaterFactory;
+  @Inject()
+  sugarFactory: SugarFactory;
 
-    make() {
-        this.beanFactory.create();
-        this.sugarFactory.create();
-        this.waterFactory.create();
-    }
+  @Inject()
+  waterFactory: WaterFactory;
 
+  make() {
+    this.beanFactory.create();
+    this.sugarFactory.create();
+    this.waterFactory.create();
+  }
 }
 
 let coffeeMaker = Container.get(CoffeeMaker);
@@ -299,39 +266,36 @@ coffeeMaker.make();
 You can also use a constructor injection:
 
 ```typescript
-import {Container, Service} from "typedi";
+import { Container, Service } from 'typedi';
 
 @Service()
 class BeanFactory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 class SugarFactory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 class WaterFactory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 class CoffeeMaker {
+  constructor(
+    private beanFactory: BeanFactory,
+    private sugarFactory: SugarFactory,
+    private waterFactory: WaterFactory
+  ) {}
 
-    constructor(private beanFactory: BeanFactory,
-                private sugarFactory: SugarFactory,
-                private waterFactory: WaterFactory) {}
-
-    make() {
-        this.beanFactory.create();
-        this.sugarFactory.create();
-        this.waterFactory.create();
-    }
-
+  make() {
+    this.beanFactory.create();
+    this.sugarFactory.create();
+    this.waterFactory.create();
+  }
 }
 
 let coffeeMaker = Container.get(CoffeeMaker);
@@ -341,54 +305,48 @@ coffeeMaker.make();
 With TypeDI you can use a named services. Example:
 
 ```typescript
-import {Container, Service, Inject} from "typedi";
+import { Container, Service, Inject } from 'typedi';
 
 interface Factory {
-    create(): void;
+  create(): void;
 }
 
-@Service("bean.factory")
+@Service('bean.factory')
 class BeanFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
-@Service("sugar.factory")
+@Service('sugar.factory')
 class SugarFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
-@Service("water.factory")
+@Service('water.factory')
 class WaterFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
-@Service("coffee.maker")
+@Service('coffee.maker')
 class CoffeeMaker {
+  beanFactory: Factory;
+  sugarFactory: Factory;
 
-    beanFactory: Factory;
-    sugarFactory: Factory;
+  @Inject('water.factory')
+  waterFactory: Factory;
 
-    @Inject("water.factory")
-    waterFactory: Factory;
+  constructor(@Inject('bean.factory') beanFactory: BeanFactory, @Inject('sugar.factory') sugarFactory: SugarFactory) {
+    this.beanFactory = beanFactory;
+    this.sugarFactory = sugarFactory;
+  }
 
-    constructor(@Inject("bean.factory") beanFactory: BeanFactory,
-                @Inject("sugar.factory") sugarFactory: SugarFactory) {
-        this.beanFactory = beanFactory;
-        this.sugarFactory = sugarFactory;
-    }
-
-    make() {
-        this.beanFactory.create();
-        this.sugarFactory.create();
-        this.waterFactory.create();
-    }
-
+  make() {
+    this.beanFactory.create();
+    this.sugarFactory.create();
+    this.waterFactory.create();
+  }
 }
 
-let coffeeMaker = Container.get<CoffeeMaker>("coffee.maker");
+let coffeeMaker = Container.get<CoffeeMaker>('coffee.maker');
 coffeeMaker.make();
 ```
 
@@ -396,17 +354,15 @@ This feature especially useful if you want to store (and inject later on) some s
 For example:
 
 ```typescript
-import {Container, Service, Inject} from "typedi";
+import { Container, Service, Inject } from 'typedi';
 
 // somewhere in your global app parameters
-Container.set("authorization-token", "RVT9rVjSVN");
+Container.set('authorization-token', 'RVT9rVjSVN');
 
 @Service()
 class UserRepository {
-
-    @Inject("authorization-token")
-    authorizationToken: string;
-
+  @Inject('authorization-token')
+  authorizationToken: string;
 }
 ```
 
@@ -419,57 +375,54 @@ Container.set(CoffeeMaker, new FakeCoffeeMaker());
 // or for named services
 
 Container.set([
-    { id: "bean.factory", value: new FakeBeanFactory() },
-    { id: "sugar.factory", value: new FakeSugarFactory() },
-    { id: "water.factory", value: new FakeWaterFactory() }
+  { id: 'bean.factory', value: new FakeBeanFactory() },
+  { id: 'sugar.factory', value: new FakeSugarFactory() },
+  { id: 'water.factory', value: new FakeWaterFactory() },
 ]);
 ```
 
 ## TypeScript Advanced Usage Examples
 
-* [Services with token name](#services-with-token-name) 
-* [Using factory function to create service](#using-factory-function-to-create-service) 
-* [Using factory class to create service](#using-factory-class-to-create-service)
-* [Problem with circular references](#problem-with-circular-references) 
-* [Inherited injections](#inherited-injections) 
-* [Custom decorators](#custom-decorators) 
-* [Using service groups](#using-service-groups) 
-* [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers) 
-* [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state) 
+- [Services with token name](#services-with-token-name)
+- [Using factory function to create service](#using-factory-function-to-create-service)
+- [Using factory class to create service](#using-factory-class-to-create-service)
+- [Problem with circular references](#problem-with-circular-references)
+- [Inherited injections](#inherited-injections)
+- [Custom decorators](#custom-decorators)
+- [Using service groups](#using-service-groups)
+- [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers)
+- [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state)
 
 ### Services with token name
 
-You can use a services with a `Token` instead of name or target class. 
+You can use a services with a `Token` instead of name or target class.
 In this case you can use type safe interface-based services.
 
 ```typescript
-import {Container, Service, Inject, Token} from "typedi";
+import { Container, Service, Inject, Token } from 'typedi';
 
 export interface Factory {
-    create(): void;
+  create(): void;
 }
 
-export const FactoryService = new Token<Factory>(); 
+export const FactoryService = new Token<Factory>();
 
 @Service(FactoryService)
 export class BeanFactory implements Factory {
-    create() {
-    }
+  create() {}
 }
 
 @Service()
 export class CoffeeMaker {
-    
-    private factory: Factory;
+  private factory: Factory;
 
-    constructor(@Inject(type => FactoryService) factory: Factory) {
-        this.factory = factory;
-    }
+  constructor(@Inject(type => FactoryService) factory: Factory) {
+    this.factory = factory;
+  }
 
-    make() {
-        this.factory.create();
-    }
-
+  make() {
+    this.factory.create();
+  }
 }
 
 let coffeeMaker = Container.get(CoffeeMaker);
@@ -487,16 +440,15 @@ This way, service instance will be created by calling your factory function inst
 instantiating a class directly.
 
 ```typescript
-import {Container, Service} from "typedi";
+import { Container, Service } from 'typedi';
 
 function createCar() {
-    return new Car("V8");
+  return new Car('V8');
 }
 
 @Service({ factory: createCar })
 class Car {
-    constructor (public engineType: string) {
-    }
+  constructor(public engineType: string) {}
 }
 
 // Getting service from the container.
@@ -514,24 +466,20 @@ This way, service instance will be created by calling given factory service's me
 instantiating a class directly.
 
 ```typescript
-import {Container, Service} from "typedi";
+import { Container, Service } from 'typedi';
 
 @Service()
 class CarFactory {
-    
-    constructor(public logger: LoggerService) {
-    }
-    
-    create() {
-        return new Car("BMW", this.logger);
-    }
-    
+  constructor(public logger: LoggerService) {}
+
+  create() {
+    return new Car('BMW', this.logger);
+  }
 }
 
-@Service({ factory: [CarFactory, "create"] })
+@Service({ factory: [CarFactory, 'create'] })
 class Car {
-    constructor(public model: string, public logger: LoggerInterface) {
-    }
+  constructor(public model: string, public logger: LoggerInterface) {}
 }
 ```
 
@@ -543,15 +491,15 @@ There is a known issue in language that it can't handle circular references. For
 // Car.ts
 @Service()
 export class Car {
-    @Inject()
-    engine: Engine;
+  @Inject()
+  engine: Engine;
 }
 
 // Engine.ts
 @Service()
 export class Engine {
-    @Inject()
-    car: Car;
+  @Inject()
+  car: Car;
 }
 ```
 
@@ -562,15 +510,15 @@ One of them will be undefined and it cause errors. To fix them you need to speci
 // Car.ts
 @Service()
 export class Car {
-    @Inject(type => Engine)
-    engine: Engine;
+  @Inject(type => Engine)
+  engine: Engine;
 }
 
 // Engine.ts
 @Service()
 export class Engine {
-    @Inject(type => Car)
-    car: Car;
+  @Inject(type => Car)
+  car: Car;
 }
 ```
 
@@ -585,17 +533,14 @@ For example:
 // Car.ts
 @Service()
 export abstract class Car {
-
-    @Inject()
-    engine: Engine;
-
+  @Inject()
+  engine: Engine;
 }
 
 // Engine.ts
 @Service()
 export class Bus extends Car {
-
-    // you can call this.engine in this class
+  // you can call this.engine in this class
 }
 ```
 
@@ -607,41 +552,34 @@ For example:
 ```typescript
 // Logger.ts
 export function Logger() {
-    return function(object: Object, propertyName: string, index?: number) {
-        const logger = new ConsoleLogger();
-        Container.registerHandler({ object, propertyName, index, value: containerInstance => logger });
-    };
+  return function (object: Object, propertyName: string, index?: number) {
+    const logger = new ConsoleLogger();
+    Container.registerHandler({ object, propertyName, index, value: containerInstance => logger });
+  };
 }
 
 // LoggerInterface.ts
 export interface LoggerInterface {
-
-    log(message: string): void;
-
+  log(message: string): void;
 }
 
 // ConsoleLogger.ts
-import {LoggerInterface} from "./LoggerInterface";
+import { LoggerInterface } from './LoggerInterface';
 
 export class ConsoleLogger implements LoggerInterface {
-
-    log(message: string) {
-        console.log(message);
-    }
-
+  log(message: string) {
+    console.log(message);
+  }
 }
 
 // UserRepository.ts
 @Service()
 export class UserRepository {
+  constructor(@Logger() private logger: LoggerInterface) {}
 
-    constructor(@Logger() private logger: LoggerInterface) {
-    }
-
-    save(user: User) {
-        this.logger.log(`user ${user.firstName} ${user.secondName} has been saved.`);
-    }
-
+  save(user: User) {
+    this.logger.log(`user ${user.firstName} ${user.secondName} has been saved.`);
+  }
 }
 ```
 
@@ -653,52 +591,42 @@ For example:
 ```typescript
 // Factory.ts
 export interface Factory {
-    create(): any;
+  create(): any;
 }
 
 // FactoryToken.ts
-export const FactoryToken = new Token<Factory>("factories");
+export const FactoryToken = new Token<Factory>('factories');
 
 // BeanFactory.ts
 @Service({ id: FactoryToken, multiple: true })
 export class BeanFactory implements Factory {
-
-    create() {
-        console.log("bean created");
-    }
-
+  create() {
+    console.log('bean created');
+  }
 }
 
 // SugarFactory.ts
 @Service({ id: FactoryToken, multiple: true })
 export class SugarFactory implements Factory {
-
-    create() {
-        console.log("sugar created");
-    }
-
+  create() {
+    console.log('sugar created');
+  }
 }
 
 // WaterFactory.ts
 @Service({ id: FactoryToken, multiple: true })
 export class WaterFactory implements Factory {
-
-    create() {
-        console.log("water created");
-    }
-
+  create() {
+    console.log('water created');
+  }
 }
 
 // app.ts
 // now you can get all factories in a single array
-Container.import([
-    BeanFactory,
-    SugarFactory,
-    WaterFactory,
-]);
+Container.import([BeanFactory, SugarFactory, WaterFactory]);
 const factories = Container.getMany(FactoryToken); // factories is Factory[]
 factories.forEach(factory => factory.create());
-``` 
+```
 
 ### Using multiple containers and scoped containers
 
@@ -706,41 +634,36 @@ By default all services are stored in the global service container,
 and this global service container holds all unique instances of each service you have.
 
 If you want your services to behave and store data inside differently,
-based on some user context (http request for example) - 
-you can use different containers for different contexts. 
+based on some user context (http request for example) -
+you can use different containers for different contexts.
 For example:
 
 ```typescript
 // QuestionController.ts
 @Service()
 export class QuestionController {
+  constructor(protected questionRepository: QuestionRepository) {}
 
-    constructor(protected questionRepository: QuestionRepository) {
-    }
-
-    save() {
-        this.questionRepository.save();
-    }
+  save() {
+    this.questionRepository.save();
+  }
 }
 
 // QuestionRepository.ts
 @Service()
 export class QuestionRepository {
-
-    save() {
-    }
-
+  save() {}
 }
 
 // app.ts
-const request1 = { param: "question1" };
+const request1 = { param: 'question1' };
 const controller1 = Container.of(request1).get(QuestionController);
-controller1.save("Timber");
+controller1.save('Timber');
 Container.reset(request1);
 
-const request2 = { param: "question2" };
+const request2 = { param: 'question2' };
 const controller2 = Container.of(request2).get(QuestionController);
-controller2.save("");
+controller2.save('');
 Container.reset(request2);
 ```
 
@@ -748,51 +671,47 @@ In this example `controller1` and `controller2` are completely different instanc
 and `QuestionRepository` used in those controllers are different instances as well.
 
 `Container.reset` removes container with the given context identifier.
-If you want your services to be completely global and not be container-specific, 
+If you want your services to be completely global and not be container-specific,
 you can mark them as global:
 
 ```typescript
 @Service({ global: true })
-export class QuestionUtils {
-  
-}
+export class QuestionUtils {}
 ```
 
 And this global service will be the same instance across all containers.
 
 TypeDI also supports a function dependency injection. Here is how it looks like:
 
-
 ```javascript
 export const PostRepository = Service(() => ({
-    getName() {
-        return "hello from post repository";
-    }
+  getName() {
+    return 'hello from post repository';
+  },
 }));
 
 export const PostManager = Service(() => ({
-    getId() {
-        return "some post id";
-    }
+  getId() {
+    return 'some post id';
+  },
 }));
 
 export class PostQueryBuilder {
-    build() {
-        return "SUPER * QUERY";
-    }
+  build() {
+    return 'SUPER * QUERY';
+  }
 }
 
-export const PostController = Service([
-    PostManager,
-    PostRepository,
-    PostQueryBuilder
-], (manager, repository, queryBuilder) => {
+export const PostController = Service(
+  [PostManager, PostRepository, PostQueryBuilder],
+  (manager, repository, queryBuilder) => {
     return {
-        id: manager.getId(),
-        name: repository.getName(),
-        query: queryBuilder.build()
+      id: manager.getId(),
+      name: repository.getName(),
+      query: queryBuilder.build(),
     };
-});
+  }
+);
 
 const postController = Container.get(PostController);
 console.log(postController);

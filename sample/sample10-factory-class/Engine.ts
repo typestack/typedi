@@ -1,8 +1,6 @@
-import {Service} from "../../src/decorators/Service";
+import { Service } from '../../src/decorators/Service';
 
 @Service()
 export class Engine {
-
-    model = "v8";
-
+  model = 'v8';
 }

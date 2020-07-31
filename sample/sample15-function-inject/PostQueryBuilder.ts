@@ -1,6 +1,5 @@
-
 export class PostQueryBuilder {
-    build() {
-        return "SUPER * QUERY";
-    }
+  build() {
+    return 'SUPER * QUERY';
+  }
 }

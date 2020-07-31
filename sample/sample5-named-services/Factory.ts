@@ -1,3 +1,3 @@
 export interface Factory {
-    create(): void;
+  create(): void;
 }
