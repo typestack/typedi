@@ -160,4 +160,16 @@ describe('Service Decorator', function () {
     expect(globalContainer.get(Engine).name).toBe('regular');
     expect(scopedContainer.get(Engine).name).toBe('sporty');
   });
+  
+  it('should support function injection with Token dependencies', function () {
+    const token: Token<string> = new Token<string>('token');
+
+    Container.set(token, 'test_string');
+
+    const TestService = Service([token], function (s: string): string {
+      return s.toUpperCase();
+    });
+
+    Container.get(TestService).should.be.equal('TEST_STRING');
+  });
 });

@@ -4,7 +4,7 @@ import { Token } from '../Token';
 import { ServiceMetadata } from '../types/ServiceMetadata';
 import { ServiceOptions } from '../types/ServiceOptions';
 
-export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 };
+export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 } | Token<T1>;
 
 export function Service<R>(factory: () => R): { service: R };
 export function Service<R, T1>(dependencies: [ObjectType<T1>], factory: (dependency1: T1) => R): { service: R };
