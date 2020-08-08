@@ -1,7 +1,7 @@
 # Inheritance
 
 Inheritance is supported **for properties** when both the base and the extended class is marked with the `@Service()` decorator.
-Classes which extends a class with decorated properties will receive the initialized class instances on those properties upon creation.
+Classes which extend a class with decorated properties will receive the initialized class instances on those properties upon creation.
 
 ```ts
 import 'reflect-metadata';

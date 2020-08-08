@@ -1,6 +1,6 @@
 # Usage with TypeORM and routing-controllers
 
-In order to use TypeDI with routing-controllers and/or TypeORM, it's required to configure them to use the top-level
+To use TypeDI with routing-controllers and/or TypeORM, it's required to configure them to use the top-level
 TypeDI container used by your application.
 
 ```ts

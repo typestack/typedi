@@ -22,7 +22,7 @@ import 'reflect-metadata';
 // comes here after you imported the reflect-metadata package!
 ```
 
-As a last step, you need to enable emitting decorator metadata in your Typescript config. Add these two lines to your `tsconfig.json` file under the `compilerOptions` key:
+As the last step, you need to enable emitting decorator metadata in your Typescript config. Add these two lines to your `tsconfig.json` file under the `compilerOptions` key:
 
 ```json
 "emitDecoratorMetadata": true,
@@ -34,7 +34,7 @@ Now you are ready to use TypeDI with Typescript!
 ## Basic Usage
 
 The most basic usage is to request an instance of a class definition. TypeDI will check if an instance of the class has
-been created before and return the cached version or it will create a new instance, cache and return it.
+been created before and return the cached version or it will create a new instance, cache, and return it.
 
 ```ts
 import { Container, Service } from 'typedi';

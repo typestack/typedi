@@ -1,12 +1,12 @@
 # The `@Inject` decorator
 
-The `@Inject()` decorator is a **property and parameter decorator** used to resolve dependencies on a property of a class or on a constructor parameter.
-By default it infers the type of the property or argument and initializes an instance of the detected type, however this behaviour can be overwritten via
-specifying a custom constructable type, `Token` or named service as the first parameter.
+The `@Inject()` decorator is a **property and parameter decorator** used to resolve dependencies on a property of a class or a constructor parameter.
+By default it infers the type of the property or argument and initializes an instance of the detected type, however, this behavior can be overwritten via
+specifying a custom constructable type, `Token`, or named service as the first parameter.
 
 ## Property injection
 
-This decorator is mandatory on properties where a class instance is desired (aka: without the decorator the property will stay undefined). The type of the
+This decorator is mandatory on properties where a class instance is desired (aka: without the decorator, the property will stay undefined). The type of the
 property is automatically inferred so there is no need to define the desired value as the decorator parameter.
 
 ```ts
@@ -45,8 +45,8 @@ console.log(instance.withoutDecorator);
 
 ## Constructor Injection
 
-The `@Inject` decorator is not required in constructor injection, when a class is marked with the `@Service` decorator. TypeDI will automatically infer and
-inject the correct class instances for every constructor argument. However it can be used to overwrite the injected type.
+The `@Inject` decorator is not required in constructor injection when a class is marked with the `@Service` decorator. TypeDI will automatically infer and
+inject the correct class instances for every constructor argument. However, it can be used to overwrite the injected type.
 
 ```ts
 import 'reflect-metadata';
@@ -85,8 +85,8 @@ instance.withoutDecorator.print();
 
 ## Explicitly requesting target type
 
-By default TypeDI will try to infer the type of the property and arguments and inject the proper class instance. However this is not always possible.
-(For example when a property type is an interface.) In these cases there are three way to overwrite type of the injected value:
+By default, TypeDI will try to infer the type of property and arguments and inject the proper class instance. When this is possible
+(eg: the property type is an interface) there is three-way to overwrite type of the injected value:
 
 - via `@Inject(() => type)` where `type` is a constructable value (eg: a class definition)
 - via `@Inject(myToken)` where `myToken` is an instance of `Token` class

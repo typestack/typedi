@@ -12,7 +12,7 @@ There are three ways to register your dependencies:
 - registering a value with a `Token`
 - registering a value with a string identifier
 
-The `Token` and string identifier can be used to register other values than classes. Both tokens and string indentifiers
+The `Token` and string identifier can be used to register other values than classes. Both tokens and string identifiers
 can register any type of value including primitive values except `undefined`. They must be set on the container with the
 `Container.set()` function before they can be requested via `Container.get()`.
 
@@ -140,7 +140,7 @@ _For detailed documentation about `Token` class please read the [Service Tokens]
 ## Singleton vs transient classes
 
 Every registered service by default is a singleton. Meaning repeated calls to `Container.get(MyClass)` will return the
-same instance. If this is not the desired behaviour a class can be marked as `transient` via the `@Service()` decorator.
+same instance. If this is not the desired behavior a class can be marked as `transient` via the `@Service()` decorator.
 
 ```ts
 import 'reflect-metadata';

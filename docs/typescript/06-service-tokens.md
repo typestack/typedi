@@ -1,6 +1,6 @@
 # Service Tokens
 
-Service tokens are unique identifiers what provides a type-safe access to a value stored in a `Conatiner`.
+Service tokens are unique identifiers what provides type-safe access to a value stored in a `Container`.
 
 ```ts
 import 'reflect-metadata';
@@ -21,7 +21,7 @@ const JWT_SECRET = Container.get(JWT_SECRET_TOKEN);
 
 ## Injecting service tokens
 
-They can be used with the `@Inject()` decorator to overwrite the inferred type of the property of argument.
+They can be used with the `@Inject()` decorator to overwrite the inferred type of the property or argument.
 
 ```ts
 import 'reflect-metadata';
@@ -67,5 +67,5 @@ console.log(tokenValueA === tokenValueB);
 
 ### Difference between Token and string identifier
 
-They both achieve the same goal, however it's recommended to use `Tokens` as they are type-safe and cannot be mistyped,
+They both achieve the same goal, however, it's recommended to use `Tokens` as they are type-safe and cannot be mistyped,
 while a mistyped string identifier will silently return `undefined` as value by default.
