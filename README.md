@@ -1,15 +1,15 @@
+---
+description: Simple yet powerful dependency injection tool for JavaScript and TypeScript.
+---
+
 # TypeDI
 
-![Build Status](https://github.com/typestack/typedi/workflows/CI/badge.svg)
-[![codecov](https://codecov.io/gh/typestack/typedi/branch/master/graph/badge.svg)](https://codecov.io/gh/typestack/typedi)
-[![npm version](https://badge.fury.io/js/typedi.svg)](https://badge.fury.io/js/typedi)
-[![Dependency Status](https://david-dm.org/typestack/typedi.svg)](https://david-dm.org/typestack/typedi)
+![Build Status](https://github.com/typestack/typedi/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/typestack/typedi/branch/master/graph/badge.svg)](https://codecov.io/gh/typestack/typedi) [![npm version](https://badge.fury.io/js/typedi.svg)](https://badge.fury.io/js/typedi) [![Dependency Status](https://david-dm.org/typestack/typedi.svg)](https://david-dm.org/typestack/typedi)
 
-TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for JavaScript and TypeScript.
-Using TypeDI you can build well-structured and easily tested applications.
+TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for JavaScript and TypeScript. Using TypeDI you can build well-structured and easily tested applications.
 
-- [Usage with JavaScript](#usage-with-javascript)
-- [Usage with TypeScript](#usage-with-typescript)
+* [Usage with JavaScript](./#usage-with-javascript)
+* [Usage with TypeScript](./#usage-with-typescript)
 
 ## Usage with JavaScript
 
@@ -17,8 +17,7 @@ Install the module:
 
 `npm install typedi --save`
 
-Now you can use TypeDI.
-The most simple usage example is:
+Now you can use TypeDI. The most simple usage example is:
 
 ```javascript
 class SomeClass {
@@ -30,8 +29,7 @@ var someClass = Container.get(SomeClass);
 someClass.someMethod();
 ```
 
-Then you can call `Container.get(SomeClass)` from anywhere in your application
-and you'll always have the same instance of `SomeClass`.
+Then you can call `Container.get(SomeClass)` from anywhere in your application and you'll always have the same instance of `SomeClass`.
 
 In your class's constructor you always receive as a last argument a container which you can use to get other dependencies.
 
@@ -111,8 +109,7 @@ var coffeeMaker = Container.get('coffee.maker');
 coffeeMaker.make();
 ```
 
-This feature especially useful if you want to store (and inject later on) some settings or configuration options.
-For example:
+This feature especially useful if you want to store \(and inject later on\) some settings or configuration options. For example:
 
 ```javascript
 var Container = require('typedi').Container;
@@ -187,7 +184,7 @@ console.log(postController);
 
    `npm install reflect-metadata --save`
 
-   and import it somewhere in the global place of your app before any service declaration or import (for example in `app.ts`):
+   and import it somewhere in the global place of your app before any service declaration or import \(for example in `app.ts`\):
 
    `import "reflect-metadata";`
 
@@ -195,15 +192,14 @@ console.log(postController);
 
    `npm install @types/node --save-dev`
 
-4) Enabled following settings in `tsconfig.json`:
+4\) Enabled following settings in `tsconfig.json`:
 
-```json
+```javascript
 "emitDecoratorMetadata": true,
 "experimentalDecorators": true,
 ```
 
-Now you can use TypeDI.
-The most simple usage example is:
+Now you can use TypeDI. The most simple usage example is:
 
 ```typescript
 import 'reflect-metadata';
@@ -218,8 +214,7 @@ let someClass = Container.get(SomeClass);
 someClass.someMethod();
 ```
 
-Then you can call `Container.get(SomeClass)` from anywhere in your application
-and you'll always have the same instance of `SomeClass`.
+Then you can call `Container.get(SomeClass)` from anywhere in your application and you'll always have the same instance of `SomeClass`.
 
 You can use **property injection** and inject services into your class using `@Inject` decorator:
 
@@ -350,8 +345,7 @@ let coffeeMaker = Container.get<CoffeeMaker>('coffee.maker');
 coffeeMaker.make();
 ```
 
-This feature especially useful if you want to store (and inject later on) some settings or configuration options.
-For example:
+This feature especially useful if you want to store \(and inject later on\) some settings or configuration options. For example:
 
 ```typescript
 import { Container, Service, Inject } from 'typedi';
@@ -366,8 +360,7 @@ class UserRepository {
 }
 ```
 
-When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method:
-`provide` methods of the container:
+When you write tests you can easily provide your own "fake" dependencies to classes you are testing using `set` method: `provide` methods of the container:
 
 ```typescript
 Container.set(CoffeeMaker, new FakeCoffeeMaker());
@@ -383,20 +376,19 @@ Container.set([
 
 ## TypeScript Advanced Usage Examples
 
-- [Services with token name](#services-with-token-name)
-- [Using factory function to create service](#using-factory-function-to-create-service)
-- [Using factory class to create service](#using-factory-class-to-create-service)
-- [Problem with circular references](#problem-with-circular-references)
-- [Inherited injections](#inherited-injections)
-- [Custom decorators](#custom-decorators)
-- [Using service groups](#using-service-groups)
-- [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers)
-- [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state)
+* [Services with token name](./#services-with-token-name)
+* [Using factory function to create service](./#using-factory-function-to-create-service)
+* [Using factory class to create service](./#using-factory-class-to-create-service)
+* [Problem with circular references](./#problem-with-circular-references)
+* [Inherited injections](./#inherited-injections)
+* [Custom decorators](./#custom-decorators)
+* [Using service groups](./#using-service-groups)
+* [Using multiple containers and scoped containers](./#using-multiple-containers-and-scoped-containers)
+* [Remove registered services or reset container state](./#remove-registered-services-or-reset-container-state)
 
 ### Services with token name
 
-You can use a services with a `Token` instead of name or target class.
-In this case you can use type safe interface-based services.
+You can use a services with a `Token` instead of name or target class. In this case you can use type safe interface-based services.
 
 ```typescript
 import { Container, Service, Inject, Token } from 'typedi';
@@ -436,8 +428,7 @@ factory.create();
 
 You can create your services with the container using factory functions.
 
-This way, service instance will be created by calling your factory function instead of
-instantiating a class directly.
+This way, service instance will be created by calling your factory function instead of instantiating a class directly.
 
 ```typescript
 import { Container, Service } from 'typedi';
@@ -462,8 +453,7 @@ console.log(car.engineType); // > "V8"
 
 You can also create your services using factory classes.
 
-This way, service instance will be created by calling given factory service's method factory instead of
-instantiating a class directly.
+This way, service instance will be created by calling given factory service's method factory instead of instantiating a class directly.
 
 ```typescript
 import { Container, Service } from 'typedi';
@@ -503,8 +493,7 @@ export class Engine {
 }
 ```
 
-This code will not work, because Engine has a reference to Car, and Car has a reference to Engine.
-One of them will be undefined and it cause errors. To fix them you need to specify a type in a function this way:
+This code will not work, because Engine has a reference to Car, and Car has a reference to Engine. One of them will be undefined and it cause errors. To fix them you need to specify a type in a function this way:
 
 ```typescript
 // Car.ts
@@ -526,8 +515,7 @@ And that's all. Same for constructor injections.
 
 ### Inherited injections
 
-Inherited injections are supported as well. In order to use them you must mark inherited class as a @Service.
-For example:
+Inherited injections are supported as well. In order to use them you must mark inherited class as a @Service. For example:
 
 ```typescript
 // Car.ts
@@ -546,8 +534,7 @@ export class Bus extends Car {
 
 ### Custom decorators
 
-You can create your own decorators which will inject your given values for your service dependencies.
-For example:
+You can create your own decorators which will inject your given values for your service dependencies. For example:
 
 ```typescript
 // Logger.ts
@@ -585,8 +572,7 @@ export class UserRepository {
 
 ### Using service groups
 
-You can group multiple services into single group tagged with service id or token.
-For example:
+You can group multiple services into single group tagged with service id or token. For example:
 
 ```typescript
 // Factory.ts
@@ -630,13 +616,9 @@ factories.forEach(factory => factory.create());
 
 ### Using multiple containers and scoped containers
 
-By default all services are stored in the global service container,
-and this global service container holds all unique instances of each service you have.
+By default all services are stored in the global service container, and this global service container holds all unique instances of each service you have.
 
-If you want your services to behave and store data inside differently,
-based on some user context (http request for example) -
-you can use different containers for different contexts.
-For example:
+If you want your services to behave and store data inside differently, based on some user context \(http request for example\) - you can use different containers for different contexts. For example:
 
 ```typescript
 // QuestionController.ts
@@ -667,12 +649,9 @@ controller2.save('');
 Container.reset(request2);
 ```
 
-In this example `controller1` and `controller2` are completely different instances,
-and `QuestionRepository` used in those controllers are different instances as well.
+In this example `controller1` and `controller2` are completely different instances, and `QuestionRepository` used in those controllers are different instances as well.
 
-`Container.reset` removes container with the given context identifier.
-If you want your services to be completely global and not be container-specific,
-you can mark them as global:
+`Container.reset` removes container with the given context identifier. If you want your services to be completely global and not be container-specific, you can mark them as global:
 
 ```typescript
 @Service({ global: true })
@@ -719,18 +698,15 @@ console.log(postController);
 
 ### Remove registered services or reset container state
 
-If you need to remove registered service from container simply use `Container.remove(...)` method.
-Also you can completely reset the container by calling `Container.reset()` method.
-This will effectively remove all registered services from the container.
+If you need to remove registered service from container simply use `Container.remove(...)` method. Also you can completely reset the container by calling `Container.reset()` method. This will effectively remove all registered services from the container.
 
 ## Troubleshooting
 
 ### Use TypeDI with routing-controllers and/or TypeORM
 
-In order to use typedi with routing-controllers and/or typeorm, it's **necessary** to tell these libs to use the typedi container.
-Otherwise you may face [this kind of issue](https://github.com/pleerock/typedi/issues/4).
+In order to use typedi with routing-controllers and/or typeorm, it's **necessary** to tell these libs to use the typedi container. Otherwise you may face [this kind of issue](https://github.com/pleerock/typedi/issues/4).
 
-```Typescript
+```typescript
 import {useContainer as routingUseContainer} from "routing-controllers";
 import {useContainer as ormUseContainer} from "typeorm";
 import {Container} from "typedi";
@@ -742,3 +718,4 @@ ormUseContainer(Container);
 ## Samples
 
 Take a look on samples in [./sample](https://github.com/pleerock/typedi/tree/master/sample) for examples of usage.
+
