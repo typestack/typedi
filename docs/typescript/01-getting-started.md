@@ -1,23 +1,9 @@
-# TypeDI
-
-![Build Status](https://github.com/typestack/typedi/workflows/CI/badge.svg)
-[![codecov](https://codecov.io/gh/typestack/typedi/branch/master/graph/badge.svg)](https://codecov.io/gh/typestack/typedi)
-[![npm version](https://badge.fury.io/js/typedi.svg)](https://badge.fury.io/js/typedi)
-[![Dependency Status](https://david-dm.org/typestack/typedi.svg)](https://david-dm.org/typestack/typedi)
-
-TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) tool for TypeScript and JavaScript. With it you can build well-structured and easily testable applications in Node or in the browser.
-
-Main features includes:
-
-- property based injection
-- constructor based injection
-- singleton and transient services
-- support for multiple DI containers
+# Getting Started
 
 ## Installation
 
-> Note: This installation guide is for usage with TypeScript, if you wish to use
-> TypeDI without Typescript please read the documentation about how get started.
+> Note: This installation guide is for usage with TypeScript, if you wish to use TypeDI without Typescript
+> please read the [getting started guide][getting-started-js] for JavaScript.
 
 To start using TypeDI install the required packages via NPM:
 
@@ -44,6 +30,9 @@ As a last step, you need to enable emitting decorator metadata in your Typescrip
 Now you are ready to use TypeDI with Typescript!
 
 ## Basic Usage
+
+The most basic usage is to request an instance of a class definition. TypeDI will check if an instance of the class has
+been created before and return the cached version or it will create a new instance, cache and return it.
 
 ```ts
 import { Container, Service } from 'typedi';
@@ -73,16 +62,4 @@ serviceInstance.injectedService.printMessage();
 // logs "I am alive!" to the console
 ```
 
-## Documentation
-
-The detailed usage guide and API documentation for the project can be found:
-
-- at [docs.typestack.community/typedi][docs-stable]
-- in the `./docs` folder of the repository
-
-[docs-stable]: https://docs.typestack.community/typedi/
-[docs-development]: https://docs.typestack.community/typedi/v/develop/
-
-## Contributing
-
-Please read our [contributing guidelines](./CONTRIBUTING.md) to get started.
+[getting-started-js]: ../javascript/01-getting-started.md
