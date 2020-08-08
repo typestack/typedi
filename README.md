@@ -25,16 +25,16 @@ First install the required packages via:
 npm install typedi reflect-metadata
 ```
 
-Import the `reflect-metadata` package in the **first line** of your application:
+Import the `reflect-metadata` package at the **first line** of your application:
 
 ```ts
 import 'reflect-metadata';
 
 // Your other imports and initialization code
-// comes here after you imported reflect-metadata package!
+// comes here after you imported the reflect-metadata package!
 ```
 
-Enable emitting decorator metadata in your Typescript config, add these two lines to your `tsconfig.json` file:
+As a last step, you need to enable emitting decorator metadata in your Typescript config. Add these two lines to your `tsconfig.json` file under the `compilerOptions` key:
 
 ```json
 "emitDecoratorMetadata": true,
@@ -82,3 +82,7 @@ The detailed usage guide and API documentation for the project can be found:
 
 [docs-stable]: https://docs.typestack.community/typedi/
 [docs-development]: https://docs.typestack.community/typedi/v/develop/
+
+## Contributing
+
+Please read our [contributing guidelines](./CONTRIBUTING.md) to get started.
