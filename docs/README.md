@@ -83,7 +83,6 @@ Container.set([
 
 ## TypeScript Advanced Usage Examples
 
-- [Services with token name](#services-with-token-name)
 - [Using factory function to create service](#using-factory-function-to-create-service)
 - [Using factory class to create service](#using-factory-class-to-create-service)
 - [Problem with circular references](#problem-with-circular-references)
@@ -92,45 +91,6 @@ Container.set([
 - [Using service groups](#using-service-groups)
 - [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers)
 - [Remove registered services or reset container state](#remove-registered-services-or-reset-container-state)
-
-### Services with token name
-
-You can use a services with a `Token` instead of name or target class.
-In this case you can use type safe interface-based services.
-
-```typescript
-import { Container, Service, Inject, Token } from 'typedi';
-
-export interface Factory {
-  create(): void;
-}
-
-export const FactoryService = new Token<Factory>();
-
-@Service(FactoryService)
-export class BeanFactory implements Factory {
-  create() {}
-}
-
-@Service()
-export class CoffeeMaker {
-  private factory: Factory;
-
-  constructor(@Inject(type => FactoryService) factory: Factory) {
-    this.factory = factory;
-  }
-
-  make() {
-    this.factory.create();
-  }
-}
-
-let coffeeMaker = Container.get(CoffeeMaker);
-coffeeMaker.make();
-
-let factory = Container.get(FactoryService); // factory is instance of Factory
-factory.create();
-```
 
 ### Using factory function to create service
 
