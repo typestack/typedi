@@ -65,7 +65,7 @@ console.log(tokenValueA === tokenValueB);
 // returns false, as Tokens are always unique
 ```
 
-### Difference between Token and string identifier
+## Difference between Token and string identifier
 
 They both achieve the same goal, however, it's recommended to use `Tokens` as they are type-safe and cannot be mistyped,
 while a mistyped string identifier will silently return `undefined` as value by default.
