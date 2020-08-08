@@ -1,5 +1,7 @@
 # Getting Started
 
+TypeDI is a [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection) library for TypeScript and JavaScript.
+
 ## Installation
 
 > Note: This installation guide is for usage with TypeScript, if you wish to use TypeDI without Typescript
