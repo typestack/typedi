@@ -8,6 +8,7 @@
   - [@Service decorator](typescript/04-service-decorator.md)
   - [@Inject decorator](typescript/05-inject-decorator.md)
   - [Service Tokens](typescript/06-service-tokens.md)
+  - [Inheritance](typescript/07-inheritance.md)
   - [Usage with TypeORM](typescript/07-usage-with-typeorm.md)
 - Advanced Usage
   - [Creating custom decorators](typescript/08-custom-decorators.md)

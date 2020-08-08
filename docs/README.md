@@ -86,7 +86,6 @@ Container.set([
 - [Using factory function to create service](#using-factory-function-to-create-service)
 - [Using factory class to create service](#using-factory-class-to-create-service)
 - [Problem with circular references](#problem-with-circular-references)
-- [Inherited injections](#inherited-injections)
 - [Custom decorators](#custom-decorators)
 - [Using service groups](#using-service-groups)
 - [Using multiple containers and scoped containers](#using-multiple-containers-and-scoped-containers)
@@ -183,26 +182,6 @@ export class Engine {
 ```
 
 And that's all. Same for constructor injections.
-
-### Inherited injections
-
-Inherited injections are supported as well. In order to use them you must mark inherited class as a @Service.
-For example:
-
-```typescript
-// Car.ts
-@Service()
-export abstract class Car {
-  @Inject()
-  engine: Engine;
-}
-
-// Engine.ts
-@Service()
-export class Bus extends Car {
-  // you can call this.engine in this class
-}
-```
 
 ### Custom decorators
 
