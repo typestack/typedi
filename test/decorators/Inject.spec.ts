@@ -52,16 +52,20 @@ describe('Inject Decorator', function () {
     @Service('mega.service')
     class NamedService {}
     @Service()
+    class ParameterlessInjectService {}
+    @Service()
     class TestServiceWithParameters {
       constructor(
         public testClass: TestService,
         @Inject(type => SecondTestService) public secondTest: any,
-        @Inject('mega.service') public megaService: any
+        @Inject('mega.service') public megaService: any,
+        @Inject() public parameterlessInject: ParameterlessInjectService
       ) {}
     }
     expect(Container.get(TestServiceWithParameters).testClass).toBeInstanceOf(TestService);
     expect(Container.get(TestServiceWithParameters).secondTest).toBeInstanceOf(SecondTestService);
     expect(Container.get(TestServiceWithParameters).megaService).toBeInstanceOf(NamedService);
+    expect(Container.get(TestServiceWithParameters).parameterlessInject).toBeInstanceOf(ParameterlessInjectService);
   });
 
   it("should inject service should work with 'many' instances", function () {

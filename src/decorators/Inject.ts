@@ -22,7 +22,15 @@ export function Inject(token: Token<any>): Function;
  */
 export function Inject(typeOrName?: ((type?: any) => Function) | string | Token<any>): Function {
   return function (target: Object, propertyName: string, index?: number) {
-    if (!typeOrName) typeOrName = () => (Reflect as any).getMetadata('design:type', target, propertyName);
+    if (!typeOrName) {
+      if (propertyName === undefined) {
+        // constructor injection
+        typeOrName = () => (Reflect as any).getMetadata('design:paramtypes', target, undefined)[index as number];
+      } else {
+        // property injection
+        typeOrName = () => (Reflect as any).getMetadata('design:type', target, propertyName);
+      }
+    }
 
     Container.registerHandler({
       object: target,
