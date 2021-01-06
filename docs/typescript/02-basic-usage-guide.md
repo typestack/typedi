@@ -123,7 +123,7 @@ Container.set(myToken, 'my-secret-value');
 Container.set('my-dependency-name-A', InjectedClass);
 Container.set('my-dependency-name-B', 'primitive-value');
 
-const injectedClassInstance = Container.get(ExampleClass);
+const injectedClassInstance = Container.get(InjectedClass);
 // a class without dependencies can be required
 const exampleClassInstance = Container.get(ExampleClass);
 // a class with dependencies can be required and dependencies will be resolved
