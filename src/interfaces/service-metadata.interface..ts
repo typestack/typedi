@@ -41,6 +41,11 @@ export interface ServiceMetadata<T, K extends keyof T> {
   factory?: [Constructable<T>, K] | ((...params: any[]) => any);
 
   /**
+   * Will call instance's #initialize method and resolve the promise it returns when getting with Container.getAsync() and Container.getManyAsync().
+   */
+  asyncInitialization?: boolean;
+
+  /**
    * Instance of the target class.
    */
   value?: any;

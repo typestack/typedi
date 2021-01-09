@@ -173,6 +173,7 @@ export function Service<T, K extends keyof T>(
         service.multiple = (optionsOrServiceName as ServiceOptions<T, K>).multiple;
         service.global = (optionsOrServiceName as ServiceOptions<T, K>).global || false;
         service.transient = (optionsOrServiceName as ServiceOptions<T, K>).transient;
+        service.asyncInitialization = (optionsOrServiceName as ServiceOptions<T, K>).asyncInitialization;
       } else if (optionsOrServiceName) {
         // ServiceOptions
         service.id = (optionsOrServiceName as ServiceOptions<T, K>).id;
@@ -180,6 +181,7 @@ export function Service<T, K extends keyof T>(
         service.multiple = (optionsOrServiceName as ServiceOptions<T, K>).multiple;
         service.global = (optionsOrServiceName as ServiceOptions<T, K>).global || false;
         service.transient = (optionsOrServiceName as ServiceOptions<T, K>).transient;
+        service.asyncInitialization = (optionsOrServiceName as ServiceOptions<T, K>).asyncInitialization;
       }
 
       Container.set(service);

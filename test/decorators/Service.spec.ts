@@ -173,4 +173,34 @@ describe('Service Decorator', function () {
 
     expect(Container.get(TestService)).toBe('TEST_STRING');
   });
+
+  it('should support services with asynchronous initialization', async function () {
+    @Service({ asyncInitialization: true })
+    class Engine {
+      ignition: string = 'off';
+      initialized: Promise<any>;
+
+      constructor() {
+        this.initialized = this.initialize();
+      }
+
+      protected initialize() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            this.ignition = 'running';
+            resolve();
+          }, 300);
+        });
+      }
+    }
+
+    @Service()
+    class Car {
+      constructor(public engine: Engine) {}
+    }
+
+    const car = await Container.getAsync<Car>(Car);
+
+    expect(car.engine.ignition).toEqual('running');
+  });
 });

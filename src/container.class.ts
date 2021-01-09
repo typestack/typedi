@@ -106,6 +106,38 @@ export class Container {
   }
 
   /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  static getAsync<T>(type: Constructable<T>): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  static getAsync<T>(id: string): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  static getAsync<T>(id: Token<T>): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  static getAsync<T>(service: { service: T }): Promise<T>;
+
+  /**
+   * Like get, but returns a promise of a service that recursively resolves async properties.
+   * Used when service defined with asyncInitialization: true flag.
+   */
+  static getAsync<T>(identifier: ServiceIdentifier<T>): Promise<T> {
+    return this.globalInstance.getAsync(identifier as any);
+  }
+
+  /**
    * Gets all instances registered in the container of the given service identifier.
    * Used when service defined with multiple: true flag.
    */
@@ -123,6 +155,26 @@ export class Container {
    */
   static getMany<T>(id: string | Token<T>): T[] {
     return this.globalInstance.getMany(id as any);
+  }
+
+  /**
+   * Like getMany, but returns a promise that recursively resolves async properties on all services.
+   * Used when services defined with multiple: true and asyncInitialization: true flags.
+   */
+  static getManyAsync<T>(id: string): T[];
+
+  /**
+   * Like getMany, but returns a promise that recursively resolves async properties on all services.
+   * Used when services defined with multiple: true and asyncInitialization: true flags.
+   */
+  static getManyAsync<T>(id: Token<T>): T[];
+
+  /**
+   * Like getMany, but returns a promise that recursively resolves async properties on all services.
+   * Used when services defined with multiple: true and asyncInitialization: true flags.
+   */
+  static getManyAsync<T>(id: string | Token<T>): Promise<T>[] {
+    return this.globalInstance.getManyAsync(id as any);
   }
 
   /**
