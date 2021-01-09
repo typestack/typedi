@@ -4,6 +4,7 @@ import { Handler } from './interfaces/handler.interface';
 import { Constructable } from './types/constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceOptions } from './interfaces/service-options.interface';
+import { AbstractConstructable } from './types/abstract-constructable.type';
 
 /**
  * Service container.
@@ -51,6 +52,7 @@ export class Container {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   static get<T>(type: Constructable<T>): T;
+  static get<T>(type: AbstractConstructable<T>): T;
   static get<T>(id: string): T;
   static get<T>(id: Token<T>): T;
   static get<T>(identifier: ServiceIdentifier<T>): T {
@@ -70,11 +72,13 @@ export class Container {
   /**
    * Sets a value for the given type or service name in the container.
    */
-  static set(type: Function, value: any): Container;
-  static set(name: string, value: any): Container;
-  static set(token: Token<any>, value: any): Container;
-  static set<T>(value: ServiceOptions<T>): Container;
-  static set<T>(values: ServiceOptions<T>[]): Container;
+  static set<T = unknown>(type: Function, value: any): Container;
+  static set<T = unknown>(type: Constructable<T>, value: any): Container;
+  static set<T = unknown>(type: AbstractConstructable<T>, value: any): Container;
+  static set<T = unknown>(name: string, value: any): Container;
+  static set<T = unknown>(token: Token<T>, value: any): Container;
+  static set<T = unknown>(value: ServiceOptions<T>): Container;
+  static set<T = unknown>(values: ServiceOptions<T>[]): Container;
   static set(
     identifierOrServiceMetadata: ServiceIdentifier | ServiceOptions<any> | ServiceOptions<any>[],
     value?: any

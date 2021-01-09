@@ -3,6 +3,7 @@ import { MissingProvidedServiceTypeError } from './error/missing-provided-servic
 import { ServiceNotFoundError } from './error/service-not-found.error';
 import { Token } from './token.class';
 import { Constructable } from './types/constructable.type';
+import { AbstractConstructable } from './types/abstract-constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface.';
 import { EMPTY_VALUE } from './empty.const';
@@ -39,6 +40,7 @@ export class ContainerInstance {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   get<T>(type: Constructable<T>): T;
+  get<T>(type: AbstractConstructable<T>): T;
   get<T>(id: string): T;
   get<T>(id: Token<T>): T;
   get<T>(identifier: ServiceIdentifier<T>): T {
@@ -79,6 +81,7 @@ export class ContainerInstance {
    */
   set<T = unknown>(service: ServiceMetadata<T>): this; // This should be hidden
   set<T = unknown>(type: Constructable<T>, instance: T): this;
+  set<T = unknown>(type: AbstractConstructable<T>, instance: T): this;
   set<T = unknown>(name: string, instance: T): this;
   set<T = unknown>(token: Token<T>, instance: T): this;
   set<T = unknown>(token: ServiceIdentifier, instance: T): this;
