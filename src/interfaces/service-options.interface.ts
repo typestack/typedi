@@ -12,6 +12,13 @@ export interface ServiceOptions<Type = unknown> {
   id?: ServiceIdentifier;
 
   /**
+   * Class definition of the service what is used to initialize given service.
+   * This property maybe null if the value of the service is set manually.
+   * If id is not set then it serves as service id.
+   */
+  type?: Constructable<Type> | null;
+
+  /**
    * Indicates if this service must be global and same instance must be used across all containers.
    */
   global?: boolean;
