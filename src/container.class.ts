@@ -1,9 +1,9 @@
-import { ContainerInstance } from './ContainerInstance';
-import { Token } from './Token';
-import { Handler } from './types/Handler';
-import { ObjectType } from './types/ObjectType';
-import { ServiceIdentifier } from './types/ServiceIdentifier';
-import { ServiceMetadata } from './types/ServiceMetadata';
+import { ContainerInstance } from './container-instance.class';
+import { Token } from './token.class';
+import { Handler } from './interfaces/handler.interface';
+import { Constructable } from './types/constructable.type';
+import { ServiceIdentifier } from './types/service-identifier.type';
+import { ServiceMetadata } from './interfaces/service-metadata.interface.';
 
 /**
  * Service container.
@@ -51,7 +51,7 @@ export class Container {
    * Checks if the service with given name or type is registered service container.
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
-  static has<T>(type: ObjectType<T>): boolean;
+  static has<T>(type: Constructable<T>): boolean;
 
   /**
    * Checks if the service with given name or type is registered service container.
@@ -77,7 +77,7 @@ export class Container {
    * Retrieves the service with given name or type from the service container.
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
-  static get<T>(type: ObjectType<T>): T;
+  static get<T>(type: Constructable<T>): T;
 
   /**
    * Retrieves the service with given name or type from the service container.

@@ -1,8 +1,8 @@
-import { Container } from '../Container';
-import { ContainerInstance } from '../ContainerInstance';
-import { Token } from '../Token';
-import { ServiceMetadata } from '../types/ServiceMetadata';
-import { ServiceOptions } from '../types/ServiceOptions';
+import { Container } from '../container.class';
+import { ContainerInstance } from '../container-instance.class';
+import { Token } from '../token.class';
+import { ServiceMetadata } from '../interfaces/service-metadata.interface.';
+import { ServiceOptions } from '../interfaces/service-options.interface';
 
 export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 } | Token<T1>;
 

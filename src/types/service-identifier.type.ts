@@ -1,4 +1,4 @@
-import { Token } from '../Token';
+import { Token } from '../token.class';
 
 /**
  * Unique service identifier.

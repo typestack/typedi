@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/Container';
-import { Service } from '../../../src/decorators/Service';
+import { Container } from '../../../src/container.class';
+import { Service } from '../../../src/decorators/service.decorator';
 
 describe('github issues > #56 extended class is being overwritten', function () {
   beforeEach(() => Container.reset());

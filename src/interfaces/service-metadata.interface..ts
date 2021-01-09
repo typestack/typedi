@@ -1,5 +1,5 @@
-import { ObjectType } from './ObjectType';
-import { ServiceIdentifier } from './ServiceIdentifier';
+import { Constructable } from '../types/constructable.type';
+import { ServiceIdentifier } from '../types/service-identifier.type';
 
 /**
  * Service metadata is used to initialize service and store its state.
@@ -38,7 +38,7 @@ export interface ServiceMetadata<T, K extends keyof T> {
    * Can be regular function ("createCar" for example),
    * or other service which produces this instance ([CarFactory, "createCar"] for example).
    */
-  factory?: [ObjectType<T>, K] | ((...params: any[]) => any);
+  factory?: [Constructable<T>, K] | ((...params: any[]) => any);
 
   /**
    * Instance of the target class.

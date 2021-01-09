@@ -1,4 +1,4 @@
-import { ContainerInstance } from '../ContainerInstance';
+import { ContainerInstance } from '../container-instance.class';
 
 /**
  * Used to register special "handler" which will be executed on a service class during its initialization.

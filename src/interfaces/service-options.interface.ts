@@ -1,5 +1,5 @@
-import { ObjectType } from './ObjectType';
-import { Token } from '../Token';
+import { Constructable } from '../types/constructable.type';
+import { Token } from '../token.class';
 
 /**
  * Service options passed to the @Service() decorator.
@@ -30,5 +30,5 @@ export interface ServiceOptions<T, K extends keyof T> {
   /**
    * Factory used to produce this service.
    */
-  factory?: [ObjectType<T>, K] | ((...params: any[]) => any);
+  factory?: [Constructable<T>, K] | ((...params: any[]) => any);
 }

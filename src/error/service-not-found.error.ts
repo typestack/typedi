@@ -1,5 +1,5 @@
-import { ServiceIdentifier } from '../types/ServiceIdentifier';
-import { Token } from '../Token';
+import { ServiceIdentifier } from '../types/service-identifier.type';
+import { Token } from '../token.class';
 
 /**
  * Thrown when requested service was not found.

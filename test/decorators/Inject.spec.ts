@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { Container } from '../../src/Container';
-import { Service } from '../../src/decorators/Service';
-import { Inject } from '../../src/decorators/Inject';
-import { Token } from '../../src/Token';
-import { InjectMany } from '../../src/decorators/InjectMany';
+import { Container } from '../../src/container.class';
+import { Service } from '../../src/decorators/service.decorator';
+import { Inject } from '../../src/decorators/inject.decorator';
+import { Token } from '../../src/token.class';
+import { InjectMany } from '../../src/decorators/inject-many.decorator';
 
 describe('Inject Decorator', function () {
   beforeEach(() => Container.reset());

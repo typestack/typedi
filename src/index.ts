@@ -1,15 +1,15 @@
-import { Container } from './Container';
+import { Container } from './container.class';
 
-export * from './decorators/Service';
-export * from './decorators/Inject';
-export * from './decorators/InjectMany';
-export { Container } from './Container';
-export { ContainerInstance } from './ContainerInstance';
-export { Token } from './Token';
-export { Handler } from './types/Handler';
-export { ServiceOptions } from './types/ServiceOptions';
-export { ServiceIdentifier } from './types/ServiceIdentifier';
-export { ServiceMetadata } from './types/ServiceMetadata';
-export { ObjectType } from './types/ObjectType';
+export * from './decorators/service.decorator';
+export * from './decorators/inject.decorator';
+export * from './decorators/inject-many.decorator';
+export { Container } from './container.class';
+export { ContainerInstance } from './container-instance.class';
+export { Token } from './token.class';
+export { Handler } from './interfaces/handler.interface';
+export { ServiceOptions } from './interfaces/service-options.interface';
+export { ServiceIdentifier } from './types/service-identifier.type';
+export { ServiceMetadata } from './interfaces/service-metadata.interface.';
+export { Constructable as ObjectType } from './types/constructable.type';
 
 export default Container;

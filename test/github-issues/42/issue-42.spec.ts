@@ -1,7 +1,7 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/Container';
-import { Service } from '../../../src/decorators/Service';
-import { Inject } from '../../../src/decorators/Inject';
+import { Container } from '../../../src/container.class';
+import { Service } from '../../../src/decorators/service.decorator';
+import { Inject } from '../../../src/decorators/inject.decorator';
 
 describe('github issues > #42 Exception not thrown on missing binding', function () {
   beforeEach(() => Container.reset());
