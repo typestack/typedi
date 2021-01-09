@@ -54,10 +54,18 @@ export class ContainerInstance {
 
     /** If it's the first time requested in the child container we load it from parent and set it. */
     if (globalService && this !== globalContainer) {
-      const clonedService = Object.assign({}, globalService);
+      const clonedService = { ...globalService };
       clonedService.value = EMPTY_VALUE;
+
+      /**
+       * We need to immediately set the empty value from the root container
+       * to prevent infinite lookup in cyclic dependencies.
+       */
+      this.set(clonedService);
+
       const value = this.getServiceValue(clonedService);
-      this.set(identifier, value);
+      this.set({ ...clonedService, value });
+
       return value;
     }
 
