@@ -5,7 +5,6 @@ import { Constructable } from './types/constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface.';
 
-
 /**
  * Service container.
  */
@@ -110,7 +109,7 @@ export class Container {
    * Like get, but returns a promise of a service that recursively resolves async properties.
    * Used when service defined with asyncInitialization: true flag.
    */
-  static getAsync<T>(type: ObjectType<T>): Promise<T>;
+  static getAsync<T>(type: Constructable<T>): Promise<T>;
 
   /**
    * Like get, but returns a promise of a service that recursively resolves async properties.

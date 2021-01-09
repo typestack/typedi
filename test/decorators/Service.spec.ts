@@ -172,35 +172,35 @@ describe('Service Decorator', function () {
     });
 
     expect(Container.get(TestService)).toBe('TEST_STRING');
+  });
 
-    it('should support services with asynchronous initialization', async function () {
-      @Service({ asyncInitialization: true })
-      class Engine {
-        ignition: string = 'off';
-        initialized: Promise<any>;
+  it('should support services with asynchronous initialization', async function () {
+    @Service({ asyncInitialization: true })
+    class Engine {
+      ignition: string = 'off';
+      initialized: Promise<any>;
 
-        constructor() {
-          this.initialized = this.initialize();
-        }
-
-        protected initialize() {
-          return new Promise(resolve => {
-            setTimeout(() => {
-              this.ignition = 'running';
-              resolve();
-            }, 300);
-          });
-        }
+      constructor() {
+        this.initialized = this.initialize();
       }
 
-      @Service()
-      class Car {
-        constructor(public engine: Engine) {}
+      protected initialize() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            this.ignition = 'running';
+            resolve();
+          }, 300);
+        });
       }
+    }
 
-      const car = await Container.getAsync<Car>(Car);
+    @Service()
+    class Car {
+      constructor(public engine: Engine) {}
+    }
 
-      expect(car.engine.ignition).toEqual('running');
-    });
+    const car = await Container.getAsync<Car>(Car);
+
+    expect(car.engine.ignition).toEqual('running');
   });
 });

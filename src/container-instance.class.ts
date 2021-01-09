@@ -8,7 +8,6 @@ import { ServiceMetadata } from './interfaces/service-metadata.interface.';
 import { AsyncInitializedService } from './types/AsyncInitializedService';
 import { MissingInitializedPromiseError } from './error/MissingInitializedPromiseError';
 
-
 /**
  * TypeDI can have multiple containers.
  * One container is ContainerInstance.
@@ -122,7 +121,7 @@ export class ContainerInstance {
    * Like get, but returns a promise of a service that recursively resolves async properties.
    * Used when service defined with asyncInitialization: true flag.
    */
-  getAsync<T>(type: ObjectType<T>): Promise<T>;
+  getAsync<T>(type: Constructable<T>): Promise<T>;
 
   /**
    * Like get, but returns a promise of a service that recursively resolves async properties.
@@ -498,9 +497,9 @@ export class ContainerInstance {
     if (type) this.applyPropertyHandlers(type, value);
 
     if (value instanceof AsyncInitializedService || service.asyncInitialization) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         if (!(value.initialized instanceof Promise) && service.asyncInitialization) {
-            throw new MissingInitializedPromiseError(service.value);
+          throw new MissingInitializedPromiseError(service.value);
         }
 
         value.initialized.then(() => resolve(value));
