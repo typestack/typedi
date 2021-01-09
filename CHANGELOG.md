@@ -11,7 +11,7 @@ to the container and returned. This behavior has changed and now a `ServiceNotFo
 
 #### Changed container reset behavior
 
-Until know resetting a container removed all dependency declarations from the container. From now on the default behavior
+Until now resetting a container removed all dependency declarations from the container. From now on the default behavior
 is to remove the created instances only but not the definitions. This means requesting a Service again from the container
 won't result in a `ServiceNotFoundError` but will create a new instance of the requested function again.
 
@@ -20,6 +20,7 @@ The old behavior can be restored with passing the `{ strategy: 'resetServices'}`
 ### Changed
 
 - **[BREAKING]** unknown values are not resolved anymore
+- **[BREAKING]** resetting a container doesn't remove the service definitions only the created instances by default
 - **[BREAKING]** container ID can be string only now
 - default container ID changed from `undefined` to `default`
 - stricter type definitions and assertions across the project
