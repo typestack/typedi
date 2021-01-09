@@ -1,14 +1,15 @@
 import { ContainerInstance } from '../container-instance.class';
+import { Constructable } from '../types/constructable.type';
 
 /**
  * Used to register special "handler" which will be executed on a service class during its initialization.
  * It can be used to create custom decorators and set/replace service class properties and constructor parameters.
  */
-export interface Handler {
+export interface Handler<T = unknown> {
   /**
    * Service object used to apply handler to.
    */
-  object: Object;
+  object: Constructable<T>;
 
   /**
    * Class property name to set/replace value of.

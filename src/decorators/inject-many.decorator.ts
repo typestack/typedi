@@ -21,7 +21,7 @@ export function InjectMany(token: Token<any>): Function;
  * Injects a service into a class property or constructor parameter.
  */
 export function InjectMany(typeOrName?: ((type?: any) => Function) | string | Token<any>): Function {
-  return function (target: Object, propertyName: string, index?: number) {
+  return function (target: any, propertyName: string, index?: number) {
     if (!typeOrName) typeOrName = () => (Reflect as any).getMetadata('design:type', target, propertyName);
 
     Container.registerHandler({
