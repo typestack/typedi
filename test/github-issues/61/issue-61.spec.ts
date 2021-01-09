@@ -2,10 +2,10 @@ import 'reflect-metadata';
 import { Container } from '../../../src/container.class';
 import { Service } from '../../../src/decorators/service.decorator';
 
-describe('github issues > #61 Scoped container creates new instance of service every time', function () {
+describe('Github Issues', function () {
   beforeEach(() => Container.reset());
 
-  it('should work properly', function () {
+  it('#61 - Scoped container creates new instance of service every time', function () {
     @Service()
     class Car {
       public serial = Math.random();
@@ -31,6 +31,6 @@ describe('github issues > #61 Scoped container creates new instance of service e
     expect(car1Serial).not.toEqual(barCar1Serial);
     expect(fooCar1Serial).not.toEqual(barCar1Serial);
 
-    expect(Container.of({}).get(Car).serial === Container.of({}).get(Car).serial).toBe(false);
+    expect(Container.of('TEST').get(Car).serial === Container.of('TEST').get(Car).serial).toBe(true);
   });
 });
