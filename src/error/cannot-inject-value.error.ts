@@ -1,14 +1,19 @@
+import { Constructable } from '../types/constructable.type';
+
 /**
  * Thrown when DI cannot inject value into property decorated by @Inject decorator.
  */
 export class CannotInjectValueError extends Error {
-  name = 'CannotInjectValueError';
+  public name = 'CannotInjectValueError';
 
-  constructor(target: Object, propertyName: string) {
-    super(
-      `Cannot inject value into "${target.constructor.name}.${propertyName}". ` +
-        `Please make sure you setup reflect-metadata properly and you don't use interfaces without service tokens as injection value.`
+  get message(): string {
+    return (
+      `Cannot inject value into "${this.target.constructor.name}.${this.propertyName}". ` +
+      `Please make sure you setup reflect-metadata properly and you don't use interfaces without service tokens as injection value.`
     );
-    Object.setPrototypeOf(this, CannotInjectValueError.prototype);
+  }
+
+  constructor(private target: Constructable<unknown>, private propertyName: string) {
+    super();
   }
 }
