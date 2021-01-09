@@ -5,64 +5,31 @@ import { Token } from './token.class';
 import { Constructable } from './types/constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface.';
+import { EMPTY_VALUE } from './empty.const';
+import { ServiceOptions } from './interfaces/service-options.interface';
 
 /**
  * TypeDI can have multiple containers.
  * One container is ContainerInstance.
  */
 export class ContainerInstance {
-  // -------------------------------------------------------------------------
-  // Public Properties
-  // -------------------------------------------------------------------------
+  /** Container instance id. */
+  public readonly id!: string;
 
-  /**
-   * Container instance id.
-   */
-  id: any;
+  /** All registered services in the container. */
+  private services: ServiceMetadata<unknown>[] = [];
 
-  // -------------------------------------------------------------------------
-  // Private Properties
-  // -------------------------------------------------------------------------
-
-  /**
-   * All registered services.
-   */
-  private services: ServiceMetadata<any, any>[] = [];
-
-  // -------------------------------------------------------------------------
-  // Constructor
-  // -------------------------------------------------------------------------
-
-  constructor(id: any) {
+  constructor(id: string) {
     this.id = id;
   }
-
-  // -------------------------------------------------------------------------
-  // Public Methods
-  // -------------------------------------------------------------------------
 
   /**
    * Checks if the service with given name or type is registered service container.
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   has<T>(type: Constructable<T>): boolean;
-
-  /**
-   * Checks if the service with given name or type is registered service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
   has<T>(id: string): boolean;
-
-  /**
-   * Checks if the service with given name or type is registered service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
   has<T>(id: Token<T>): boolean;
-
-  /**
-   * Checks if the service with given name or type is registered service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
   has<T>(identifier: ServiceIdentifier): boolean {
     return !!this.findService(identifier);
   }
@@ -72,47 +39,29 @@ export class ContainerInstance {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   get<T>(type: Constructable<T>): T;
-
-  /**
-   * Retrieves the service with given name or type from the service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
   get<T>(id: string): T;
-
-  /**
-   * Retrieves the service with given name or type from the service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
   get<T>(id: Token<T>): T;
-
-  /**
-   * Retrieves the service with given name or type from the service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
-  get<T>(id: { service: T }): T;
-
-  /**
-   * Retrieves the service with given name or type from the service container.
-   * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
-   */
   get<T>(identifier: ServiceIdentifier<T>): T {
     const globalContainer = Container.of(undefined);
-    const service = globalContainer.findService(identifier);
+    const globalService = globalContainer.findService(identifier);
     const scopedService = this.findService(identifier);
 
-    if (service && service.global === true) return this.getServiceValue(identifier, service);
+    if (globalService && globalService.global === true) return this.getServiceValue(globalService);
 
-    if (scopedService) return this.getServiceValue(identifier, scopedService);
+    if (scopedService) return this.getServiceValue(scopedService);
 
-    if (service && this !== globalContainer) {
-      const clonedService = Object.assign({}, service);
-      clonedService.value = undefined;
-      const value = this.getServiceValue(identifier, clonedService);
+    /** If it's the first time requested in the child container we load it from parent and set it. */
+    if (globalService && this !== globalContainer) {
+      const clonedService = Object.assign({}, globalService);
+      clonedService.value = EMPTY_VALUE;
+      const value = this.getServiceValue(clonedService);
       this.set(identifier, value);
       return value;
     }
 
-    return this.getServiceValue(identifier, service);
+    if (globalService) return this.getServiceValue(globalService);
+
+    throw new ServiceNotFoundError(identifier);
   }
 
   /**
@@ -120,77 +69,64 @@ export class ContainerInstance {
    * Used when service defined with multiple: true flag.
    */
   getMany<T>(id: string): T[];
-
-  /**
-   * Gets all instances registered in the container of the given service identifier.
-   * Used when service defined with multiple: true flag.
-   */
   getMany<T>(id: Token<T>): T[];
-
-  /**
-   * Gets all instances registered in the container of the given service identifier.
-   * Used when service defined with multiple: true flag.
-   */
   getMany<T>(id: string | Token<T>): T[] {
-    return this.filterServices(id).map(service => this.getServiceValue(id, service));
+    return this.filterServices(id).map(service => this.getServiceValue(service));
   }
 
   /**
    * Sets a value for the given type or service name in the container.
    */
-  set<T, K extends keyof T>(service: ServiceMetadata<T, K>): this;
-
-  /**
-   * Sets a value for the given type or service name in the container.
-   */
-  set(type: Function, value: any): this;
-
-  /**
-   * Sets a value for the given type or service name in the container.
-   */
-  set(name: string, value: any): this;
-
-  /**
-   * Sets a value for the given type or service name in the container.
-   */
-  set(token: Token<any>, value: any): this;
-
-  /**
-   * Sets a value for the given type or service name in the container.
-   */
-  set(token: ServiceIdentifier, value: any): this;
-
-  /**
-   * Sets a value for the given type or service name in the container.
-   */
-  set<T, K extends keyof T>(values: ServiceMetadata<T, K>[]): this;
-
-  /**
-   * Sets a value for the given type or service name in the container.
-   */
-  set(
-    identifierOrServiceMetadata: ServiceIdentifier | ServiceMetadata<any, any> | ServiceMetadata<any, any>[],
-    value?: any
+  set<T = unknown>(service: ServiceMetadata<T>): this; // This should be hidden
+  set<T = unknown>(type: Constructable<T>, instance: T): this;
+  set<T = unknown>(name: string, instance: T): this;
+  set<T = unknown>(token: Token<T>, instance: T): this;
+  set<T = unknown>(token: ServiceIdentifier, instance: T): this;
+  set<T = unknown>(metadata: ServiceOptions<T>): this;
+  set<T = unknown>(metadataArray: ServiceOptions<T>[]): this;
+  set<T = unknown>(
+    identifierOrServiceMetadata: ServiceIdentifier | ServiceOptions<T> | ServiceOptions<T>[],
+    value?: T
   ): this {
     if (identifierOrServiceMetadata instanceof Array) {
-      identifierOrServiceMetadata.forEach((v: any) => this.set(v));
+      identifierOrServiceMetadata.forEach(data => this.set(data));
       return this;
     }
     if (typeof identifierOrServiceMetadata === 'string' || identifierOrServiceMetadata instanceof Token) {
-      return this.set({ id: identifierOrServiceMetadata, value: value });
-    }
-    if (
-      typeof identifierOrServiceMetadata === 'object' &&
-      (identifierOrServiceMetadata as { service: Token<any> }).service
-    ) {
-      return this.set({ id: (identifierOrServiceMetadata as { service: Token<any> }).service, value: value });
-    }
-    if (typeof identifierOrServiceMetadata === 'function') {
-      return this.set({ type: identifierOrServiceMetadata, id: identifierOrServiceMetadata, value: value });
+      return this.set({
+        id: identifierOrServiceMetadata,
+        type: null,
+        value: value,
+        factory: undefined,
+        global: false,
+        multiple: false,
+        transient: false,
+      });
     }
 
-    // const newService: ServiceMetadata<any, any> = arguments.length === 1 && typeof identifierOrServiceMetadata === "object"  && !(identifierOrServiceMetadata instanceof Token) ? identifierOrServiceMetadata : undefined;
-    const newService: ServiceMetadata<any, any> = identifierOrServiceMetadata as any;
+    if (typeof identifierOrServiceMetadata === 'function') {
+      return this.set({
+        id: identifierOrServiceMetadata,
+        // TODO: remove explicit casting
+        type: identifierOrServiceMetadata as Constructable<unknown>,
+        value: value,
+        factory: undefined,
+        global: false,
+        multiple: false,
+        transient: false,
+      });
+    }
+
+    const newService: ServiceMetadata<T> = {
+      id: new Token('UNREACHABLE'),
+      type: null,
+      factory: undefined,
+      value: EMPTY_VALUE,
+      global: false,
+      multiple: false,
+      transient: false,
+      ...identifierOrServiceMetadata,
+    };
     const service = this.findService(newService.id);
     if (service && service.multiple !== true) {
       Object.assign(service, newService);
@@ -216,19 +152,30 @@ export class ContainerInstance {
   /**
    * Completely resets the container by removing all previously registered services from it.
    */
-  reset(): this {
-    this.services = [];
+  public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
+    // TODO: The resources should be freed up.
+    switch (options.strategy) {
+      case 'resetValue':
+        this.services = this.services.map(s => {
+          return {
+            ...s,
+            value: !!s.type ? EMPTY_VALUE : s.value,
+          };
+        });
+        break;
+      case 'resetValue':
+        this.services = [];
+        break;
+      default:
+        throw new Error('Received invalid reset strategy.');
+    }
     return this;
   }
-
-  // -------------------------------------------------------------------------
-  // Private Methods
-  // -------------------------------------------------------------------------
 
   /**
    * Filters registered service in the with a given service identifier.
    */
-  private filterServices(identifier: ServiceIdentifier): ServiceMetadata<any, any>[] {
+  private filterServices(identifier: ServiceIdentifier): ServiceMetadata<any>[] {
     return this.services.filter(service => {
       if (service.id) return service.id === identifier;
 
@@ -242,7 +189,7 @@ export class ContainerInstance {
   /**
    * Finds registered service in the with a given service identifier.
    */
-  private findService(identifier: ServiceIdentifier): ServiceMetadata<any, any> | undefined {
+  private findService(identifier: ServiceIdentifier): ServiceMetadata<any> | undefined {
     return this.services.find(service => {
       if (service.id) {
         if (
@@ -265,81 +212,90 @@ export class ContainerInstance {
   /**
    * Gets service value.
    */
-  private getServiceValue(identifier: ServiceIdentifier, service: ServiceMetadata<any, any> | undefined): any {
+  private getServiceValue(serviceMetadata: ServiceMetadata<unknown>): any {
     // find if instance of this object already initialized in the container and return it if it is
-    if (service && service.value !== undefined) return service.value;
+    /**
+     * If the service value has been set to anything prior to this call we return the set value.
+     * NOTE: This part builds on the assumption that transient dependencies has no value set ever.
+     */
+    if (serviceMetadata.value !== EMPTY_VALUE) {
+      return serviceMetadata.value;
+    }
 
     // if named service was requested and its instance was not found plus there is not type to know what to initialize,
     // this means service was not pre-registered and we throw an exception
     if (
-      (!service || !service.type) &&
-      (!service || !service.factory) &&
-      (typeof identifier === 'string' || identifier instanceof Token)
+      (!serviceMetadata || !serviceMetadata.type) &&
+      (!serviceMetadata || !serviceMetadata.factory) &&
+      (typeof serviceMetadata.id === 'string' || serviceMetadata.id instanceof Token)
     )
-      throw new ServiceNotFoundError(identifier);
+      throw new ServiceNotFoundError(serviceMetadata.id);
 
     // at this point we either have type in service registered, either identifier is a target type
-    let type = undefined;
-    if (service && service.type) {
-      type = service.type;
-    } else if (service && typeof service.id === 'function') {
-      type = service.id;
-    } else if (typeof identifier === 'function') {
-      type = identifier;
+    let construtableType: Constructable<unknown> | undefined;
 
-      // } else if (identifier instanceof Object && (identifier as { service: Token<any> }).service instanceof Token) {
-      //     type = (identifier as { service: Token<any> }).service;
-    }
-
-    // if service was not found then create a new one and register it
-    if (!service) {
-      if (!type) throw new MissingProvidedServiceTypeError(identifier);
-
-      service = { type: type };
-      this.services.push(service);
+    if (serviceMetadata && serviceMetadata.type) {
+      construtableType = serviceMetadata.type;
+    } else if (typeof serviceMetadata.id === 'function') {
+      construtableType = serviceMetadata.id as Constructable<unknown>;
     }
 
     // setup constructor parameters for a newly initialized service
     const paramTypes =
-      type && Reflect && (Reflect as any).getMetadata
-        ? (Reflect as any).getMetadata('design:paramtypes', type)
+      construtableType && Reflect && (Reflect as any).getMetadata
+        ? (Reflect as any).getMetadata('design:paramtypes', construtableType)
         : undefined;
-    let params: any[] = paramTypes ? this.initializeParams(type, paramTypes) : [];
+    // TODO: remove as any, here it cannot be undefined but TS doesn't see this.
+    let params: any[] = paramTypes ? this.initializeParams(construtableType as any, paramTypes) : [];
 
     // if factory is set then use it to create service instance
     let value: any;
-    if (service.factory) {
+    if (serviceMetadata.factory) {
       // filter out non-service parameters from created service constructor
       // non-service parameters can be, lets say Car(name: string, isNew: boolean, engine: Engine)
       // where name and isNew are non-service parameters and engine is a service parameter
       params = params.filter(param => param !== undefined);
 
-      if (service.factory instanceof Array) {
+      if (serviceMetadata.factory instanceof Array) {
         // use special [Type, "create"] syntax to allow factory services
         // in this case Type instance will be obtained from Container and its method "create" will be called
-        value = this.get(service.factory[0])[service.factory[1]](...params);
+        let factoryInstance;
+        try {
+          factoryInstance = this.get<any>(serviceMetadata.factory[0]);
+        } catch (error) {
+          if (error instanceof ServiceNotFoundError) {
+            factoryInstance = new serviceMetadata.factory[0]();
+          }
+        }
+
+        // TODO: rethink this
+        // We need to pass `this` to make the following test pass:
+        // "should support function injection with Token dependencies"
+        // We should have the dependencies here, instead of passing the container to the factory.
+        // Maybe we should save the dependency ID list on the meta-data?
+        value = factoryInstance[serviceMetadata.factory[1]](...params, this);
       } else {
         // regular factory function
-        value = service.factory(...params, this);
+        value = serviceMetadata.factory(...params, this);
       }
     } else {
-      // otherwise simply create a new object instance
-      if (!type) throw new MissingProvidedServiceTypeError(identifier);
-
-      params.unshift(null);
+      // TODO: Commented it out as this makes no sense.
+      // params.unshift(null);
 
       // "extra feature" - always pass container instance as the last argument to the service function
       // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
       // need to be injected, and user can use provided container to get instances he needs
       params.push(this);
 
+      if (!construtableType) throw new MissingProvidedServiceTypeError(serviceMetadata.id);
+
       // eslint-disable-next-line prefer-spread
-      value = new (type.bind.apply(type, params))();
+      value = new construtableType(...params);
     }
 
-    if (service && !service.transient && value) service.value = value;
+    if (serviceMetadata && !serviceMetadata.transient && value) serviceMetadata.value = value;
 
-    if (type) this.applyPropertyHandlers(type, value);
+    if (construtableType) this.applyPropertyHandlers(construtableType, value);
 
     return value;
   }
@@ -375,7 +331,9 @@ export class ContainerInstance {
       if (typeof handler.index === 'number') return;
       if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor)) return;
 
-      instance[handler.propertyName] = handler.value(this);
+      if (handler.propertyName) {
+        instance[handler.propertyName] = handler.value(this);
+      }
     });
   }
 }

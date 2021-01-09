@@ -3,6 +3,8 @@ import { ContainerInstance } from '../container-instance.class';
 import { Token } from '../token.class';
 import { ServiceMetadata } from '../interfaces/service-metadata.interface.';
 import { ServiceOptions } from '../interfaces/service-options.interface';
+import { EMPTY_VALUE } from '../empty.const';
+import { Constructable } from '../types/constructable.type';
 
 export type ObjectType<T1> = { new (...args: any[]): T1 } | { service: T1 } | Token<T1>;
 
@@ -139,47 +141,64 @@ export function Service(token: Token<any>): Function;
 /**
  * Marks class as a service that can be injected using Container.
  */
-export function Service<T, K extends keyof T>(options?: ServiceOptions<T, K>): Function;
+export function Service<T, K extends keyof T>(options?: ServiceOptions<T>): Function;
 
 /**
  * Marks class as a service that can be injected using container.
  */
 export function Service<T, K extends keyof T>(
-  optionsOrServiceName?: ServiceOptions<T, K> | Token<any> | string | any[] | (() => any),
+  optionsOrServiceName?: ServiceOptions<T> | Token<any> | string | any[] | (() => any),
   maybeFactory?: (...args: any[]) => any
 ): any {
   if (arguments.length === 2 || typeof optionsOrServiceName === 'function') {
-    const serviceId = { service: new Token<T>() };
+    const serviceId = new Token<T>();
     const dependencies = arguments.length === 2 ? (optionsOrServiceName as any[]) : [];
     const factory = arguments.length === 2 ? maybeFactory : (optionsOrServiceName as Function);
 
+    if (factory === undefined) {
+      // TODO: This should never happen, but regardless, lets re-think this bit.
+      throw Error('Ohh no.');
+    }
+
     Container.set({
-      id: serviceId.service,
-      factory: (container: ContainerInstance) => {
-        const params = dependencies.map(dependency => container.get(dependency));
-        return factory(...params);
-      },
+      id: serviceId,
+      factory: [
+        class DefaultFactory {
+          create(container: ContainerInstance) {
+            const params = dependencies.map(dependency => container.get(dependency));
+            return factory(...params);
+          }
+        },
+        'create',
+      ],
+      global: false,
+      multiple: false,
+      transient: false,
+      value: EMPTY_VALUE,
     });
 
     return serviceId;
   } else {
-    return function (target: Function) {
-      const service: ServiceMetadata<T, K> = {
+    return function (target: Constructable<T>) {
+      const service: ServiceMetadata<T> = {
+        id: target,
         type: target,
+        factory: undefined,
+        multiple: false,
+        global: false,
+        transient: false,
+        value: EMPTY_VALUE,
       };
 
       if (typeof optionsOrServiceName === 'string' || optionsOrServiceName instanceof Token) {
         service.id = optionsOrServiceName;
-        service.multiple = (optionsOrServiceName as ServiceOptions<T, K>).multiple;
-        service.global = (optionsOrServiceName as ServiceOptions<T, K>).global || false;
-        service.transient = (optionsOrServiceName as ServiceOptions<T, K>).transient;
       } else if (optionsOrServiceName) {
         // ServiceOptions
-        service.id = (optionsOrServiceName as ServiceOptions<T, K>).id;
-        service.factory = (optionsOrServiceName as ServiceOptions<T, K>).factory;
-        service.multiple = (optionsOrServiceName as ServiceOptions<T, K>).multiple;
-        service.global = (optionsOrServiceName as ServiceOptions<T, K>).global || false;
-        service.transient = (optionsOrServiceName as ServiceOptions<T, K>).transient;
+        service.id = (optionsOrServiceName as ServiceOptions<T>).id || target;
+        service.factory = (optionsOrServiceName as ServiceOptions<T>).factory || undefined;
+        service.multiple = (optionsOrServiceName as ServiceOptions<T>).multiple || false;
+        service.global = (optionsOrServiceName as ServiceOptions<T>).global || false;
+        service.transient = (optionsOrServiceName as ServiceOptions<T>).transient || false;
       }
 
       Container.set(service);

@@ -96,9 +96,7 @@ describe('Container', function () {
 
   describe('set multiple', function () {
     it('should be able to provide a list of values', function () {
-      class TestService {
-        constructor() {}
-      }
+      class TestService {}
 
       class TestServiceFactory {
         create() {

@@ -39,6 +39,7 @@ describe('Service Decorator', function () {
   });
 
   it('should support factory functions', function () {
+    @Service()
     class Engine {
       constructor(public serialNumber: string) {}
     }
@@ -171,6 +172,6 @@ describe('Service Decorator', function () {
       return s.toUpperCase();
     });
 
-    expect(Container.get(TestService)).toBe('TEST_STRING');
+    expect(Container.get(TestService as any)).toBe('TEST_STRING');
   });
 });

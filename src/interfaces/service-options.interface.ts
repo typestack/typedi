@@ -1,11 +1,16 @@
 import { Constructable } from '../types/constructable.type';
-import { Token } from '../token.class';
+import { ServiceIdentifier } from '../types/service-identifier.type';
 
 /**
  * Service options passed to the @Service() decorator.
  * Allows to specify service id and/or factory used to create this service.
  */
-export interface ServiceOptions<T, K extends keyof T> {
+export interface ServiceOptions<Type = unknown> {
+  /**
+   * Unique service id.
+   */
+  id?: ServiceIdentifier;
+
   /**
    * Indicates if this service must be global and same instance must be used across all containers.
    */
@@ -23,12 +28,12 @@ export interface ServiceOptions<T, K extends keyof T> {
   multiple?: boolean;
 
   /**
-   * Unique service id.
-   */
-  id?: string | Token<any>;
-
-  /**
    * Factory used to produce this service.
    */
-  factory?: [Constructable<T>, K] | ((...params: any[]) => any);
+  factory?: [Constructable<unknown>, string] | CallableFunction | undefined;
+
+  /**
+   * Instance of the target class.
+   */
+  value?: unknown | Symbol;
 }

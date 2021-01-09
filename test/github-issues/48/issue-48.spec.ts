@@ -9,24 +9,22 @@ describe("github issues > #48 Token service iDs in global container aren't inher
   it('should work properly', function () {
     let poloCounter = 0;
 
-    interface FooService {
-      marco(): void;
-    }
-
     const FooServiceToken = new Token<FooService>();
 
-    // @Service({ id: FooServiceToken, factory: () => new FooServiceI() }) <= Providing a factory does not work either
     @Service(FooServiceToken)
-    class FooServiceI implements FooService {
+    class FooService implements FooService {
       public marco() {
         poloCounter++;
       }
     }
 
-    Container.get(FooServiceToken).marco();
-    const scopedContainer = Container.of({});
-    scopedContainer.get(FooServiceI).marco();
-    scopedContainer.get(FooServiceToken).marco();
-    expect(poloCounter).toBe(3);
+    const scopedContainer = Container.of('myScopredContainer');
+    const rootInstance = Container.get(FooServiceToken);
+    const scopedInstance = scopedContainer.get(FooServiceToken);
+
+    rootInstance.marco();
+    scopedInstance.marco();
+
+    expect(poloCounter).toBe(2);
   });
 });

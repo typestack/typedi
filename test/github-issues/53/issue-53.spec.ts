@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import 'reflect-metadata';
 import { Container } from '../../../src/container.class';
 import { Service } from '../../../src/decorators/service.decorator';
@@ -12,13 +13,13 @@ describe('github issues > #53 Token-based services are cached in the Global cont
       userName: string;
 
       save() {
-        // console.log(`saving question. author is ${this.userName}`);
+        return null;
       }
     }
 
-    const QuestionController = new Token<QuestionControllerImpl>('QCImpl');
+    const QuestionControllerToken = new Token<QuestionControllerImpl>('QCImpl');
 
-    @Service({ id: QuestionController })
+    @Service({ id: QuestionControllerToken })
     class QuestionControllerImpl {
       constructor(protected questionRepository: QuestionRepository) {}
 
@@ -28,17 +29,17 @@ describe('github issues > #53 Token-based services are cached in the Global cont
       }
     }
 
-    const request1 = { param: 'Timber' };
-    const controller1 = Container.of(request1).get(QuestionController);
+    const request1 = 'REQUEST_1';
+    const controller1 = Container.of(request1).get(QuestionControllerToken);
     controller1.save('Timber');
     Container.reset(request1);
 
-    const request2 = { param: 'Guest' };
-    const controller2 = Container.of(request2).get(QuestionController);
-    controller2.save('');
+    const request2 = 'REQUEST_2';
+    const controller2 = Container.of(request2).get(QuestionControllerToken);
+    controller2.save('John');
     Container.reset(request2);
 
     expect(controller1).not.toBe(controller2);
-    expect(controller1).not.toBe(Container.get(QuestionController));
+    expect(controller1).not.toBe(Container.get(QuestionControllerToken));
   });
 });
