@@ -1,9 +1,7 @@
-import {Reader} from "./Reader";
+import { Reader } from './Reader';
 
 export class FtpReader implements Reader {
-
-    read(): string {
-         return "read from ftp";
-    }
-
+  read(): string {
+    return 'read from ftp';
+  }
 }

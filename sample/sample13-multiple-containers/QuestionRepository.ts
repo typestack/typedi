@@ -1,11 +1,10 @@
-import {Service} from "../../src/decorators/Service";
+import { Service } from '../../src/decorators/Service';
 
 @Service()
 export class QuestionRepository {
-    userName: string;
+  userName: string;
 
-    save() {
-        console.log(`saving question. author is ${this.userName}`);
-    }
-
+  save() {
+    console.log(`saving question. author is ${this.userName}`);
+  }
 }

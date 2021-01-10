@@ -1,7 +1,7 @@
-import "reflect-metadata";
-import {Container} from "../../src/index";
-import {BmwCar} from "./BmwCar";
-import {PorsheCar} from "./PorsheCar";
+import 'reflect-metadata';
+import { Container } from '../../src/index';
+import { BmwCar } from './BmwCar';
+import { PorsheCar } from './PorsheCar';
 
 // drive bmw
 let bmwCar = Container.get(BmwCar);

@@ -1,35 +1,30 @@
-import "reflect-metadata";
-import {Container} from "../../../src/Container";
-import {Service} from "../../../src/decorators/Service";
-import {Token} from "../../../src";
+import 'reflect-metadata';
+import { Container } from '../../../src/container.class';
+import { Service } from '../../../src/decorators/service.decorator';
+import { Token } from '../../../src/token.class';
 
-describe("github issues > #48 Token service iDs in global container aren't inherited by scoped containers", function() {
+describe("github issues > #48 Token service iDs in global container aren't inherited by scoped containers", function () {
+  beforeEach(() => Container.reset());
 
-    beforeEach(() => Container.reset());
+  it('should work properly', function () {
+    let poloCounter = 0;
 
-    it("should work properly", function() {
+    const FooServiceToken = new Token<FooService>();
 
-        let poloCounter = 0;
+    @Service(FooServiceToken)
+    class FooService implements FooService {
+      public marco() {
+        poloCounter++;
+      }
+    }
 
-        interface FooService {
-            marco(): void;
-        }
+    const scopedContainer = Container.of('myScopredContainer');
+    const rootInstance = Container.get(FooServiceToken);
+    const scopedInstance = scopedContainer.get(FooServiceToken);
 
-        const FooServiceToken = new Token<FooService>();
+    rootInstance.marco();
+    scopedInstance.marco();
 
-        // @Service({ id: FooServiceToken, factory: () => new FooServiceI() }) <= Providing a factory does not work either
-        @Service(FooServiceToken)
-        class FooServiceI implements FooService {
-            public marco() {
-                poloCounter++;
-            }
-        }
-
-        Container.get(FooServiceToken).marco();
-        const scopedContainer = Container.of({});
-        scopedContainer.get(FooServiceI).marco();
-        scopedContainer.get(FooServiceToken).marco();
-        poloCounter.should.be.equal(3);
-    });
-
+    expect(poloCounter).toBe(2);
+  });
 });

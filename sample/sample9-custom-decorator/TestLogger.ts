@@ -1,11 +1,9 @@
-import {LoggerInterface} from "./LoggerInterface";
+import { LoggerInterface } from './LoggerInterface';
 
 export class TestLogger implements LoggerInterface {
+  lastMessage: string;
 
-    lastMessage: string;
-
-    log(message: string) {
-        this.lastMessage = message;
-    }
-
+  log(message: string) {
+    this.lastMessage = message;
+  }
 }

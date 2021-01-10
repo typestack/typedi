@@ -1,37 +1,73 @@
 # Changelog
 
+## 0.9.0 - 2021.01.10
+
+### BREAKING CHANGES
+
+#### Unregistered types are not resolved
+
+Prior to this version when an unknown constructable type was requested from the default container it was added automatically
+to the container and returned. This behavior has changed and now a `ServiceNotFoundError` error is thrown.
+
+#### Changed container reset behavior
+
+Until now resetting a container removed all dependency declarations from the container. From now on the default behavior
+is to remove the created instances only but not the definitions. This means requesting a Service again from the container
+won't result in a `ServiceNotFoundError` but will create a new instance of the requested function again.
+
+The old behavior can be restored with passing the `{ strategy: 'resetServices'}` to the `ContainerInstance.reset` function.
+
+### Changed
+
+- **[BREAKING]** unknown values are not resolved anymore (ref #87)
+- **[BREAKING]** resetting a container doesn't remove the service definitions only the created instances by default
+- **[BREAKING]** container ID can be string only now
+- default container ID changed from `undefined` to `default`
+- stricter type definitions and assertions across the project
+- updated the wording of `ServiceNotFoundError` to better explain which service is missing (#138)
+- updated various dev-dependencies
+- various changes to project tooling
+
+### Fixed
+
+- fixed a bug where requesting service with circular dependencies from a scoped container would result in Maximum call stack size exceeded error (ref #112)
+- fixed a bug where `@Inject`-ed properties were not injected in inherited child classes (ref #102)
+- fixed a typing issue which prevented using abstract class as service identifier (ref #144)
+- fixed a bug which broke transient services when `Container.reset()` was called (ref #157)
+- fixed some typos in the getting started documentation
+
 ## 0.8.0
 
-* added new type of dependency injection - function DI
-* now null can be stored in the container for values
+- added new type of dependency injection - function DI
+- now null can be stored in the container for values
 
 ## 0.7.2
 
-* fixed bug with inherited services
+- fixed bug with inherited services
 
 ## 0.7.1
 
-* fixed the way how global services work
+- fixed the way how global services work
 
 ## 0.7.0
 
-* added javascript support
-* removed deprecated `@Require` decorator
-* added support for transient services
-* now service constructors cannot accept non-service arguments
-* added `@InjectMany` decorator to support injection of "many" values
-* fixed the way how global services work
+- added javascript support
+- removed deprecated `@Require` decorator
+- added support for transient services
+- now service constructors cannot accept non-service arguments
+- added `@InjectMany` decorator to support injection of "many" values
+- fixed the way how global services work
 
 ## 0.6.1
 
-* added `Container.has` method
+- added `Container.has` method
 
 ## 0.6.0
 
-* added multiple containers support
-* added grouped (tagged) containers support
-* removed `provide` method, use `set` method instead
-* deprecated `Require` decorator. Use es6 imports instead or named services
-* inherited classes don't need to be decorated with `@Service` decorator
-* other small api changes
-* now `Handler`'s `value` accepts a container which requests the value
+- added multiple containers support
+- added grouped (tagged) containers support
+- removed `provide` method, use `set` method instead
+- deprecated `Require` decorator. Use es6 imports instead or named services
+- inherited classes don't need to be decorated with `@Service` decorator
+- other small api changes
+- now `Handler`'s `value` accepts a container which requests the value

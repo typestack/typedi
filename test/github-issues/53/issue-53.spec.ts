@@ -1,51 +1,45 @@
-import "reflect-metadata";
-import {Container} from "../../../src/Container";
-import {Service} from "../../../src/decorators/Service";
-import {Token} from "../../../src";
+import { Console } from 'console';
+import 'reflect-metadata';
+import { Container } from '../../../src/container.class';
+import { Service } from '../../../src/decorators/service.decorator';
+import { Token } from '../../../src/token.class';
 
-describe("github issues > #53 Token-based services are cached in the Global container even when fetched via a subcontainer", function() {
+describe('github issues > #53 Token-based services are cached in the Global container even when fetched via a subcontainer', function () {
+  beforeEach(() => Container.reset());
 
-    beforeEach(() => Container.reset());
+  it('should work properly', function () {
+    @Service()
+    class QuestionRepository {
+      userName: string;
 
-    it("should work properly", function() {
+      save() {
+        return null;
+      }
+    }
 
-        @Service()
-        class QuestionRepository {
-            userName: string;
+    const QuestionControllerToken = new Token<QuestionControllerImpl>('QCImpl');
 
-            save() {
-                // console.log(`saving question. author is ${this.userName}`);
-            }
+    @Service({ id: QuestionControllerToken })
+    class QuestionControllerImpl {
+      constructor(protected questionRepository: QuestionRepository) {}
 
-        }
+      save(name: string) {
+        if (name) this.questionRepository.userName = name;
+        this.questionRepository.save();
+      }
+    }
 
-        const QuestionController = new Token<QuestionControllerImpl>("QCImpl");
+    const request1 = 'REQUEST_1';
+    const controller1 = Container.of(request1).get(QuestionControllerToken);
+    controller1.save('Timber');
+    Container.reset(request1);
 
-        @Service({ id: QuestionController })
-        class QuestionControllerImpl {
+    const request2 = 'REQUEST_2';
+    const controller2 = Container.of(request2).get(QuestionControllerToken);
+    controller2.save('John');
+    Container.reset(request2);
 
-            constructor(protected questionRepository: QuestionRepository) {
-            }
-
-            save(name: string) {
-                if (name)
-                    this.questionRepository.userName = name;
-                this.questionRepository.save();
-            }
-        }
-
-        const request1 = { param: "Timber" };
-        const controller1 = Container.of(request1).get(QuestionController);
-        controller1.save("Timber");
-        Container.reset(request1);
-
-        const request2 = { param: "Guest" };
-        const controller2 = Container.of(request2).get(QuestionController);
-        controller2.save("");
-        Container.reset(request2);
-
-        controller1.should.not.be.equal(controller2);
-        controller1.should.not.be.equal(Container.get(QuestionController));
-    });
-
+    expect(controller1).not.toBe(controller2);
+    expect(controller1).not.toBe(Container.get(QuestionControllerToken));
+  });
 });

@@ -1,34 +1,28 @@
-import "reflect-metadata";
-import {Container} from "../../../src/Container";
-import {Service} from "../../../src/decorators/Service";
-import {Inject} from "../../../src/decorators/Inject";
-import {expect} from "chai";
+import 'reflect-metadata';
+import { Container } from '../../../src/container.class';
+import { Service } from '../../../src/decorators/service.decorator';
+import { Inject } from '../../../src/decorators/inject.decorator';
 
-describe("github issues > #42 Exception not thrown on missing binding", function() {
+describe('github issues > #42 Exception not thrown on missing binding', function () {
+  beforeEach(() => Container.reset());
 
-    beforeEach(() => Container.reset());
+  it('should work properly', function () {
+    interface Factory {
+      create(): void;
+    }
 
-    it("should work properly", function() {
+    @Service()
+    class CoffeeMaker {
+      @Inject() // This is an incorrect usage of typedi because Factory is an interface
+      private factory: Factory;
 
-        interface Factory {
-            create(): void;
-        }
+      make() {
+        this.factory.create();
+      }
+    }
 
-        @Service()
-        class CoffeeMaker {
-
-            @Inject() // This is an incorrect usage of typedi because Factory is an interface
-            private factory: Factory;
-
-            make() {
-                this.factory.create();
-            }
-
-        }
-
-        expect(() => {
-            Container.get(CoffeeMaker);
-        }).to.throw(Error);
-    });
-
+    expect(() => {
+      Container.get(CoffeeMaker);
+    }).toThrowError(Error);
+  });
 });

@@ -1,9 +1,7 @@
-import {LoggerInterface} from "./LoggerInterface";
+import { LoggerInterface } from './LoggerInterface';
 
 export class ConsoleLogger implements LoggerInterface {
-
-    log(message: string) {
-        console.log(message);
-    }
-
+  log(message: string) {
+    console.log(message);
+  }
 }

@@ -1,20 +1,16 @@
-import {Service} from "../../src/index";
-import {Bus} from "./Bus";
-import {Car} from "./Car";
+import { Service } from '../../src/index';
+import { Bus } from './Bus';
+import { Car } from './Car';
 
 @Service()
 export class Driver {
+  constructor(private bus: Bus, private car: Car) {}
 
-    constructor(private bus: Bus,
-                private car: Car) {
-    }
+  driveBus() {
+    this.bus.drive();
+  }
 
-    driveBus() {
-        this.bus.drive();
-    }
-
-    driveCar() {
-        this.car.drive();
-    }
-
+  driveCar() {
+    this.car.drive();
+  }
 }
