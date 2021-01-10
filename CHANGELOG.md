@@ -1,13 +1,13 @@
 # Changelog
 
-## UNRELEASED
+## 0.9.0 - 2021.01.10
 
 ### BREAKING CHANGES
 
 #### Unregistered types are not resolved
 
 Prior to this version when an unknown constructable type was requested from the default container it was added automatically
-to the container and returned. This behavior has changed and now a `ServiceNotFound` error is thrown.
+to the container and returned. This behavior has changed and now a `ServiceNotFoundError` error is thrown.
 
 #### Changed container reset behavior
 
@@ -19,11 +19,22 @@ The old behavior can be restored with passing the `{ strategy: 'resetServices'}`
 
 ### Changed
 
-- **[BREAKING]** unknown values are not resolved anymore
+- **[BREAKING]** unknown values are not resolved anymore (ref #87)
 - **[BREAKING]** resetting a container doesn't remove the service definitions only the created instances by default
 - **[BREAKING]** container ID can be string only now
 - default container ID changed from `undefined` to `default`
 - stricter type definitions and assertions across the project
+- updated the wording of `ServiceNotFoundError` to better explain which service is missing (#138)
+- updated various dev-dependencies
+- various changes to project tooling
+
+### Fixed
+
+- fixed a bug where requesting service with circular dependencies from a scoped container would result in Maximum call stack size exceeded error (ref #112)
+- fixed a bug where `@Inject`-ed properties were not injected in inherited child classes (ref #102)
+- fixed a typing issue which prevented using abstract class as service identifier (ref #144)
+- fixed a bug which broke transient services when `Container.reset()` was called (ref #157)
+- fixed some typos in the getting started documentation
 
 ## 0.8.0
 
