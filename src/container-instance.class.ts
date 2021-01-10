@@ -214,7 +214,10 @@ export class ContainerInstance {
         return service.id === identifier;
       }
 
-      if (service.type && typeof identifier === 'function') return service.type === identifier; // todo: not sure why it was here || identifier.prototype instanceof service.type;
+      // todo: not sure why it was here || identifier.prototype instanceof service.type;
+      if (service.type && typeof identifier === 'function') {
+        return service.type === identifier;
+      }
 
       return false;
     });
@@ -314,9 +317,24 @@ export class ContainerInstance {
   /**
    * Initializes all parameter types for a given target service class.
    */
-  private initializeParams(type: Function, paramTypes: any[]): any[] {
+  private initializeParams(target: Function, paramTypes: any[]): any[] {
     return paramTypes.map((paramType, index) => {
-      const paramHandler = Container.handlers.find(handler => handler.object === type && handler.index === index);
+      const paramHandler = Container.handlers.find(handler => {
+        /**
+         * @Inject()-ed values are stored as parameter handlers and they reference their target
+         * when created. So when a class is extended the @Inject()-ed values are not inherited
+         * because the handler still points to the old object only.
+         *
+         * As a quick fix a single level parent lookup is added via `Object.getPrototypeOf(target)`,
+         * however this should be updated to a more robust solution.
+         *
+         * TODO: Add proper inheritance handling: either copy the handlers when a class is registered what
+         * TODO: has it's parent already registered as dependency or make the lookup search up to the base Object.
+         */
+        return (
+          (handler.object === target || handler.object === Object.getPrototypeOf(target)) && handler.index === index
+        );
+      });
       if (paramHandler) return paramHandler.value(this);
 
       if (paramType && paramType.name && !this.isTypePrimitive(paramType.name)) {

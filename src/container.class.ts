@@ -10,7 +10,9 @@ import { AbstractConstructable } from './types/abstract-constructable.type';
  * Service container.
  */
 export class Container {
-  /** All registered handlers. */
+  /**
+   * All registered handlers. The @Inject() decorator uses handlers internally to mark a property for injection.
+   **/
   static readonly handlers: Handler[] = [];
 
   /**  Global container instance. */
