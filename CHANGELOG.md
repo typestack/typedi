@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1 - 2021.01.11
+
+### Fixed
+
+- correctly export error classes from package root
+
 ## 0.9.0 - 2021.01.10
 
 ### BREAKING CHANGES
