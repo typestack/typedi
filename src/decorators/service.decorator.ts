@@ -171,8 +171,9 @@ export function Service<T, K extends keyof T>(
         },
         'create',
       ],
-      global: false,
       multiple: false,
+      global: false,
+      eager: false,
       transient: false,
       value: EMPTY_VALUE,
     });
@@ -186,6 +187,7 @@ export function Service<T, K extends keyof T>(
         factory: undefined,
         multiple: false,
         global: false,
+        eager: false,
         transient: false,
         value: EMPTY_VALUE,
       };
@@ -198,6 +200,7 @@ export function Service<T, K extends keyof T>(
         service.factory = (optionsOrServiceName as ServiceOptions<T>).factory || undefined;
         service.multiple = (optionsOrServiceName as ServiceOptions<T>).multiple || false;
         service.global = (optionsOrServiceName as ServiceOptions<T>).global || false;
+        service.eager = (optionsOrServiceName as ServiceOptions<T>).eager || false;
         service.transient = (optionsOrServiceName as ServiceOptions<T>).transient || false;
       }
 

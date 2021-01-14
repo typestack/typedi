@@ -33,6 +33,12 @@ export interface ServiceMetadata<Type = unknown> extends ServiceOptions<Type> {
   multiple: boolean;
 
   /**
+   * Indicates whether a new instance should be created as soon as the class is registered.
+   * By default the registered classes are only instantiated when they are requested from the container.
+   */
+  eager?: boolean;
+
+  /**
    * Factory function used to initialize this service.
    * Can be regular function ("createCar" for example),
    * or other service which produces this instance ([CarFactory, "createCar"] for example).

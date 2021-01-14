@@ -35,6 +35,12 @@ export interface ServiceOptions<Type = unknown> {
   multiple?: boolean;
 
   /**
+   * Indicates whether a new instance should be created as soon as the class is registered.
+   * By default the registered classes are only instantiated when they are requested from the container.
+   */
+  eager?: boolean;
+
+  /**
    * Factory used to produce this service.
    */
   factory?: [Constructable<unknown>, string] | CallableFunction | undefined;

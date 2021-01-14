@@ -43,6 +43,7 @@ export class ContainerInstance {
   get<T>(type: AbstractConstructable<T>): T;
   get<T>(id: string): T;
   get<T>(id: Token<T>): T;
+  get<T>(id: ServiceIdentifier<T>): T;
   get<T>(identifier: ServiceIdentifier<T>): T {
     const globalContainer = Container.of(undefined);
     const globalService = globalContainer.findService(identifier);
@@ -101,8 +102,10 @@ export class ContainerInstance {
   ): this {
     if (identifierOrServiceMetadata instanceof Array) {
       identifierOrServiceMetadata.forEach(data => this.set(data));
+
       return this;
     }
+
     if (typeof identifierOrServiceMetadata === 'string' || identifierOrServiceMetadata instanceof Token) {
       return this.set({
         id: identifierOrServiceMetadata,
@@ -111,6 +114,7 @@ export class ContainerInstance {
         factory: undefined,
         global: false,
         multiple: false,
+        eager: false,
         transient: false,
       });
     }
@@ -124,6 +128,7 @@ export class ContainerInstance {
         factory: undefined,
         global: false,
         multiple: false,
+        eager: false,
         transient: false,
       });
     }
@@ -135,14 +140,21 @@ export class ContainerInstance {
       value: EMPTY_VALUE,
       global: false,
       multiple: false,
+      eager: false,
       transient: false,
       ...identifierOrServiceMetadata,
     };
+
     const service = this.findService(newService.id);
+
     if (service && service.multiple !== true) {
       Object.assign(service, newService);
     } else {
       this.services.push(newService);
+    }
+
+    if (newService.eager) {
+      this.get(newService.id);
     }
 
     return this;
