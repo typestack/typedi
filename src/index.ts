@@ -14,7 +14,7 @@ export * from './decorators/inject.decorator';
 export * from './decorators/service.decorator';
 
 export * from './error/cannot-inject-value.error';
-export * from './error/missing-provided-service-type.error';
+export * from './error/cannot-instantiate-value.error';
 export * from './error/service-not-found.error';
 
 export { Handler } from './interfaces/handler.interface';
