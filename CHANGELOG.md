@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.10.0 [BREAKING] - [NOT RELEASED]
+
+### BREAKING CHANGES
+
+#### Removed support for calling `Service([depA, depB], factory)`
+
+This was an undocumented way of calling the `Service` function directly instead of using it as a decorator. This option
+has been removed and the official supported way of achieving the same is with `Container.set`. Example:
+
+```ts
+const myToken = new Token('myToken');
+
+Container.set(myToken, 'test-value');
+
+// Old format:
+const oldWayService = Service([myToken], function myFactory(myToken) {
+  return myToken.toUpperCase();
+});
+const oldResult = Container.get(oldWayService);
+// New format
+const newWayService = Container.set({
+  // ID can be anything, we use string for simplicity
+  id: 'my-custom-service',
+  factory: function myFactory(container) {
+    return container.get(myToken).toUppserCase();
+  },
+});
+const newResult = Container.get('my-custom-service');
+
+oldResult === newResult; // -> true, both equals to "TEST-VALUE"
+```
+
+### Added
+
+- added `eager` option to `ServiceOptions`, when enabled the class will be instantiated as soon as it's registered in the container
+
+### Changed
+
+- removed old, undocumented way of calling `@Service` decorator directly
+
 ## 0.9.1 - 2021.01.11
 
 ### Fixed
