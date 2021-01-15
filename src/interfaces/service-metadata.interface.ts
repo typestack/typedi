@@ -1,11 +1,10 @@
 import { Constructable } from '../types/constructable.type';
 import { ServiceIdentifier } from '../types/service-identifier.type';
-import { ServiceOptions } from './service-options.interface';
 
 /**
  * Service metadata is used to initialize service and store its state.
  */
-export interface ServiceMetadata<Type = unknown> extends ServiceOptions<Type> {
+export interface ServiceMetadata<Type = unknown> {
   /** Unique identifier of the referenced service. */
   id: ServiceIdentifier;
 
@@ -31,6 +30,12 @@ export interface ServiceMetadata<Type = unknown> extends ServiceOptions<Type> {
    * Allows to setup multiple instances the different classes under a single service id string or token.
    */
   multiple: boolean;
+
+  /**
+   * Indicates whether a new instance should be created as soon as the class is registered.
+   * By default the registered classes are only instantiated when they are requested from the container.
+   */
+  eager?: boolean;
 
   /**
    * Factory function used to initialize this service.

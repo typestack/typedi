@@ -164,14 +164,28 @@ describe('Service Decorator', function () {
   });
 
   it('should support function injection with Token dependencies', function () {
-    const token: Token<string> = new Token<string>('token');
+    const myToken: Token<string> = new Token<string>('myToken');
 
-    Container.set(token, 'test_string');
-
-    const TestService = Service([token], function (s: string): string {
-      return s.toUpperCase();
+    Container.set(myToken, 'test_string');
+    Container.set({
+      id: 'my-service-A',
+      factory: function myServiceFactory(container): string {
+        return container.get(myToken).toUpperCase();
+      },
     });
 
-    expect(Container.get(TestService as any)).toBe('TEST_STRING');
+    /**
+     * This is an unusual format and not officially supported, but it should work.
+     * We can set null as the target, because we have set the ID manually, so it won't be used.
+     */
+    Service({
+      id: 'my-service-B',
+      factory: function myServiceFactory(container): string {
+        return container.get(myToken).toUpperCase();
+      },
+    })(null);
+
+    expect(Container.get<string>('my-service-A')).toBe('TEST_STRING');
+    expect(Container.get<string>('my-service-B')).toBe('TEST_STRING');
   });
 });

@@ -1,46 +1,41 @@
 import { Container } from '../container.class';
 import { Token } from '../token.class';
 import { CannotInjectValueError } from '../error/cannot-inject-value.error';
+import { resolveToTypeWrapper } from '../utils/resolve-to-type-wrapper.util';
+import { Constructable } from '../types/constructable.type';
+import { ServiceIdentifier } from '../types/service-identifier.type';
 
 /**
- * Injects a service into a class property or constructor parameter.
+ * Injects a list of services into a class property or constructor parameter.
  */
+export function InjectMany(): Function;
 export function InjectMany(type?: (type?: any) => Function): Function;
-
-/**
- * Injects a service into a class property or constructor parameter.
- */
 export function InjectMany(serviceName?: string): Function;
-
-/**
- * Injects a service into a class property or constructor parameter.
- */
 export function InjectMany(token: Token<any>): Function;
+export function InjectMany(
+  typeOrIdentifier?: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown>
+): Function {
+  return function (target: Object, propertyName: string | Symbol, index?: number): void {
+    const typeWrapper = resolveToTypeWrapper(typeOrIdentifier, target, propertyName, index);
 
-/**
- * Injects a service into a class property or constructor parameter.
- */
-export function InjectMany(typeOrName?: ((type?: any) => Function) | string | Token<any>): Function {
-  return function (target: any, propertyName: string, index?: number) {
-    if (!typeOrName) typeOrName = () => (Reflect as any).getMetadata('design:type', target, propertyName);
+    /** If no type was inferred, or the general Object type was inferred we throw an error. */
+    if (typeWrapper === undefined || typeWrapper.eagerType === undefined || typeWrapper.eagerType === Object) {
+      throw new CannotInjectValueError(target as Constructable<unknown>, propertyName as string);
+    }
 
     Container.registerHandler({
-      object: target,
-      propertyName: propertyName,
+      object: target as Constructable<unknown>,
+      propertyName: propertyName as string,
       index: index,
       value: containerInstance => {
-        let identifier: any;
-        if (typeof typeOrName === 'string') {
-          identifier = typeOrName;
-        } else if (typeOrName instanceof Token) {
-          identifier = typeOrName;
-        } else {
-          identifier = typeOrName();
+        const evaluatedLazyType = typeWrapper.lazyType();
+
+        /** If no type was inferred lazily, or the general Object type was inferred we throw an error. */
+        if (evaluatedLazyType === undefined || evaluatedLazyType === Object) {
+          throw new CannotInjectValueError(target as Constructable<unknown>, propertyName as string);
         }
 
-        if (identifier === Object) throw new CannotInjectValueError(target, propertyName);
-
-        return containerInstance.getMany<any>(identifier);
+        return containerInstance.getMany<unknown>(evaluatedLazyType);
       },
     });
   };

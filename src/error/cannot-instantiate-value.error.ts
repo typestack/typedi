@@ -1,22 +1,26 @@
-import { Token } from '../token.class';
 import { ServiceIdentifier } from '../types/service-identifier.type';
+import { Token } from '../token.class';
 
 /**
- * Thrown when service is registered without type.
+ * Thrown when DI cannot inject value into property decorated by @Inject decorator.
  */
-export class MissingProvidedServiceTypeError extends Error {
-  public name = 'MissingProvidedServiceTypeError';
+export class CannotInstantiateValueError extends Error {
+  public name = 'CannotInstantiateValueError';
 
   /** Normalized identifier name used in the error message. */
   private normalizedIdentifier: string = '<UNKNOWN_IDENTIFIER>';
 
   get message(): string {
-    return `Cannot determine a class of the requesting service: "${this.normalizedIdentifier}".`;
+    return (
+      `Cannot instantiate the requested value for the "${this.normalizedIdentifier}" identifier. ` +
+      `The related metadata doesn't contain a factory or a type to instantiate.`
+    );
   }
 
   constructor(identifier: ServiceIdentifier) {
     super();
 
+    // TODO: Extract this to a helper function and share between this and NotFoundError.
     if (typeof identifier === 'string') {
       this.normalizedIdentifier = identifier;
     } else if (identifier instanceof Token) {
