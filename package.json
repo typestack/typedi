@@ -1,6 +1,6 @@
 {
   "name": "typedi",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Dependency injection for TypeScript.",
   "author": "TypeStack contributors",
   "license": "MIT",
