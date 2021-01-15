@@ -85,7 +85,7 @@ export class ContainerInstance {
   getMany<T>(id: Token<T>): T[];
   getMany<T>(id: ServiceIdentifier<T>): T[];
   getMany<T>(identifier: ServiceIdentifier<T>): T[] {
-    return this.filterServices(identifier).map(service => this.getServiceValue(service));
+    return this.findAllServices(identifier).map(service => this.getServiceValue(service));
   }
 
   /**
@@ -168,7 +168,7 @@ export class ContainerInstance {
    */
   remove(...ids: ServiceIdentifier[]): this {
     ids.forEach(id => {
-      this.filterServices(id).forEach(service => {
+      this.findAllServices(id).forEach(service => {
         this.services.splice(this.services.indexOf(service), 1);
       });
     });
@@ -199,43 +199,17 @@ export class ContainerInstance {
   }
 
   /**
-   * Filters registered service in the with a given service identifier.
+   * Returns all services registered with the given identifier.
    */
-  private filterServices(identifier: ServiceIdentifier): ServiceMetadata<any>[] {
-    return this.services.filter(service => {
-      if (service.id) return service.id === identifier;
-
-      if (service.type && typeof identifier === 'function')
-        return service.type === identifier || identifier.prototype instanceof service.type;
-
-      return false;
-    });
+  private findAllServices(identifier: ServiceIdentifier): ServiceMetadata<unknown>[] {
+    return this.services.filter(service => service.id === identifier);
   }
 
   /**
    * Finds registered service in the with a given service identifier.
    */
   private findService(identifier: ServiceIdentifier): ServiceMetadata<unknown> | undefined {
-    return this.services.find(service => {
-      if (service.id) {
-        if (
-          identifier instanceof Object &&
-          service.id instanceof Token &&
-          (identifier as any).service instanceof Token
-        ) {
-          return service.id === (identifier as any).service;
-        }
-
-        return service.id === identifier;
-      }
-
-      // todo: not sure why it was here || identifier.prototype instanceof service.type;
-      if (service.type && typeof identifier === 'function') {
-        return service.type === identifier;
-      }
-
-      return false;
-    });
+    return this.services.find(service => service.id === identifier);
   }
 
   /**
@@ -353,7 +327,7 @@ export class ContainerInstance {
       });
       if (paramHandler) return paramHandler.value(this);
 
-      if (paramType && paramType.name && !this.isTypePrimitive(paramType.name)) {
+      if (paramType && paramType.name && !this.isPrimitiveParamType(paramType.name)) {
         return this.get(paramType);
       }
 
@@ -362,10 +336,10 @@ export class ContainerInstance {
   }
 
   /**
-   * Checks if given type is primitive (e.g. string, boolean, number, object).
+   * Checks if given parameter type is primitive type or not.
    */
-  private isTypePrimitive(param: string): boolean {
-    return ['string', 'boolean', 'number', 'object'].indexOf(param.toLowerCase()) !== -1;
+  private isPrimitiveParamType(paramTypeName: string): boolean {
+    return ['string', 'boolean', 'number', 'object'].includes(paramTypeName.toLowerCase());
   }
 
   /**
