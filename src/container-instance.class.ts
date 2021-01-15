@@ -79,10 +79,13 @@ export class ContainerInstance {
    * Gets all instances registered in the container of the given service identifier.
    * Used when service defined with multiple: true flag.
    */
+  getMany<T>(type: Constructable<T>): T[];
+  getMany<T>(type: AbstractConstructable<T>): T[];
   getMany<T>(id: string): T[];
   getMany<T>(id: Token<T>): T[];
-  getMany<T>(id: string | Token<T>): T[] {
-    return this.filterServices(id).map(service => this.getServiceValue(service));
+  getMany<T>(id: ServiceIdentifier<T>): T[];
+  getMany<T>(identifier: ServiceIdentifier<T>): T[] {
+    return this.filterServices(identifier).map(service => this.getServiceValue(service));
   }
 
   /**
@@ -212,7 +215,7 @@ export class ContainerInstance {
   /**
    * Finds registered service in the with a given service identifier.
    */
-  private findService(identifier: ServiceIdentifier): ServiceMetadata<any> | undefined {
+  private findService(identifier: ServiceIdentifier): ServiceMetadata<unknown> | undefined {
     return this.services.find(service => {
       if (service.id) {
         if (

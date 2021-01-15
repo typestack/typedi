@@ -92,4 +92,19 @@ describe('Inject Decorator', function () {
     expect(carNames).toContain('Mercedes');
     expect(carNames).toContain('Toyota');
   });
+
+  it('should work with empty decorator on constructor parameter', function () {
+    @Service()
+    class InjectedClass {}
+
+    @Service()
+    class TestService {
+      constructor(@Inject() public myClass: InjectedClass) {}
+    }
+
+    const instance = Container.get(TestService);
+
+    expect(instance).toBeInstanceOf(TestService);
+    expect(instance.myClass).toBeInstanceOf(InjectedClass);
+  });
 });
