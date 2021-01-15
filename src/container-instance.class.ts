@@ -308,14 +308,16 @@ export class ContainerInstance {
       // TODO: it will start the instantiation process over. So this is currently called outside of the if branch
       // TODO: after the current value has been assigned to the serviceMetadata.
       // this.applyPropertyHandlers(constructableTargetType, value as Constructable<unknown>);
-    } else {
-      /** This branch should never execute, but better to be safe than sorry. */
-      throw new CannotInstantiateValueError(serviceMetadata.id);
     }
 
     /** If this is not a transient service, and we resolved something, then we set it as the value. */
     if (!serviceMetadata.transient && value !== EMPTY_VALUE) {
       serviceMetadata.value = value;
+    }
+
+    if (value === EMPTY_VALUE) {
+      /** This branch should never execute, but better to be safe than sorry. */
+      throw new CannotInstantiateValueError(serviceMetadata.id);
     }
 
     if (serviceMetadata.type) {
