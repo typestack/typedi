@@ -1,6 +1,6 @@
 import { Container } from './container.class';
-import { MissingProvidedServiceTypeError } from './error/missing-provided-service-type.error';
 import { ServiceNotFoundError } from './error/service-not-found.error';
+import { CannotInstantiateValueError } from './error/cannot-instantiate-value.error';
 import { Token } from './token.class';
 import { Constructable } from './types/constructable.type';
 import { AbstractConstructable } from './types/abstract-constructable.type';
@@ -236,92 +236,91 @@ export class ContainerInstance {
   }
 
   /**
-   * Gets service value.
+   * Gets the value belonging to `serviceMetadata.id`.
+   *
+   * - if `serviceMetadata.value` is already set it is immediately returned
+   * - otherwise the requested type is resolved to the value saved to `serviceMetadata.value` and returned
    */
   private getServiceValue(serviceMetadata: ServiceMetadata<unknown>): any {
-    // find if instance of this object already initialized in the container and return it if it is
+    let value: unknown = EMPTY_VALUE;
+
     /**
-     * If the service value has been set to anything prior to this call we return the set value.
+     * If the service value has been set to anything prior to this call we return that value.
      * NOTE: This part builds on the assumption that transient dependencies has no value set ever.
      */
     if (serviceMetadata.value !== EMPTY_VALUE) {
       return serviceMetadata.value;
     }
 
-    // if named service was requested and its instance was not found plus there is not type to know what to initialize,
-    // this means service was not pre-registered and we throw an exception
-    if (
-      (!serviceMetadata || !serviceMetadata.type) &&
-      (!serviceMetadata || !serviceMetadata.factory) &&
-      (typeof serviceMetadata.id === 'string' || serviceMetadata.id instanceof Token)
-    )
-      throw new ServiceNotFoundError(serviceMetadata.id);
-
-    // at this point we either have type in service registered, either identifier is a target type
-    let construtableType: Constructable<unknown> | undefined;
-
-    if (serviceMetadata && serviceMetadata.type) {
-      construtableType = serviceMetadata.type;
-    } else if (typeof serviceMetadata.id === 'function') {
-      construtableType = serviceMetadata.id as Constructable<unknown>;
+    /** If both factory and type is missing, we cannot resolve the requested ID. */
+    if (!serviceMetadata.factory && !serviceMetadata.type) {
+      throw new CannotInstantiateValueError(serviceMetadata.id);
     }
 
-    // setup constructor parameters for a newly initialized service
-    const paramTypes =
-      construtableType && Reflect && (Reflect as any).getMetadata
-        ? (Reflect as any).getMetadata('design:paramtypes', construtableType)
-        : undefined;
-    // TODO: remove as any, here it cannot be undefined but TS doesn't see this.
-    let params: any[] = paramTypes ? this.initializeParams(construtableType as any, paramTypes) : [];
-
-    // if factory is set then use it to create service instance
-    let value: any;
+    /**
+     * If a factory is defined it takes priority over creating an instance via `new`.
+     * The return value of the factory is not checked, we believe by design that the user knows what he/she is doing.
+     */
     if (serviceMetadata.factory) {
-      // filter out non-service parameters from created service constructor
-      // non-service parameters can be, lets say Car(name: string, isNew: boolean, engine: Engine)
-      // where name and isNew are non-service parameters and engine is a service parameter
-      params = params.filter(param => param !== undefined);
-
+      /**
+       * If we received the factory in the [Constructable<Factory>, "functionName"] format, we need to create the
+       * factory first and then call the specified function on it.
+       */
       if (serviceMetadata.factory instanceof Array) {
-        // use special [Type, "create"] syntax to allow factory services
-        // in this case Type instance will be obtained from Container and its method "create" will be called
         let factoryInstance;
+
         try {
+          /** Try to get the factory from TypeDI first, if failed, fall back to simply initiating the class. */
           factoryInstance = this.get<any>(serviceMetadata.factory[0]);
         } catch (error) {
           if (error instanceof ServiceNotFoundError) {
             factoryInstance = new serviceMetadata.factory[0]();
+          } else {
+            throw error;
           }
         }
 
-        // TODO: rethink this
-        // We need to pass `this` to make the following test pass:
-        // "should support function injection with Token dependencies"
-        // We should have the dependencies here, instead of passing the container to the factory.
-        // Maybe we should save the dependency ID list on the meta-data?
-        value = factoryInstance[serviceMetadata.factory[1]](...params, this);
+        value = factoryInstance[serviceMetadata.factory[1]](this, serviceMetadata.id);
       } else {
-        // regular factory function
-        value = serviceMetadata.factory(...params, this);
+        /** If only a simple function was provided we simply call it. */
+        value = serviceMetadata.factory(this, serviceMetadata.id);
       }
-    } else {
-      // TODO: Commented it out as this makes no sense.
-      // params.unshift(null);
+    }
+
+    /**
+     * If no factory was provided and only then, we create the instance from the type if it was set.
+     */
+    if (!serviceMetadata.factory && serviceMetadata.type) {
+      const constructableTargetType: Constructable<unknown> = serviceMetadata.type;
+      // setup constructor parameters for a newly initialized service
+      const paramTypes = (Reflect as any)?.getMetadata('design:paramtypes', constructableTargetType) || [];
+      const params = this.initializeParams(constructableTargetType, paramTypes);
 
       // "extra feature" - always pass container instance as the last argument to the service function
       // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
       // need to be injected, and user can use provided container to get instances he needs
       params.push(this);
 
-      if (!construtableType) throw new MissingProvidedServiceTypeError(serviceMetadata.id);
+      value = new constructableTargetType(...params);
 
-      // eslint-disable-next-line prefer-spread
-      value = new construtableType(...params);
+      // TODO: Calling this here, leads to infinite loop, because @Inject decorator registerds a handler
+      // TODO: which calls Container.get, which will check if the requested type has a value set and if not
+      // TODO: it will start the instantiation process over. So this is currently called outside of the if branch
+      // TODO: after the current value has been assigned to the serviceMetadata.
+      // this.applyPropertyHandlers(constructableTargetType, value as Constructable<unknown>);
+    } else {
+      /** This branch should never execute, but better to be safe than sorry. */
+      throw new CannotInstantiateValueError(serviceMetadata.id);
     }
 
-    if (serviceMetadata && !serviceMetadata.transient && value) serviceMetadata.value = value;
+    /** If this is not a transient service, and we resolved something, then we set it as the value. */
+    if (!serviceMetadata.transient && value !== EMPTY_VALUE) {
+      serviceMetadata.value = value;
+    }
 
-    if (construtableType) this.applyPropertyHandlers(construtableType, value);
+    if (serviceMetadata.type) {
+      this.applyPropertyHandlers(serviceMetadata.type, value as Record<string, any>);
+    }
 
     return value;
   }
@@ -329,7 +328,7 @@ export class ContainerInstance {
   /**
    * Initializes all parameter types for a given target service class.
    */
-  private initializeParams(target: Function, paramTypes: any[]): any[] {
+  private initializeParams(target: Function, paramTypes: any[]): unknown[] {
     return paramTypes.map((paramType, index) => {
       const paramHandler = Container.handlers.find(handler => {
         /**
