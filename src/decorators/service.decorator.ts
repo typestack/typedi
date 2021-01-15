@@ -1,6 +1,6 @@
 import { Container } from '../container.class';
 import { Token } from '../token.class';
-import { ServiceMetadata } from '../interfaces/service-metadata.interface.';
+import { ServiceMetadata } from '../interfaces/service-metadata.interface';
 import { ServiceOptions } from '../interfaces/service-options.interface';
 import { EMPTY_VALUE } from '../empty.const';
 import { Constructable } from '../types/constructable.type';
@@ -31,12 +31,12 @@ export function Service<T>(optionsOrServiceIdentifier?: ServiceOptions<T> | Toke
       serviceMetadata.id = optionsOrServiceIdentifier;
     } else if (optionsOrServiceIdentifier) {
       /** We received a ServiceOptions object. */
-      serviceMetadata.id = optionsOrServiceIdentifier.id || targetConstructor;
-      serviceMetadata.factory = optionsOrServiceIdentifier.factory || undefined;
-      serviceMetadata.multiple = optionsOrServiceIdentifier.multiple || false;
-      serviceMetadata.global = optionsOrServiceIdentifier.global || false;
-      serviceMetadata.eager = optionsOrServiceIdentifier.eager || false;
-      serviceMetadata.transient = optionsOrServiceIdentifier.transient || false;
+      serviceMetadata.id = (optionsOrServiceIdentifier as ServiceMetadata).id || targetConstructor;
+      serviceMetadata.factory = (optionsOrServiceIdentifier as ServiceMetadata).factory || undefined;
+      serviceMetadata.multiple = (optionsOrServiceIdentifier as ServiceMetadata).multiple || false;
+      serviceMetadata.global = (optionsOrServiceIdentifier as ServiceMetadata).global || false;
+      serviceMetadata.eager = (optionsOrServiceIdentifier as ServiceMetadata).eager || false;
+      serviceMetadata.transient = (optionsOrServiceIdentifier as ServiceMetadata).transient || false;
     }
 
     Container.set(serviceMetadata);

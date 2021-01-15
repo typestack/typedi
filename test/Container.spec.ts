@@ -142,7 +142,7 @@ describe('Container', function () {
       expect(Container.get<TestService>('test1-service')).toBe(test1Service);
       expect(Container.get<TestService>('test2-service')).toBe(test2Service);
 
-      Container.remove('test1-service', 'test2-service');
+      Container.remove(['test1-service', 'test2-service']);
 
       expect(Container.get(TestService)).toBe(testService);
       expect(() => Container.get<TestService>('test1-service')).toThrowError(ServiceNotFoundError);
@@ -285,6 +285,98 @@ describe('Container', function () {
       });
 
       expect(Container.get(VehicleService).getColor()).toBe('yellow');
+    });
+  });
+
+  describe('Container.reset', () => {
+    it('should call destroy function on removed service', () => {
+      const destroyFnMock = jest.fn();
+      const destroyPropertyFnMock = jest.fn();
+      @Service()
+      class MyServiceA {
+        destroy() {
+          destroyFnMock();
+        }
+      }
+
+      @Service()
+      class MyServiceB {
+        public destroy = destroyPropertyFnMock;
+      }
+
+      const instanceAOne = Container.get(MyServiceA);
+      const instanceBOne = Container.get(MyServiceB);
+
+      Container.reset();
+
+      const instanceATwo = Container.get(MyServiceA);
+      const instanceBTwo = Container.get(MyServiceB);
+
+      expect(destroyFnMock).toBeCalledTimes(1);
+      expect(destroyPropertyFnMock).toBeCalledTimes(1);
+
+      expect(instanceAOne).toBeInstanceOf(MyServiceA);
+      expect(instanceATwo).toBeInstanceOf(MyServiceA);
+      expect(instanceBOne).toBeInstanceOf(MyServiceB);
+      expect(instanceBTwo).toBeInstanceOf(MyServiceB);
+
+      expect(instanceAOne).not.toBe(instanceATwo);
+      expect(instanceBOne).not.toBe(instanceBTwo);
+    });
+
+    it('should be able to destroy services without destroy function', () => {
+      @Service()
+      class MyService {}
+
+      const instanceA = Container.get(MyService);
+
+      Container.reset();
+
+      const instanceB = Container.get(MyService);
+
+      expect(instanceA).toBeInstanceOf(MyService);
+      expect(instanceB).toBeInstanceOf(MyService);
+      expect(instanceA).not.toBe(instanceB);
+    });
+  });
+
+  describe('Container.remove', () => {
+    it('should call destroy function on removed service', () => {
+      const destroyFnMock = jest.fn();
+      const destroyPropertyFnMock = jest.fn();
+      @Service()
+      class MyServiceA {
+        destroy() {
+          destroyFnMock();
+        }
+      }
+
+      @Service()
+      class MyServiceB {
+        public destroy = destroyPropertyFnMock();
+      }
+
+      Container.get(MyServiceA);
+      Container.get(MyServiceB);
+
+      expect(() => Container.remove(MyServiceA)).not.toThrowError();
+      expect(() => Container.remove(MyServiceB)).not.toThrowError();
+
+      expect(destroyFnMock).toBeCalledTimes(1);
+      expect(destroyPropertyFnMock).toBeCalledTimes(1);
+
+      expect(() => Container.get(MyServiceA)).toThrowError(ServiceNotFoundError);
+      expect(() => Container.get(MyServiceB)).toThrowError(ServiceNotFoundError);
+    });
+
+    it('should be able to destroy services without destroy function', () => {
+      @Service()
+      class MyService {}
+
+      Container.get(MyService);
+
+      expect(() => Container.remove(MyService)).not.toThrowError();
+      expect(() => Container.get(MyService)).toThrowError(ServiceNotFoundError);
     });
   });
 });

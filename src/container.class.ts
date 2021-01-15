@@ -90,10 +90,11 @@ export class Container {
   }
 
   /**
-   * Removes services with a given service identifiers (tokens or types).
+   * Removes services with a given service identifiers.
    */
-  static remove(...ids: ServiceIdentifier[]): Container {
-    this.globalInstance.remove(...ids);
+  static remove(identifierOrIdentifierArray: ServiceIdentifier | ServiceIdentifier[]): Container {
+    this.globalInstance.remove(identifierOrIdentifierArray);
+
     return this;
   }
 

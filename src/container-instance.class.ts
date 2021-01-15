@@ -5,9 +5,9 @@ import { Token } from './token.class';
 import { Constructable } from './types/constructable.type';
 import { AbstractConstructable } from './types/abstract-constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
-import { ServiceMetadata } from './interfaces/service-metadata.interface.';
-import { EMPTY_VALUE } from './empty.const';
+import { ServiceMetadata } from './interfaces/service-metadata.interface';
 import { ServiceOptions } from './interfaces/service-options.interface';
+import { EMPTY_VALUE } from './empty.const';
 
 /**
  * TypeDI can have multiple containers.
@@ -164,14 +164,22 @@ export class ContainerInstance {
   }
 
   /**
-   * Removes services with a given service identifiers (tokens or types).
+   * Removes services with a given service identifiers.
    */
-  remove(...ids: ServiceIdentifier[]): this {
-    ids.forEach(id => {
-      this.findAllServices(id).forEach(service => {
-        this.services.splice(this.services.indexOf(service), 1);
+  public remove(identifierOrIdentifierArray: ServiceIdentifier | ServiceIdentifier[]): this {
+    if (Array.isArray(identifierOrIdentifierArray)) {
+      identifierOrIdentifierArray.forEach(id => this.remove(id));
+    } else {
+      this.services = this.services.filter(service => {
+        if (service.id === identifierOrIdentifierArray) {
+          this.destroyServiceInstance(service);
+          return false;
+        }
+
+        return true;
       });
-    });
+    }
+
     return this;
   }
 
@@ -179,17 +187,12 @@ export class ContainerInstance {
    * Completely resets the container by removing all previously registered services from it.
    */
   public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
-    // TODO: The resources should be freed up.
     switch (options.strategy) {
       case 'resetValue':
-        this.services = this.services.map(s => {
-          return {
-            ...s,
-            value: !!s.type ? EMPTY_VALUE : s.value,
-          };
-        });
+        this.services.forEach(service => this.destroyServiceInstance(service));
         break;
-      case 'resetValue':
+      case 'resetServices':
+        this.services.forEach(service => this.destroyServiceInstance(service));
         this.services = [];
         break;
       default:
@@ -354,5 +357,30 @@ export class ContainerInstance {
         instance[handler.propertyName] = handler.value(this);
       }
     });
+  }
+
+  /**
+   * Checks if the given service metadata contains a destroyable service instance and destroys it in place. If the service
+   * contains a callable function named `destroy` it is called but not awaited and the return value is ignored..
+   *
+   * @param serviceMetadata the service metadata containing the instance to destroy
+   * @param force when true the service will be always destroyed even if it's cannot be re-created
+   */
+  private destroyServiceInstance(serviceMetadata: ServiceMetadata, force = false) {
+    /** We reset value only if we can re-create it (aka type or factory exists). */
+    const shouldResetValue = force || !!serviceMetadata.type || !!serviceMetadata.factory;
+
+    if (shouldResetValue) {
+      /** If we wound a function named destroy we call it without any params. */
+      if (typeof (serviceMetadata?.value as Record<string, unknown>)['destroy'] === 'function') {
+        try {
+          (serviceMetadata.value as { destroy: CallableFunction }).destroy();
+        } catch (error) {
+          /** We simply ignore the errors from the destroy function. */
+        }
+      }
+
+      serviceMetadata.value = EMPTY_VALUE;
+    }
   }
 }

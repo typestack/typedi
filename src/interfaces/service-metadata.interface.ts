@@ -1,11 +1,10 @@
 import { Constructable } from '../types/constructable.type';
 import { ServiceIdentifier } from '../types/service-identifier.type';
-import { ServiceOptions } from './service-options.interface';
 
 /**
  * Service metadata is used to initialize service and store its state.
  */
-export interface ServiceMetadata<Type = unknown> extends ServiceOptions<Type> {
+export interface ServiceMetadata<Type = unknown> {
   /** Unique identifier of the referenced service. */
   id: ServiceIdentifier;
 
