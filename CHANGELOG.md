@@ -1,8 +1,20 @@
 # Changelog
 
-## 0.10.0 [BREAKING] - [NOT RELEASED]
+## 0.10.0 [BREAKING] - 2021.01.15
 
 ### BREAKING CHANGES
+
+#### Container.remove signature change
+
+The `Container.remove` method from now accepts one ID or an array of IDs.
+
+```ts
+// Old format
+Container.remove(myServiceA, myServiceB);
+
+// New format
+Container.remove([myServiceA, myServiceB]);
+```
 
 #### Removed support for calling `Service([depA, depB], factory)`
 
@@ -35,10 +47,18 @@ oldResult === newResult; // -> true, both equals to "TEST-VALUE"
 ### Added
 
 - added `eager` option to `ServiceOptions`, when enabled the class will be instantiated as soon as it's registered in the container
+- added support for destroying removed services, when a service is removed and has a callable `destroy` property it will be called by TypeDI
 
 ### Changed
 
-- removed old, undocumented way of calling `@Service` decorator directly
+- [BREAKING] removed old, undocumented way of calling `@Service` decorator directly
+- [BREAKING] renamed `MissingProvidedServiceTypeError` to `CannotInstantiateValueError`
+- various internal refactors
+- updated various dev dependencies
+
+### Fixed
+
+- generated sourcemaps contains the Typescript files preventing reference errors when using TypeDI with various build tools
 
 ## 0.9.1 - 2021.01.11
 
