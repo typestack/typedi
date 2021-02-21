@@ -146,7 +146,7 @@ same instance. If this is not the desired behavior a class can be marked as `tra
 import 'reflect-metadata';
 import { Container, Inject, Service } from 'typedi';
 
-@Service({ transient: true })
+@Service({ scope: 'transient' })
 class ExampleTransientClass {
   constructor() {
     console.log('I am being created!');

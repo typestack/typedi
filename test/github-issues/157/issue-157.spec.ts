@@ -8,7 +8,7 @@ describe('Github Issues', function () {
   it('#157 - reset should not break transient services', () => {
     let creationCounter = 0;
 
-    @Service({ transient: true })
+    @Service({ scope: 'transient' })
     class TransientService {
       public constructor() {
         creationCounter++;

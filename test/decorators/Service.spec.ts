@@ -112,7 +112,7 @@ describe('Service Decorator', function () {
       public serial = Math.random();
     }
 
-    @Service({ transient: true })
+    @Service({ scope: 'transient' })
     class Engine {
       public serial = Math.random();
     }
@@ -139,7 +139,7 @@ describe('Service Decorator', function () {
       public name = 'sporty';
     }
 
-    @Service({ global: true })
+    @Service({ scope: 'singleton' })
     class Car {
       public name = 'SportCar';
     }
@@ -166,7 +166,7 @@ describe('Service Decorator', function () {
   it('should support function injection with Token dependencies', function () {
     const myToken: Token<string> = new Token<string>('myToken');
 
-    Container.set(myToken, 'test_string');
+    Container.set({ id: myToken, value: 'test_string'});
     Container.set({
       id: 'my-service-A',
       factory: function myServiceFactory(container): string {

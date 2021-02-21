@@ -11,8 +11,8 @@ describe('Container', function () {
     it('should be able to get a boolean', () => {
       const booleanTrue = 'boolean.true';
       const booleanFalse = 'boolean.false';
-      Container.set(booleanTrue, true);
-      Container.set(booleanFalse, false);
+      Container.set({ id: booleanTrue, value: true});
+      Container.set({ id: booleanFalse, value: false});
 
       expect(Container.get(booleanTrue)).toBe(true);
       expect(Container.get(booleanFalse)).toBe(false);
@@ -20,14 +20,14 @@ describe('Container', function () {
 
     it('should be able to get an empty string', () => {
       const emptyString = 'emptyString';
-      Container.set(emptyString, '');
+      Container.set({ id: emptyString, value: ''});
 
       expect(Container.get(emptyString)).toBe('');
     });
 
     it('should be able to get the 0 number', () => {
       const zero = 'zero';
-      Container.set(zero, 0);
+      Container.set({ id: zero, value: 0});
 
       expect(Container.get(zero)).toBe(0);
     });
@@ -39,7 +39,7 @@ describe('Container', function () {
         constructor(public name: string) {}
       }
       const testService = new TestService('this is test');
-      Container.set(TestService, testService);
+      Container.set({ id: TestService, value: testService });
       expect(Container.get(TestService)).toBe(testService);
       expect(Container.get(TestService).name).toBe('this is test');
     });
@@ -49,10 +49,10 @@ describe('Container', function () {
         constructor(public name: string) {}
       }
       const firstService = new TestService('first');
-      Container.set('first.service', firstService);
+      Container.set({ id: 'first.service', value: firstService });
 
       const secondService = new TestService('second');
-      Container.set('second.service', secondService);
+      Container.set({ id: 'second.service', value: secondService });
 
       expect(Container.get<TestService>('first.service').name).toBe('first');
       expect(Container.get<TestService>('second.service').name).toBe('second');
@@ -66,10 +66,10 @@ describe('Container', function () {
       const SecondTestToken = new Token<TestService>();
 
       const firstService = new TestService('first');
-      Container.set(FirstTestToken, firstService);
+      Container.set({ id: FirstTestToken, value: firstService });
 
       const secondService = new TestService('second');
-      Container.set(SecondTestToken, secondService);
+      Container.set({ id: SecondTestToken, value: secondService });
 
       expect(Container.get(FirstTestToken).name).toBe('first');
       expect(Container.get(SecondTestToken).name).toBe('second');
@@ -82,12 +82,12 @@ describe('Container', function () {
       const TestToken = new Token<TestService>();
 
       const firstService = new TestService('first');
-      Container.set(TestToken, firstService);
+      Container.set({ id: TestToken, value: firstService });
       expect(Container.get(TestToken)).toBe(firstService);
       expect(Container.get(TestToken).name).toBe('first');
 
       const secondService = new TestService('second');
-      Container.set(TestToken, secondService);
+      Container.set({ id: TestToken, value: secondService });
 
       expect(Container.get(TestToken)).toBe(secondService);
       expect(Container.get(TestToken).name).toBe('second');
@@ -153,8 +153,10 @@ describe('Container', function () {
         constructor(public name: string = 'frank') {}
       }
 
-      const testService = new TestService('john');
-      Container.set(TestService, testService);
+      Container.set({ id: TestService, type: TestService });
+      const testService = Container.get(TestService);
+      testService.name = 'john';
+
       expect(Container.get(TestService)).toBe(testService);
       expect(Container.get(TestService).name).toBe('john');
       Container.reset({ strategy: 'resetValue' });

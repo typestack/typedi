@@ -19,7 +19,7 @@ export class ContainerInstance {
   public readonly id!: ContainerIdentifer;
 
   /** All registered services in the container. */
-  private services: ServiceMetadata<unknown>[] = [];
+  private services: Map<ServiceIdentifier, ServiceMetadata<unknown>> = new Map();
 
   /**
    * All registered handlers. The @Inject() decorator uses handlers internally to mark a property for injection.
@@ -45,7 +45,7 @@ export class ContainerInstance {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   has<T = unknown>(identifier: ServiceIdentifier<T>): boolean {
-    return !!this.findService(identifier);
+    return !!this.services.has(identifier);
   }
 
   /**
@@ -53,17 +53,26 @@ export class ContainerInstance {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   get<T = unknown>(identifier: ServiceIdentifier<T>): T {
-    const globalContainer = ContainerRegistry.defaultContainer;
-    const globalService = globalContainer.findService(identifier);
-    const scopedService = this.findService(identifier);
+    const global = ContainerRegistry.defaultContainer.services.get(identifier);
+    const local = this.services.get(identifier);
+    /** If the service is registered as global we load it from there, otherwise we use the local one. */
+    const metadata = global?.scope === 'singleton' ? global : local;
 
-    if (globalService && globalService.global === true) return this.getServiceValue(globalService);
+    if (metadata && metadata.multiple === true) {
+      throw new Error(`Cannot resolve multiple values for ${identifier.toString()} service!`);
+    }
 
-    if (scopedService) return this.getServiceValue(scopedService);
+    /** Otherwise it's returned from the current container. */
+    if (metadata) {
+      return this.getServiceValue(metadata);
+    }
 
-    /** If it's the first time requested in the child container we load it from parent and set it. */
-    if (globalService && this !== globalContainer) {
-      const clonedService = { ...globalService };
+    /**
+     * If it's the first time requested in the child container we load it from parent and set it.
+     * TODO: This will be removed with the container inheritance rework.
+     */
+    if (global && this !== ContainerRegistry.defaultContainer) {
+      const clonedService = { ...global };
       clonedService.value = EMPTY_VALUE;
 
       /**
@@ -78,8 +87,6 @@ export class ContainerInstance {
       return value;
     }
 
-    if (globalService) return this.getServiceValue(globalService);
-
     throw new ServiceNotFoundError(identifier);
   }
 
@@ -88,64 +95,101 @@ export class ContainerInstance {
    * Used when service defined with multiple: true flag.
    */
   getMany<T = unknown>(identifier: ServiceIdentifier<T>): T[] {
-    return this.findAllServices(identifier).map(service => this.getServiceValue(service));
+    const global = ContainerRegistry.defaultContainer.services.get(identifier);
+    const local = this.services.get(identifier);
+    /** If the service is registered as global we load it from there, otherwise we use the local one. */
+    const metadata = global?.scope === 'singleton' ? global : local;
+
+    /** This function doesn't handle services with multiple: false. */
+    if (metadata && metadata.multiple === false) {
+      throw new Error(`Cannot resolve non multiple values for ${identifier.toString()} service!`);
+    }
+
+    if (metadata) {
+      const resolved = metadata.typeMap.map(multiTypeInfo =>
+        this.getServiceValue({
+          id: metadata.id,
+          multiple: false,
+          scope: metadata.scope,
+          referencedBy: metadata.referencedBy,
+          typeMap: [],
+          type: multiTypeInfo.type,
+          value: multiTypeInfo.value,
+          eager: metadata.eager,
+          factory: multiTypeInfo.factory,
+        })
+      );
+
+      /**
+       * This is hacky, since we created a one-time used metadata wrapper for the types, we need to
+       * set this from the outside manually.
+       */
+      if (metadata.scope !== 'transient') {
+        resolved.map((value, i) => (metadata.typeMap[i].value = value));
+      }
+
+      return resolved;
+    }
+
+    throw new ServiceNotFoundError(identifier);
   }
 
   /**
    * Sets a value for the given type or service name in the container.
    */
-  set<T = unknown>(identifier: ServiceIdentifier<T>, instance: T): this;
-  set<T = unknown>(metadata: ServiceOptions<T>): this;
-  set<T = unknown>(identifierOrServiceMetadata: ServiceIdentifier<T> | ServiceOptions<T>, value?: T): this {
-    if (typeof identifierOrServiceMetadata === 'string' || identifierOrServiceMetadata instanceof Token) {
-      return this.set({
-        id: identifierOrServiceMetadata,
-        type: null,
-        value: value,
-        factory: undefined,
-        global: false,
-        multiple: false,
-        eager: false,
-        transient: false,
-      });
-    }
-
-    if (typeof identifierOrServiceMetadata === 'function') {
-      return this.set({
-        id: identifierOrServiceMetadata,
-        // TODO: remove explicit casting
-        type: identifierOrServiceMetadata as Constructable<unknown>,
-        value: value,
-        factory: undefined,
-        global: false,
-        multiple: false,
-        eager: false,
-        transient: false,
-      });
-    }
-
+  set<T = unknown>(metadata: ServiceOptions<T>): this {
     const newService: ServiceMetadata<T> = {
       id: new Token('UNREACHABLE'),
       type: null,
+      typeMap: [],
       factory: undefined,
       value: EMPTY_VALUE,
-      global: false,
       multiple: false,
       eager: false,
-      transient: false,
-      ...identifierOrServiceMetadata,
+      scope: 'container',
+      ...metadata,
+      referencedBy: new Map().set(this.id, this),
     };
 
-    const service = this.findService(newService.id);
+    const existingMetadata = this.services.get(newService.id);
 
-    if (service && service.multiple !== true) {
-      Object.assign(service, newService);
-    } else {
-      this.services.push(newService);
+    if (existingMetadata && existingMetadata.multiple) {
+      /** If we are adding non multiple metadata service to existing multiple metadata */
+      if (existingMetadata.multiple && !newService.multiple) {
+        throw new Error(`Cannot mix multiple and non-multiple services with same ID (${newService.id.toString()})!`);
+      }
+
+      if (existingMetadata.scope !== newService.scope) {
+        throw new Error(`Cannot mix scope when using multiple services (ID: ${newService.id.toString()})!`);
+      }
+
+      if (existingMetadata.eager !== newService.eager) {
+        throw new Error(`Cannot mix eager when using multiple services (ID: ${newService.id.toString()})!`);
+      }
+
+      existingMetadata.typeMap.push({
+        type: newService.typeMap[0].type,
+        factory: newService.typeMap[0].factory,
+        value: newService.typeMap[0].value,
+      });
     }
 
-    if (newService.eager) {
+    if (existingMetadata && existingMetadata.multiple === false) {
+      // TODO: Here we should differentiate based on the received set option.
+      Object.assign(existingMetadata, newService);
+    }
+
+    /** If this service hasn't been registered yet, we register it. */
+    if (!existingMetadata) {
+      this.services.set(newService.id, newService);
+    }
+
+    if (newService.eager && newService.multiple === false) {
       this.get(newService.id);
+    }
+
+    if (newService.eager && newService.multiple === true) {
+      this.getMany(newService.id);
     }
 
     return this;
@@ -158,14 +202,12 @@ export class ContainerInstance {
     if (Array.isArray(identifierOrIdentifierArray)) {
       identifierOrIdentifierArray.forEach(id => this.remove(id));
     } else {
-      this.services = this.services.filter(service => {
-        if (service.id === identifierOrIdentifierArray) {
-          this.destroyServiceInstance(service);
-          return false;
-        }
+      const serviceMetadata = this.services.get(identifierOrIdentifierArray);
 
-        return true;
-      });
+      if (serviceMetadata) {
+        this.destroyServiceInstance(serviceMetadata);
+        this.services.delete(identifierOrIdentifierArray);
+      }
     }
 
     return this;
@@ -220,7 +262,7 @@ export class ContainerInstance {
         break;
       case 'resetServices':
         this.services.forEach(service => this.destroyServiceInstance(service));
-        this.services = [];
+        this.services.clear();
         break;
       default:
         throw new Error('Received invalid reset strategy.');
@@ -239,21 +281,7 @@ export class ContainerInstance {
   }
 
   /**
-   * Returns all services registered with the given identifier.
-   */
-  private findAllServices(identifier: ServiceIdentifier): ServiceMetadata<unknown>[] {
-    return this.services.filter(service => service.id === identifier);
-  }
-
-  /**
-   * Finds registered service in the with a given service identifier.
-   */
-  private findService(identifier: ServiceIdentifier): ServiceMetadata<unknown> | undefined {
-    return this.services.find(service => service.id === identifier);
-  }
-
-  /**
-   * Gets the value belonging to `serviceMetadata.id`.
+   * Gets the value belonging to passed in `ServiceMetadata` instance.
    *
    * - if `serviceMetadata.value` is already set it is immediately returned
    * - otherwise the requested type is resolved to the value saved to `serviceMetadata.value` and returned
@@ -267,6 +295,14 @@ export class ContainerInstance {
      */
     if (serviceMetadata.value !== EMPTY_VALUE) {
       return serviceMetadata.value;
+    }
+
+    /** If it's a multiple type we throw as it's handled in a different function. */
+    if (serviceMetadata.multiple) {
+      // TODO: add proper error here.
+      throw new Error(
+        `Cannot request single service when multiple option enabled (ID: ${serviceMetadata.id.toString()})!`
+      );
     }
 
     /** If both factory and type is missing, we cannot resolve the requested ID. */
@@ -328,7 +364,7 @@ export class ContainerInstance {
     }
 
     /** If this is not a transient service, and we resolved something, then we set it as the value. */
-    if (!serviceMetadata.transient && value !== EMPTY_VALUE) {
+    if (serviceMetadata.scope !== 'transient' && value !== EMPTY_VALUE) {
       serviceMetadata.value = value;
     }
 
@@ -417,7 +453,18 @@ export class ContainerInstance {
         }
       }
 
+      serviceMetadata.typeMap.forEach(metadata => {
+        if (typeof (metadata?.value as Record<string, unknown>)['destroy'] === 'function') {
+          try {
+            (metadata.value as { destroy: CallableFunction }).destroy();
+          } catch (error) {
+            /** We simply ignore the errors from the destroy function. */
+          }
+        }
+      });
+
       serviceMetadata.value = EMPTY_VALUE;
+      serviceMetadata.typeMap = [];
     }
   }
 }

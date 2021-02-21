@@ -16,9 +16,9 @@ describe('github issues > #40 Constructor inject not working', function () {
       ) {}
     }
 
-    Container.set('moment', 'A');
-    Container.set('jsonwebtoken', 'B');
-    Container.set('cfg.auth.jwt', 'C');
+    Container.set({ id: 'moment', value: 'A' });
+    Container.set({ id: 'jsonwebtoken', value: 'B'});
+    Container.set({ id: 'cfg.auth.jwt', value: 'C'});
     const accessTokenService = Container.get<AccessTokenService>('AccessTokenService');
 
     expect(accessTokenService.moment).not.toBeUndefined();
