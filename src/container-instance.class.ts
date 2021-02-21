@@ -298,18 +298,18 @@ export class ContainerInstance {
 
   public async dispose(): Promise<void> {
     this.reset({ strategy: 'resetServices' });
-    
+
     /** We mark the container as disposed, forbidding any further interaction with it. */
     this.disposed = true;
 
-    /** 
-     * Placeholder, this function returns a promise in preparation to support async services. 
+    /**
+     * Placeholder, this function returns a promise in preparation to support async services.
      */
     await Promise.resolve();
   }
 
   private throwIfDisposed() {
-    if(this.disposed) {
+    if (this.disposed) {
       // TODO: Use custom error.
       throw new Error('Cannot use container after it has been disposed.');
     }
