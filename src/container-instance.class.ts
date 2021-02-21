@@ -2,7 +2,6 @@ import { ServiceNotFoundError } from './error/service-not-found.error';
 import { CannotInstantiateValueError } from './error/cannot-instantiate-value.error';
 import { Token } from './token.class';
 import { Constructable } from './types/constructable.type';
-import { AbstractConstructable } from './types/abstract-constructable.type';
 import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface';
 import { ServiceOptions } from './interfaces/service-options.interface';
@@ -45,10 +44,7 @@ export class ContainerInstance {
    * Checks if the service with given name or type is registered service container.
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
-  has<T>(type: Constructable<T>): boolean;
-  has<T>(id: string): boolean;
-  has<T>(id: Token<T>): boolean;
-  has<T>(identifier: ServiceIdentifier): boolean {
+  has<T = unknown>(identifier: ServiceIdentifier<T>): boolean {
     return !!this.findService(identifier);
   }
 
@@ -56,12 +52,7 @@ export class ContainerInstance {
    * Retrieves the service with given name or type from the service container.
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
-  get<T>(type: Constructable<T>): T;
-  get<T>(type: AbstractConstructable<T>): T;
-  get<T>(id: string): T;
-  get<T>(id: Token<T>): T;
-  get<T>(id: ServiceIdentifier<T>): T;
-  get<T>(identifier: ServiceIdentifier<T>): T {
+  get<T = unknown>(identifier: ServiceIdentifier<T>): T {
     const globalContainer = ContainerRegistry.defaultContainer;
     const globalService = globalContainer.findService(identifier);
     const scopedService = this.findService(identifier);
@@ -96,24 +87,14 @@ export class ContainerInstance {
    * Gets all instances registered in the container of the given service identifier.
    * Used when service defined with multiple: true flag.
    */
-  getMany<T>(type: Constructable<T>): T[];
-  getMany<T>(type: AbstractConstructable<T>): T[];
-  getMany<T>(id: string): T[];
-  getMany<T>(id: Token<T>): T[];
-  getMany<T>(id: ServiceIdentifier<T>): T[];
-  getMany<T>(identifier: ServiceIdentifier<T>): T[] {
+  getMany<T = unknown>(identifier: ServiceIdentifier<T>): T[] {
     return this.findAllServices(identifier).map(service => this.getServiceValue(service));
   }
 
   /**
    * Sets a value for the given type or service name in the container.
    */
-  set<T = unknown>(service: ServiceMetadata<T>): this; // This should be hidden
-  set<T = unknown>(type: Constructable<T>, instance: T): this;
-  set<T = unknown>(type: AbstractConstructable<T>, instance: T): this;
-  set<T = unknown>(name: string, instance: T): this;
-  set<T = unknown>(token: Token<T>, instance: T): this;
-  set<T = unknown>(token: ServiceIdentifier, instance: T): this;
+  set<T = unknown>(identifier: ServiceIdentifier<T>, instance: T): this;
   set<T = unknown>(metadata: ServiceOptions<T>): this;
   set<T = unknown>(metadataArray: ServiceOptions<T>[]): this;
   set<T = unknown>(
