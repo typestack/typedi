@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.11.0 [BREAKING] - [UNRELEASED]
+
+### BREAKING CHANGES
+
+#### Container.reset signature change
+
+The `Container.reset` signature has changed. It's only possible to reset the current container instance, you are calling
+the function on, so the first `containerId` parameter has been removed.
+
+```ts
+// Old format
+Container.reset(myContainerId, { strategy: 'resetValue' });
+
+// New format
+MyContainer.reset({ strategy: 'resetValue' });
+```
+
+### Added
+
+- added support for specifying Container ID as `Symbol`
+- re-enabled throwing error when `reflect-metadata` is not imported
+
 ## 0.10.0 [BREAKING] - 2021.01.15
 
 ### BREAKING CHANGES
