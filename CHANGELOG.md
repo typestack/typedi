@@ -4,6 +4,54 @@
 
 ### BREAKING CHANGES
 
+### `Container.set(token, value)` and `Container.set('string-id', value)` signature removed
+
+To allow better intellisense support for signatures, the overloads allowing to specify services
+via a simplified form has been removed. From now on, services can be specified via the configuration object.
+
+```ts
+// Old format
+Container.set(myToken, myValue);
+
+// New format
+Container.set({ id: myToken, value: myValue });
+```
+
+### `Service(token)` and `Service('string-id')` signature removed
+
+To allow better intellisense support for signatures, the overloads allowing to specify services
+via a simplified form has been removed. From now on, services can be specified via the configuration object.
+
+```ts
+// Old format
+@Service(myToken)
+export class MyClass {}
+
+// New format
+@Service({ id: myToken })
+export class MyClass {}
+```
+
+### `Container.set({})` and `@Service()` decorator signature change
+
+The `global`, `transient` options had been removed in favor of `scope` option.
+
+```ts
+// Old format
+@Service({ transient: true })
+class MyTransientClass { }
+
+@Service({ global: true })
+class MySingletonClass { }
+
+// New format
+@Service({ scope: 'transient' })
+class MyTransientClass { }
+
+@Service({ scope: 'singleton' })
+class MySingletonClass { }
+```
+
 #### Container.reset signature change
 
 The `Container.reset` signature has changed. It's only possible to reset the current container instance you are calling
