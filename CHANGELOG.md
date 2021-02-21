@@ -6,7 +6,7 @@
 
 #### Container.reset signature change
 
-The `Container.reset` signature has changed. It's only possible to reset the current container instance, you are calling
+The `Container.reset` signature has changed. It's only possible to reset the current container instance you are calling
 the function on, so the first `containerId` parameter has been removed.
 
 ```ts
@@ -17,10 +17,32 @@ Container.reset(myContainerId, { strategy: 'resetValue' });
 MyContainer.reset({ strategy: 'resetValue' });
 ```
 
+#### Container.set([definitionOne, definitionTwo]) removed
+
+The option to add definitions as an array was removed. This was internally used, but exposed via the typing.
+
+<!-- prettier-ignore -->
+```ts
+// Old format
+Container.set([{ id: SomeClass, type: SomeClass }, { id: OtherClass, type: OtherClass }])
+
+// New format
+[{ id: SomeClass, type: SomeClass }, { id: OtherClass, type: OtherClass }].map(metadata => Container.set(metadata));
+```
+
 ### Added
 
 - added support for specifying Container ID as `Symbol`
 - re-enabled throwing error when `reflect-metadata` is not imported
+
+### Changed
+
+- internally the default container is also an instance of the ContainerInstance class from now on
+
+### Fixed
+
+- `Container.set()` correctly enforces typing when used with a `Token`. Attempting to set something else than the Token
+  type allows will raise a compile time error
 
 ## 0.10.0 [BREAKING] - 2021.01.15
 
