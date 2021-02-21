@@ -9,7 +9,7 @@ describe('Service Decorator', function () {
   it('should register class in the container, and its instance should be retrievable', function () {
     @Service()
     class TestService {}
-    @Service('super.service')
+    @Service({ id: 'super.service' })
     class NamedService {}
     expect(Container.get(TestService)).toBeInstanceOf(TestService);
     expect(Container.get(TestService)).not.toBeInstanceOf(NamedService);
@@ -18,7 +18,7 @@ describe('Service Decorator', function () {
   it('should register class in the container with given name, and its instance should be retrievable', function () {
     @Service()
     class TestService {}
-    @Service('super.service')
+    @Service({ id: 'super.service' })
     class NamedService {}
     expect(Container.get('super.service')).toBeInstanceOf(NamedService);
     expect(Container.get('super.service')).not.toBeInstanceOf(TestService);

@@ -11,22 +11,22 @@ interface Factory {
   create(): void;
 }
 
-@Service('bean.factory')
+@Service({ id: 'bean.factory' })
 class BeanFactory implements Factory {
   create() {}
 }
 
-@Service('sugar.factory')
+@Service({ id: 'sugar.factory' })
 class SugarFactory implements Factory {
   create() {}
 }
 
-@Service('water.factory')
+@Service({ id: 'water.factory' })
 class WaterFactory implements Factory {
   create() {}
 }
 
-@Service('coffee.maker')
+@Service({ id: 'coffee.maker' })
 class CoffeeMaker {
   beanFactory: Factory;
   sugarFactory: Factory;

@@ -7,7 +7,7 @@ describe('github issues > #40 Constructor inject not working', function () {
   beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('should work properly', function () {
-    @Service('AccessTokenService')
+    @Service({ id: 'AccessTokenService' })
     class AccessTokenService {
       constructor(
         @Inject('moment') public moment: any,

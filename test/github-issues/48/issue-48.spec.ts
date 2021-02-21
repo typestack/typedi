@@ -11,7 +11,7 @@ describe("github issues > #48 Token service iDs in global container aren't inher
 
     const FooServiceToken = new Token<FooService>();
 
-    @Service(FooServiceToken)
+    @Service({ id: FooServiceToken })
     class FooService implements FooService {
       public marco() {
         poloCounter++;

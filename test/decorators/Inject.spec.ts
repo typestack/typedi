@@ -23,7 +23,7 @@ describe('Inject Decorator', function () {
     interface Test {}
     const ServiceToken = new Token<Test>();
 
-    @Service(ServiceToken)
+    @Service({ id: ServiceToken })
     class TestService {}
     @Service()
     class SecondTestService {
@@ -34,7 +34,7 @@ describe('Inject Decorator', function () {
   });
 
   it('should inject named service into class property', function () {
-    @Service('mega.service')
+    @Service({ id: 'mega.service' })
     class NamedService {}
     @Service()
     class SecondTestService {
@@ -49,7 +49,7 @@ describe('Inject Decorator', function () {
     class TestService {}
     @Service()
     class SecondTestService {}
-    @Service('mega.service')
+    @Service({ id: 'mega.service' })
     class NamedService {}
     @Service()
     class TestServiceWithParameters {
