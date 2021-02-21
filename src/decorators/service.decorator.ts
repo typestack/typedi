@@ -15,25 +15,12 @@ export function Service<T>(options: ServiceOptions<T> = {}): ClassDecorator {
       id: options.id || targetConstructor,
       type: (targetConstructor as unknown) as Constructable<T>,
       factory: (options as any).factory || undefined,
-      typeMap: [],
       multiple: options.multiple || false,
       eager: options.eager || false,
       scope: options.scope || 'container',
       referencedBy: new Map().set(ContainerRegistry.defaultContainer.id, ContainerRegistry.defaultContainer),
       value: EMPTY_VALUE,
     };
-
-    /** Handling multiple instances. */
-    if (options.multiple) {
-      serviceMetadata.typeMap = [
-        {
-          type: serviceMetadata.type,
-          factory: serviceMetadata.factory,
-          value: EMPTY_VALUE,
-        },
-      ];
-      serviceMetadata.type = null;
-    }
 
     ContainerRegistry.defaultContainer.set(serviceMetadata);
   };

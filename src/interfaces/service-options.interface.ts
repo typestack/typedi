@@ -5,6 +5,6 @@ import { ServiceMetadata } from './service-metadata.interface';
  * of the following is set: `type`, `factory`, `value` but not more than one.
  */
 export type ServiceOptions<T = unknown> =
-  | Omit<Partial<ServiceMetadata<T>>, 'referencedBy' | 'typeMap' | 'type' | 'factory'>
-  | Omit<Partial<ServiceMetadata<T>>, 'referencedBy' | 'typeMap' | 'value' | 'factory'>
-  | Omit<Partial<ServiceMetadata<T>>, 'referencedBy' | 'typeMap' | 'value' | 'type'>;
+  | Omit<Partial<ServiceMetadata<T>>, 'referencedBy' | 'type' | 'factory'>
+  | Omit<Partial<ServiceMetadata<T>>, 'referencedBy' | 'value' | 'factory'>
+  | Omit<Partial<ServiceMetadata<T>>, 'referencedBy' | 'value' | 'type'>;

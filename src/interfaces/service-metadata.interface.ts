@@ -1,6 +1,7 @@
 import { ContainerInstance } from '../container-instance.class';
 import { Constructable } from '../types/constructable.type';
 import { ContainerIdentifer } from '../types/container-identifier.type';
+import { ContainerScope } from '../types/container-scope.type';
 import { ServiceIdentifier } from '../types/service-identifier.type';
 
 /**
@@ -16,7 +17,7 @@ export interface ServiceMetadata<Type = unknown> {
    *   - a `container` scoped service will be created once when requested from the given container
    *   - a `transient` service will be created each time it is requested
    */
-  scope: 'singleton' | 'container' | 'transient';
+  scope: ContainerScope;
 
   /**
    * Class definition of the service what is used to initialize given service.
@@ -24,16 +25,6 @@ export interface ServiceMetadata<Type = unknown> {
    * If id is not set then it serves as service id.
    */
   type: Constructable<Type> | null;
-
-  /**
-   * When a service is marked as multiple, the type definitions are stored
-   * on this property instead of the `type`, `factory` and `value`.
-   */
-  typeMap: {
-    type: Constructable<Type> | null;
-    factory: [Constructable<unknown>, string] | CallableFunction | undefined;
-    value: unknown;
-  }[];
 
   /**
    * Allows to setup multiple instances the different classes under a single service id string or token.
