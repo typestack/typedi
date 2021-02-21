@@ -19,7 +19,7 @@ export class ContainerInstance {
   public readonly id!: ContainerIdentifer;
 
   /** All registered services in the container. */
-  private services: Map<ServiceIdentifier, ServiceMetadata<unknown>> = new Map();
+  private metadataMap: Map<ServiceIdentifier, ServiceMetadata<unknown>> = new Map();
 
   /**
    * All registered handlers. The @Inject() decorator uses handlers internally to mark a property for injection.
@@ -45,7 +45,7 @@ export class ContainerInstance {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   has<T = unknown>(identifier: ServiceIdentifier<T>): boolean {
-    return !!this.services.has(identifier);
+    return !!this.metadataMap.has(identifier);
   }
 
   /**
@@ -53,8 +53,8 @@ export class ContainerInstance {
    * Optionally, parameters can be passed in case if instance is initialized in the container for the first time.
    */
   get<T = unknown>(identifier: ServiceIdentifier<T>): T {
-    const global = ContainerRegistry.defaultContainer.services.get(identifier);
-    const local = this.services.get(identifier);
+    const global = ContainerRegistry.defaultContainer.metadataMap.get(identifier);
+    const local = this.metadataMap.get(identifier);
     /** If the service is registered as global we load it from there, otherwise we use the local one. */
     const metadata = global?.scope === 'singleton' ? global : local;
 
@@ -95,8 +95,8 @@ export class ContainerInstance {
    * Used when service defined with multiple: true flag.
    */
   getMany<T = unknown>(identifier: ServiceIdentifier<T>): T[] {
-    const global = ContainerRegistry.defaultContainer.services.get(identifier);
-    const local = this.services.get(identifier);
+    const global = ContainerRegistry.defaultContainer.metadataMap.get(identifier);
+    const local = this.metadataMap.get(identifier);
     /** If the service is registered as global we load it from there, otherwise we use the local one. */
     const metadata = global?.scope === 'singleton' ? global : local;
 
@@ -151,7 +151,7 @@ export class ContainerInstance {
       referencedBy: new Map().set(this.id, this),
     };
 
-    const existingMetadata = this.services.get(newService.id);
+    const existingMetadata = this.metadataMap.get(newService.id);
 
     if (existingMetadata && existingMetadata.multiple) {
       /** If we are adding non multiple metadata service to existing multiple metadata */
@@ -181,7 +181,7 @@ export class ContainerInstance {
 
     /** If this service hasn't been registered yet, we register it. */
     if (!existingMetadata) {
-      this.services.set(newService.id, newService);
+      this.metadataMap.set(newService.id, newService);
     }
 
     if (newService.eager && newService.multiple === false) {
@@ -202,11 +202,11 @@ export class ContainerInstance {
     if (Array.isArray(identifierOrIdentifierArray)) {
       identifierOrIdentifierArray.forEach(id => this.remove(id));
     } else {
-      const serviceMetadata = this.services.get(identifierOrIdentifierArray);
+      const serviceMetadata = this.metadataMap.get(identifierOrIdentifierArray);
 
       if (serviceMetadata) {
         this.destroyServiceInstance(serviceMetadata);
-        this.services.delete(identifierOrIdentifierArray);
+        this.metadataMap.delete(identifierOrIdentifierArray);
       }
     }
 
@@ -258,11 +258,11 @@ export class ContainerInstance {
   public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
     switch (options.strategy) {
       case 'resetValue':
-        this.services.forEach(service => this.destroyServiceInstance(service));
+        this.metadataMap.forEach(service => this.destroyServiceInstance(service));
         break;
       case 'resetServices':
-        this.services.forEach(service => this.destroyServiceInstance(service));
-        this.services.clear();
+        this.metadataMap.forEach(service => this.destroyServiceInstance(service));
+        this.metadataMap.clear();
         break;
       default:
         throw new Error('Received invalid reset strategy.');
