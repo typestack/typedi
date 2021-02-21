@@ -4,7 +4,7 @@
 
 ### BREAKING CHANGES
 
-### `Container.set(token, value)` and `Container.set('string-id', value)` signature removed
+#### `Container.set(token, value)` and `Container.set('string-id', value)` signature removed
 
 To allow better intellisense support for signatures, the overloads allowing to specify services
 via a simplified form has been removed. From now on, services can be specified via the configuration object.
@@ -17,7 +17,7 @@ Container.set(myToken, myValue);
 Container.set({ id: myToken, value: myValue });
 ```
 
-### `Service(token)` and `Service('string-id')` signature removed
+#### `Service(token)` and `Service('string-id')` signature removed
 
 To allow better intellisense support for signatures, the overloads allowing to specify services
 via a simplified form has been removed. From now on, services can be specified via the configuration object.
@@ -32,7 +32,7 @@ export class MyClass {}
 export class MyClass {}
 ```
 
-### `Container.set({})` and `@Service()` decorator signature change
+#### `Container.set({})` and `@Service()` decorator signature change
 
 The `global`, `transient` options had been removed in favor of `scope` option.
 
@@ -52,7 +52,7 @@ class MyTransientClass {}
 class MySingletonClass {}
 ```
 
-#### Container.reset signature change
+#### `Container.reset()` signature change
 
 The `Container.reset` signature has changed. It's only possible to reset the current container instance you are calling
 the function on, so the first `containerId` parameter has been removed.
@@ -65,7 +65,7 @@ Container.reset(myContainerId, { strategy: 'resetValue' });
 MyContainer.reset({ strategy: 'resetValue' });
 ```
 
-#### Container.set([definitionOne, definitionTwo]) removed
+#### `Container.set([definitionOne, definitionTwo])` signature removed
 
 The option to add definitions as an array was removed. This was internally used, but exposed via the typing.
 
