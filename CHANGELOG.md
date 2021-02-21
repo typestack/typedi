@@ -39,17 +39,17 @@ The `global`, `transient` options had been removed in favor of `scope` option.
 ```ts
 // Old format
 @Service({ transient: true })
-class MyTransientClass { }
+class MyTransientClass {}
 
 @Service({ global: true })
-class MySingletonClass { }
+class MySingletonClass {}
 
 // New format
 @Service({ scope: 'transient' })
-class MyTransientClass { }
+class MyTransientClass {}
 
 @Service({ scope: 'singleton' })
-class MySingletonClass { }
+class MySingletonClass {}
 ```
 
 #### Container.reset signature change

@@ -166,7 +166,7 @@ describe('Service Decorator', function () {
   it('should support function injection with Token dependencies', function () {
     const myToken: Token<string> = new Token<string>('myToken');
 
-    Container.set({ id: myToken, value: 'test_string'});
+    Container.set({ id: myToken, value: 'test_string' });
     Container.set({
       id: 'my-service-A',
       factory: function myServiceFactory(container): string {

@@ -11,8 +11,8 @@ describe('Container', function () {
     it('should be able to get a boolean', () => {
       const booleanTrue = 'boolean.true';
       const booleanFalse = 'boolean.false';
-      Container.set({ id: booleanTrue, value: true});
-      Container.set({ id: booleanFalse, value: false});
+      Container.set({ id: booleanTrue, value: true });
+      Container.set({ id: booleanFalse, value: false });
 
       expect(Container.get(booleanTrue)).toBe(true);
       expect(Container.get(booleanFalse)).toBe(false);
@@ -20,14 +20,14 @@ describe('Container', function () {
 
     it('should be able to get an empty string', () => {
       const emptyString = 'emptyString';
-      Container.set({ id: emptyString, value: ''});
+      Container.set({ id: emptyString, value: '' });
 
       expect(Container.get(emptyString)).toBe('');
     });
 
     it('should be able to get the 0 number', () => {
       const zero = 'zero';
-      Container.set({ id: zero, value: 0});
+      Container.set({ id: zero, value: 0 });
 
       expect(Container.get(zero)).toBe(0);
     });

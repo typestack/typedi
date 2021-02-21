@@ -23,7 +23,7 @@ describe('Github Issues', function () {
     class Child extends Base {}
 
     const testconfig = { value: 'I AM A CONFIG OBJECT ' };
-    Container.set({ id: 'config', value: testconfig});
+    Container.set({ id: 'config', value: testconfig });
 
     const baseService = Container.get(Base);
     const childService = Container.get(Child);

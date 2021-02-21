@@ -23,7 +23,7 @@ export function Service<T>(options: ServiceOptions<T> = {}): ClassDecorator {
     };
 
     /** Handling multiple instances. */
-    if(options.multiple) {
+    if (options.multiple) {
       serviceMetadata.typeMap = [
         {
           type: serviceMetadata.type,
