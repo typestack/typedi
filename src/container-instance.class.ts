@@ -1,4 +1,3 @@
-import { Container } from './container.class';
 import { ServiceNotFoundError } from './error/service-not-found.error';
 import { CannotInstantiateValueError } from './error/cannot-instantiate-value.error';
 import { Token } from './token.class';
@@ -8,6 +7,9 @@ import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface';
 import { ServiceOptions } from './interfaces/service-options.interface';
 import { EMPTY_VALUE } from './empty.const';
+import { ContainerIdentifer } from './types/container-identifier.type';
+import { Handler } from './interfaces/handler.interface';
+import { ContainerRegistry } from './container-registry.class';
 
 /**
  * TypeDI can have multiple containers.
@@ -15,13 +17,28 @@ import { EMPTY_VALUE } from './empty.const';
  */
 export class ContainerInstance {
   /** Container instance id. */
-  public readonly id!: string;
+  public readonly id!: ContainerIdentifer;
 
   /** All registered services in the container. */
   private services: ServiceMetadata<unknown>[] = [];
 
-  constructor(id: string) {
+  /**
+   * All registered handlers. The @Inject() decorator uses handlers internally to mark a property for injection.
+   **/
+  private readonly handlers: Handler[] = [];
+
+  private disposed: boolean = false;
+
+  constructor(id: ContainerIdentifer) {
     this.id = id;
+
+    ContainerRegistry.registerContainer(this);
+
+    /**
+     * TODO: This is to replicate the old functionality. This should be copied only
+     * TODO: if the container decides to inherit registered classes from a parent container.
+     */
+    this.handlers = ContainerRegistry.defaultContainer?.handlers || [];
   }
 
   /**
@@ -45,7 +62,7 @@ export class ContainerInstance {
   get<T>(id: Token<T>): T;
   get<T>(id: ServiceIdentifier<T>): T;
   get<T>(identifier: ServiceIdentifier<T>): T {
-    const globalContainer = Container.of(undefined);
+    const globalContainer = ContainerRegistry.defaultContainer;
     const globalService = globalContainer.findService(identifier);
     const scopedService = this.findService(identifier);
 
@@ -184,6 +201,45 @@ export class ContainerInstance {
   }
 
   /**
+   * Gets a separate container instance for the given instance id.
+   */
+  public of(containerId: ContainerIdentifer = 'default'): ContainerInstance {
+    if (containerId === 'default') {
+      return ContainerRegistry.defaultContainer;
+    }
+
+    let container: ContainerInstance;
+
+    if (ContainerRegistry.hasContainer(containerId)) {
+      container = ContainerRegistry.getContainer(containerId);
+    } else {
+      /**
+       * This is deprecated functionality, for now we create the container if it's doesn't exists.
+       * This will be reworked when container inheritance is reworked.
+       */
+      container = new ContainerInstance(containerId);
+    }
+
+    return container;
+  }
+
+  /**
+   * Registers a new handler.
+   */
+  public registerHandler(handler: Handler): ContainerInstance {
+    this.handlers.push(handler);
+    return this;
+  }
+
+  /**
+   * Helper method that imports given services.
+   */
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  public import(services: Function[]): ContainerInstance {
+    return this;
+  }
+
+  /**
    * Completely resets the container by removing all previously registered services from it.
    */
   public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
@@ -199,6 +255,16 @@ export class ContainerInstance {
         throw new Error('Received invalid reset strategy.');
     }
     return this;
+  }
+
+  public async dispose(): Promise<void> {
+    /**
+     * Placeholder.
+     * This function will dispose all service instances which are registered in this container only.
+     */
+    this.disposed = true;
+
+    await Promise.resolve();
   }
 
   /**
@@ -312,7 +378,7 @@ export class ContainerInstance {
    */
   private initializeParams(target: Function, paramTypes: any[]): unknown[] {
     return paramTypes.map((paramType, index) => {
-      const paramHandler = Container.handlers.find(handler => {
+      const paramHandler = this.handlers.find(handler => {
         /**
          * @Inject()-ed values are stored as parameter handlers and they reference their target
          * when created. So when a class is extended the @Inject()-ed values are not inherited
@@ -349,7 +415,7 @@ export class ContainerInstance {
    * Applies all registered handlers on a given target class.
    */
   private applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
-    Container.handlers.forEach(handler => {
+    this.handlers.forEach(handler => {
       if (typeof handler.index === 'number') return;
       if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor)) return;
 

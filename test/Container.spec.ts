@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { Container } from '../src/container.class';
+import { Container } from '../src/index';
 import { Service } from '../src/decorators/service.decorator';
 import { Token } from '../src/token.class';
 import { ServiceNotFoundError } from '../src/error/service-not-found.error';
 
 describe('Container', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   describe('get', () => {
     it('should be able to get a boolean', () => {
@@ -161,7 +161,7 @@ describe('Container', function () {
       Container.set(TestService, testService);
       expect(Container.get(TestService)).toBe(testService);
       expect(Container.get(TestService).name).toBe('john');
-      Container.reset();
+      Container.reset({ strategy: 'resetValue' });
       expect(Container.get(TestService)).not.toBe(testService);
       expect(Container.get(TestService).name).toBe('frank');
     });
@@ -307,7 +307,7 @@ describe('Container', function () {
       const instanceAOne = Container.get(MyServiceA);
       const instanceBOne = Container.get(MyServiceB);
 
-      Container.reset();
+      Container.reset({ strategy: 'resetValue' });
 
       const instanceATwo = Container.get(MyServiceA);
       const instanceBTwo = Container.get(MyServiceB);
@@ -330,7 +330,7 @@ describe('Container', function () {
 
       const instanceA = Container.get(MyService);
 
-      Container.reset();
+      Container.reset({ strategy: 'resetValue' });
 
       const instanceB = Container.get(MyService);
 

@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/container.class';
+import { Container } from '../../../src/index';
 import { Service } from '../../../src/decorators/service.decorator';
 import { Inject } from '../../../src/decorators/inject.decorator';
 import { CannotInjectValueError } from '../../../src/error/cannot-inject-value.error';
 
 describe('github issues > #42 Exception not thrown on missing binding', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('should work properly', function () {
     interface Factory {

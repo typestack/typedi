@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/container.class';
+import { Container } from '../../../src/index';
 import { Service } from '../../../src/decorators/service.decorator';
 
 describe('Github Issues', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('#151 - should be able to define type when setting service', () => {
     /**

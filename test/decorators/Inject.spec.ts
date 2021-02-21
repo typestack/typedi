@@ -1,12 +1,12 @@
 import 'reflect-metadata';
-import { Container } from '../../src/container.class';
+import { Container } from '../../src/index';
 import { Service } from '../../src/decorators/service.decorator';
 import { Inject } from '../../src/decorators/inject.decorator';
 import { Token } from '../../src/token.class';
 import { InjectMany } from '../../src/decorators/inject-many.decorator';
 
 describe('Inject Decorator', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('should inject service into class property', function () {
     @Service()

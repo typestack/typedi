@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/container.class';
+import { Container } from '../../../src/index';
 import { Service } from '../../../src/decorators/service.decorator';
 import { Inject } from '../../../src/decorators/inject.decorator';
 
 describe('Github Issues', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('#112 - maximum call stack size error with circular dependencies', () => {
     @Service()

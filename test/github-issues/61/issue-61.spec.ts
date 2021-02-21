@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/container.class';
+import { Container } from '../../../src/index';
 import { Service } from '../../../src/decorators/service.decorator';
 
 describe('Github Issues', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('#61 - Scoped container creates new instance of service every time', function () {
     @Service()

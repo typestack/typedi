@@ -1,4 +1,4 @@
-import { Container } from '../container.class';
+import { ContainerRegistry } from '../container-registry.class';
 import { Token } from '../token.class';
 import { CannotInjectValueError } from '../error/cannot-inject-value.error';
 import { resolveToTypeWrapper } from '../utils/resolve-to-type-wrapper.util';
@@ -23,7 +23,7 @@ export function InjectMany(
       throw new CannotInjectValueError(target as Constructable<unknown>, propertyName as string);
     }
 
-    Container.registerHandler({
+    ContainerRegistry.defaultContainer.registerHandler({
       object: target as Constructable<unknown>,
       propertyName: propertyName as string,
       index: index,

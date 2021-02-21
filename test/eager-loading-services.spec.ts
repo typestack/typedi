@@ -1,9 +1,9 @@
 import 'reflect-metadata';
-import { Container } from '../src/container.class';
+import { Container } from '../src/index';
 import { Service } from '../src/decorators/service.decorator';
 
 describe('Eager loading of services', function () {
-  beforeEach(() => Container.reset());
+  beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   describe('Container API', () => {
     it('should be able to set eager and lazy service with Container API', () => {

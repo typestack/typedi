@@ -1,4 +1,4 @@
-import { Container } from '../container.class';
+import { ContainerRegistry } from '../container-registry.class';
 import { Token } from '../token.class';
 import { ServiceMetadata } from '../interfaces/service-metadata.interface';
 import { ServiceOptions } from '../interfaces/service-options.interface';
@@ -39,6 +39,6 @@ export function Service<T>(optionsOrServiceIdentifier?: ServiceOptions<T> | Toke
       serviceMetadata.transient = (optionsOrServiceIdentifier as ServiceMetadata).transient || false;
     }
 
-    Container.set(serviceMetadata);
+    ContainerRegistry.defaultContainer.set(serviceMetadata);
   };
 }
