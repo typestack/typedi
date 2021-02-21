@@ -96,17 +96,7 @@ export class ContainerInstance {
    */
   set<T = unknown>(identifier: ServiceIdentifier<T>, instance: T): this;
   set<T = unknown>(metadata: ServiceOptions<T>): this;
-  set<T = unknown>(metadataArray: ServiceOptions<T>[]): this;
-  set<T = unknown>(
-    identifierOrServiceMetadata: ServiceIdentifier | ServiceOptions<T> | ServiceOptions<T>[],
-    value?: T
-  ): this {
-    if (identifierOrServiceMetadata instanceof Array) {
-      identifierOrServiceMetadata.forEach(data => this.set(data));
-
-      return this;
-    }
-
+  set<T = unknown>(identifierOrServiceMetadata: ServiceIdentifier<T> | ServiceOptions<T>, value?: T): this {
     if (typeof identifierOrServiceMetadata === 'string' || identifierOrServiceMetadata instanceof Token) {
       return this.set({
         id: identifierOrServiceMetadata,

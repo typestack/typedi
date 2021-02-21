@@ -108,12 +108,10 @@ describe('Container', function () {
       const test1Service = new TestService();
       const test2Service = new TestService();
 
-      Container.set([
-        { id: TestService, value: testService },
-        { id: 'test1-service', value: test1Service },
-        { id: 'test2-service', value: test2Service },
-        { id: 'test3-service', factory: [TestServiceFactory, 'create'] },
-      ]);
+      Container.set({ id: TestService, value: testService });
+      Container.set({ id: 'test1-service', value: test1Service });
+      Container.set({ id: 'test2-service', value: test2Service });
+      Container.set({ id: 'test3-service', factory: [TestServiceFactory, 'create'] });
 
       expect(Container.get(TestService)).toBe(testService);
       expect(Container.get<TestService>('test1-service')).toBe(test1Service);
@@ -132,11 +130,9 @@ describe('Container', function () {
       const test1Service = new TestService();
       const test2Service = new TestService();
 
-      Container.set([
-        { id: TestService, value: testService },
-        { id: 'test1-service', value: test1Service },
-        { id: 'test2-service', value: test2Service },
-      ]);
+      Container.set({ id: TestService, value: testService });
+      Container.set({ id: 'test1-service', value: test1Service });
+      Container.set({ id: 'test2-service', value: test2Service });
 
       expect(Container.get(TestService)).toBe(testService);
       expect(Container.get<TestService>('test1-service')).toBe(test1Service);
