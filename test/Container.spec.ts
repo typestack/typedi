@@ -299,7 +299,7 @@ describe('Container', function () {
 
       @Service()
       class MyServiceB {
-        public destroy = destroyPropertyFnMock;
+        public dispose = destroyPropertyFnMock;
       }
 
       const instanceAOne = Container.get(MyServiceA);
@@ -351,7 +351,7 @@ describe('Container', function () {
 
       @Service()
       class MyServiceB {
-        public destroy = destroyPropertyFnMock();
+        public dispose = destroyPropertyFnMock();
       }
 
       Container.get(MyServiceA);
