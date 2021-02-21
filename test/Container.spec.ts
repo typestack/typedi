@@ -287,12 +287,12 @@ describe('Container', function () {
   });
 
   describe('Container.reset', () => {
-    it('should call destroy function on removed service', () => {
+    it('should call dispose function on removed service', () => {
       const destroyFnMock = jest.fn();
       const destroyPropertyFnMock = jest.fn();
       @Service()
       class MyServiceA {
-        destroy() {
+        dispose() {
           destroyFnMock();
         }
       }
@@ -339,12 +339,12 @@ describe('Container', function () {
   });
 
   describe('Container.remove', () => {
-    it('should call destroy function on removed service', () => {
+    it('should call dispose function on removed service', () => {
       const destroyFnMock = jest.fn();
       const destroyPropertyFnMock = jest.fn();
       @Service()
       class MyServiceA {
-        destroy() {
+        dispose() {
           destroyFnMock();
         }
       }

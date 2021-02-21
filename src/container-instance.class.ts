@@ -224,7 +224,7 @@ export class ContainerInstance {
       const serviceMetadata = this.metadataMap.get(identifierOrIdentifierArray);
 
       if (serviceMetadata) {
-        this.destroyServiceInstance(serviceMetadata);
+        this.disposeServiceInstance(serviceMetadata);
         this.metadataMap.delete(identifierOrIdentifierArray);
       }
     }
@@ -283,10 +283,10 @@ export class ContainerInstance {
 
     switch (options.strategy) {
       case 'resetValue':
-        this.metadataMap.forEach(service => this.destroyServiceInstance(service));
+        this.metadataMap.forEach(service => this.disposeServiceInstance(service));
         break;
       case 'resetServices':
-        this.metadataMap.forEach(service => this.destroyServiceInstance(service));
+        this.metadataMap.forEach(service => this.disposeServiceInstance(service));
         this.metadataMap.clear();
         this.multiServiceIds.clear();
         break;
@@ -466,7 +466,7 @@ export class ContainerInstance {
    * @param serviceMetadata the service metadata containing the instance to destroy
    * @param force when true the service will be always destroyed even if it's cannot be re-created
    */
-  private destroyServiceInstance(serviceMetadata: ServiceMetadata, force = false) {
+  private disposeServiceInstance(serviceMetadata: ServiceMetadata, force = false) {
     this.throwIfDisposed();
 
     /** We reset value only if we can re-create it (aka type or factory exists). */
@@ -474,9 +474,9 @@ export class ContainerInstance {
 
     if (shouldResetValue) {
       /** If we wound a function named destroy we call it without any params. */
-      if (typeof (serviceMetadata?.value as Record<string, unknown>)['destroy'] === 'function') {
+      if (typeof (serviceMetadata?.value as Record<string, unknown>)['dispose'] === 'function') {
         try {
-          (serviceMetadata.value as { destroy: CallableFunction }).destroy();
+          (serviceMetadata.value as { dispose: CallableFunction }).dispose();
         } catch (error) {
           /** We simply ignore the errors from the destroy function. */
         }
