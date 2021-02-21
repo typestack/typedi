@@ -24,6 +24,9 @@ export function Service<T>(optionsOrServiceIdentifier?: ServiceOptions<T> | Toke
       eager: false,
       transient: false,
       value: EMPTY_VALUE,
+      async: false,
+      asyncInitializationStatus: 'pending',
+      asyncInitializationPromise: undefined,
     };
 
     if (optionsOrServiceIdentifier instanceof Token || typeof optionsOrServiceIdentifier === 'string') {
@@ -31,12 +34,13 @@ export function Service<T>(optionsOrServiceIdentifier?: ServiceOptions<T> | Toke
       serviceMetadata.id = optionsOrServiceIdentifier;
     } else if (optionsOrServiceIdentifier) {
       /** We received a ServiceOptions object. */
-      serviceMetadata.id = (optionsOrServiceIdentifier as ServiceMetadata).id || targetConstructor;
+      serviceMetadata.id = optionsOrServiceIdentifier.id || targetConstructor;
       serviceMetadata.factory = (optionsOrServiceIdentifier as ServiceMetadata).factory || undefined;
-      serviceMetadata.multiple = (optionsOrServiceIdentifier as ServiceMetadata).multiple || false;
-      serviceMetadata.global = (optionsOrServiceIdentifier as ServiceMetadata).global || false;
-      serviceMetadata.eager = (optionsOrServiceIdentifier as ServiceMetadata).eager || false;
-      serviceMetadata.transient = (optionsOrServiceIdentifier as ServiceMetadata).transient || false;
+      serviceMetadata.multiple = optionsOrServiceIdentifier.multiple || false;
+      serviceMetadata.global = optionsOrServiceIdentifier.global || false;
+      serviceMetadata.eager = optionsOrServiceIdentifier.eager || false;
+      serviceMetadata.transient = optionsOrServiceIdentifier.transient || false;
+      serviceMetadata.async = optionsOrServiceIdentifier.async || false;
     }
 
     ContainerRegistry.defaultContainer.set(serviceMetadata);

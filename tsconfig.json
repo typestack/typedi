@@ -3,7 +3,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2018",
-    "lib": ["es2018"],
+    "lib": ["es2020"],
     "outDir": "build/node",
     "rootDirs": ["./src"],
     "strict": true,

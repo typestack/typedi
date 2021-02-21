@@ -1,5 +1,6 @@
 import { Constructable } from '../types/constructable.type';
 import { ServiceIdentifier } from '../types/service-identifier.type';
+import { EMPTY_VALUE } from '../empty.const';
 
 /**
  * Service metadata is used to initialize service and store its state.
@@ -11,7 +12,7 @@ export interface ServiceMetadata<Type = unknown> {
   /**
    * Class definition of the service what is used to initialize given service.
    * This property maybe null if the value of the service is set manually.
-   * If id is not set then it serves as service id.
+   * If ID is not set then this value is set as the service ID.
    */
   type: Constructable<Type> | null;
 
@@ -27,7 +28,24 @@ export interface ServiceMetadata<Type = unknown> {
   transient: boolean;
 
   /**
-   * Allows to setup multiple instances the different classes under a single service id string or token.
+   * Indicates if a service requires async setup. When enabled TypeDI will call
+   * the `instance.initialize()` function on the class instance. The service
+   * initialization can be awaited via `Container.waitForServiceInitialization()`.
+   */
+  async: boolean;
+
+  /**
+   * This property either contains the Promise returned from the `instance.initialize()` call.
+   */
+  asyncInitializationPromise: undefined | Promise<unknown>;
+
+  /**
+   * The status of the async initialization.
+   */
+  asyncInitializationStatus: 'pending' | 'finished' | 'failed';
+
+  /**
+   * Allows to setup multiple instances of different classes under a single service ID.
    */
   multiple: boolean;
 
@@ -45,7 +63,7 @@ export interface ServiceMetadata<Type = unknown> {
   factory: [Constructable<unknown>, string] | CallableFunction | undefined;
 
   /**
-   * Instance of the target class.
+   * Instance of the target value.
    */
-  value: unknown | Symbol;
+  value: unknown | typeof EMPTY_VALUE;
 }
