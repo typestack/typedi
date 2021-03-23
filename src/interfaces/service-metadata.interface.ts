@@ -27,6 +27,18 @@ export interface ServiceMetadata<Type = unknown> {
   type: Constructable<Type> | null;
 
   /**
+   * Factory function used to initialize this service.
+   * Can be regular function ("createCar" for example),
+   * or other service which produces this instance ([CarFactory, "createCar"] for example).
+   */
+  factory: [Constructable<unknown>, string] | CallableFunction | undefined;
+
+  /**
+   * Instance of the target class.
+   */
+  value: unknown | Symbol;
+
+  /**
    * Allows to setup multiple instances the different classes under a single service id string or token.
    */
   multiple: boolean;
@@ -38,18 +50,6 @@ export interface ServiceMetadata<Type = unknown> {
    * _Note: This option is ignored for transient services._
    */
   eager: boolean;
-
-  /**
-   * Factory function used to initialize this service.
-   * Can be regular function ("createCar" for example),
-   * or other service which produces this instance ([CarFactory, "createCar"] for example).
-   */
-  factory: [Constructable<unknown>, string] | CallableFunction | undefined;
-
-  /**
-   * Instance of the target class.
-   */
-  value: unknown | Symbol;
 
   /**
    * Map of containers referencing this metadata. This is used when a container

@@ -7,6 +7,7 @@ import { Constructable } from '../types/constructable.type';
 /**
  * Marks class as a service that can be injected using Container.
  */
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 export function Service<T = unknown>(): Function;
 export function Service<T = unknown>(options: ServiceOptions<T>): Function;
 export function Service<T>(options: ServiceOptions<T> = {}): ClassDecorator {
