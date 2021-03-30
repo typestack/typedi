@@ -44,7 +44,7 @@ There are three ways to inject your dependencies:
 
 ### Constructor argument injection
 
-Any class which has been marked with the `@Service()` decorator will have it's constructor properties automatically
+Any class which has been marked with the `@Service()` decorator will have its constructor properties automatically
 injected with the correct dependency.
 
 **TypeDI inserts the container instance** which was used to resolve the dependencies **as the last parameter in the constructor**.
