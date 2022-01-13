@@ -14,7 +14,7 @@ export function Service<T>(options: ServiceOptions<T> = {}): ClassDecorator {
   return targetConstructor => {
     const serviceMetadata: ServiceMetadata<T> = {
       id: options.id || targetConstructor,
-      type: (targetConstructor as unknown) as Constructable<T>,
+      type: targetConstructor as unknown as Constructable<T>,
       factory: (options as any).factory || undefined,
       multiple: options.multiple || false,
       eager: options.eager || false,
