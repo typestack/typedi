@@ -62,7 +62,7 @@ class ExampleService {
     // decorator TypeDI will automatically inject an instance of
     // ExampleInjectedService here when the ExampleService class is requested
     // from TypeDI.
-    private injectedService: ExampleInjectedService
+    public injectedService: ExampleInjectedService
   ) {}
 }
 

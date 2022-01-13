@@ -1,6 +1,6 @@
 import { ContainerInstance } from '../container-instance.class';
 import { Constructable } from '../types/constructable.type';
-import { ContainerIdentifer } from '../types/container-identifier.type';
+import { ContainerIdentifier } from '../types/container-identifier.type';
 import { ContainerScope } from '../types/container-scope.type';
 import { ServiceIdentifier } from '../types/service-identifier.type';
 
@@ -57,5 +57,5 @@ export interface ServiceMetadata<Type = unknown> {
    * the metadata. Namely, a service can be disposed only if it's only referenced
    * by the container being disposed.
    */
-  referencedBy: Map<ContainerIdentifer, ContainerInstance>;
+  referencedBy: Map<ContainerIdentifier, ContainerInstance>;
 }

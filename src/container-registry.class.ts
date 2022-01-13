@@ -1,5 +1,5 @@
 import { ContainerInstance } from './container-instance.class';
-import { ContainerIdentifer } from './types/container-identifier.type';
+import { ContainerIdentifier } from './types/container-identifier.type';
 
 /**
  * The container registry is responsible for holding the default and every
@@ -15,13 +15,12 @@ export class ContainerRegistry {
    *
    * This map doesn't contains the default container.
    */
-  private static readonly containerMap: Map<ContainerIdentifer, ContainerInstance> = new Map();
+  private static readonly containerMap: Map<ContainerIdentifier, ContainerInstance> = new Map();
 
   /**
    * The default global container. By default services are registered into this
    * container when registered via `Container.set()` or `@Service` decorator.
    */
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public static readonly defaultContainer: ContainerInstance = new ContainerInstance('default');
 
   /**
@@ -57,7 +56,7 @@ export class ContainerRegistry {
    *
    * @param container the ID of the container
    */
-  public static hasContainer(id: ContainerIdentifer): boolean {
+  public static hasContainer(id: ContainerIdentifier): boolean {
     return ContainerRegistry.containerMap.has(id);
   }
 
@@ -67,7 +66,7 @@ export class ContainerRegistry {
    *
    * @param container the ID of the container
    */
-  public static getContainer(id: ContainerIdentifer): ContainerInstance {
+  public static getContainer(id: ContainerIdentifier): ContainerInstance {
     const registeredContainer = this.containerMap.get(id);
 
     if (registeredContainer === undefined) {

@@ -6,7 +6,7 @@ import { ServiceIdentifier } from './types/service-identifier.type';
 import { ServiceMetadata } from './interfaces/service-metadata.interface';
 import { ServiceOptions } from './interfaces/service-options.interface';
 import { EMPTY_VALUE } from './empty.const';
-import { ContainerIdentifer } from './types/container-identifier.type';
+import { ContainerIdentifier } from './types/container-identifier.type';
 import { Handler } from './interfaces/handler.interface';
 import { ContainerRegistry } from './container-registry.class';
 import { ContainerScope } from './types/container-scope.type';
@@ -17,7 +17,7 @@ import { ContainerScope } from './types/container-scope.type';
  */
 export class ContainerInstance {
   /** Container instance id. */
-  public readonly id!: ContainerIdentifer;
+  public readonly id!: ContainerIdentifier;
 
   /** Metadata for all registered services in this container. */
   private metadataMap: Map<ServiceIdentifier, ServiceMetadata<unknown>> = new Map();
@@ -43,7 +43,7 @@ export class ContainerInstance {
    */
   private disposed: boolean = false;
 
-  constructor(id: ContainerIdentifer) {
+  constructor(id: ContainerIdentifier) {
     this.id = id;
 
     ContainerRegistry.registerContainer(this);
@@ -235,7 +235,7 @@ export class ContainerInstance {
   /**
    * Gets a separate container instance for the given instance id.
    */
-  public of(containerId: ContainerIdentifer = 'default'): ContainerInstance {
+  public of(containerId: ContainerIdentifier = 'default'): ContainerInstance {
     this.throwIfDisposed();
 
     if (containerId === 'default') {
@@ -373,7 +373,7 @@ export class ContainerInstance {
     if (!serviceMetadata.factory && serviceMetadata.type) {
       const constructableTargetType: Constructable<unknown> = serviceMetadata.type;
       // setup constructor parameters for a newly initialized service
-      const paramTypes = (Reflect as any)?.getMetadata('design:paramtypes', constructableTargetType) || [];
+      const paramTypes: unknown[] = (Reflect as any)?.getMetadata('design:paramtypes', constructableTargetType) || [];
       const params = this.initializeParams(constructableTargetType, paramTypes);
 
       // "extra feature" - always pass container instance as the last argument to the service function
@@ -433,7 +433,9 @@ export class ContainerInstance {
 
       if (paramHandler) return paramHandler.value(this);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       if (paramType && paramType.name && !this.isPrimitiveParamType(paramType.name)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         return this.get(paramType);
       }
 
