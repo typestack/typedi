@@ -21,7 +21,6 @@ export class ContainerRegistry {
    * The default global container. By default services are registered into this
    * container when registered via `Container.set()` or `@Service` decorator.
    */
-  // eslint-disable-next-line @typescript-eslint/member-ordering
   public static readonly defaultContainer: ContainerInstance = new ContainerInstance('default');
 
   /**
