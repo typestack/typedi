@@ -181,7 +181,7 @@ export class Engine {
 }
 ```
 
-And that's all. Same for constructor injections.
+And that's all. This does **NOT** work for constructor injections.
 
 ### Custom decorators
 
