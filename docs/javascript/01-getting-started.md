@@ -5,10 +5,10 @@ These differences are listed below in the [Limitations][limitations-sections] se
 
 ## Installation
 
-To start using TypeDI with JavaScript install it via NPM:
+To start using TypeDI with JavaScript install the required packages via NPM:
 
 ```bash
-npm install typedi
+npm install typedi reflect-metadata
 ```
 
 ## Basic usage
@@ -17,13 +17,20 @@ The most basic usage is to request an instance of a class definition. TypeDI wil
 been created before and return the cached version or it will create a new instance, cache and return it.
 
 ```js
+import 'reflect-metadata';
 import { Container } from 'typedi';
+
+// require('reflect-metadata');
+// const { Container }= require('typedi');
 
 class ExampleClass {
   print() {
     console.log('I am alive!');
   }
 }
+
+/** Register this class to the TypeDI container */
+Container.set({ id: ExampleClass, type: ExampleClass});
 
 /** Request an instance of ExampleClass from TypeDI. */
 const classInstance = Container.get(ExampleClass);
