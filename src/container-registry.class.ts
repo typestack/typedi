@@ -1,5 +1,7 @@
 import { ContainerInstance } from './container-instance.class';
 import { ContainerIdentifier } from './types/container-identifier.type';
+import { ContainerNotFoundError } from './error/container-not-found.error';
+import { CannotRegisterContainerError } from './error/cannot-register-container.error';
 
 /**
  * The container registry is responsible for holding the default and every
@@ -33,19 +35,16 @@ export class ContainerRegistry {
    */
   public static registerContainer(container: ContainerInstance): void {
     if (container instanceof ContainerInstance === false) {
-      // TODO: Create custom error for this.
-      throw new Error('Only ContainerInstance instances can be registered.');
+      throw new CannotRegisterContainerError('Only ContainerInstance instances can be registered.');
     }
 
     /** If we already set the default container (in index) then no-one else can register a default. */
     if (!!ContainerRegistry.defaultContainer && container.id === 'default') {
-      // TODO: Create custom error for this.
-      throw new Error('You cannot register a container with the "default" ID.');
+      throw new CannotRegisterContainerError('You cannot register a container with the "default" ID.');
     }
 
     if (ContainerRegistry.containerMap.has(container.id)) {
-      // TODO: Create custom error for this.
-      throw new Error('Cannot register container with same ID.');
+      throw new CannotRegisterContainerError('Cannot register container with same ID.');
     }
 
     ContainerRegistry.containerMap.set(container.id, container);
@@ -70,8 +69,7 @@ export class ContainerRegistry {
     const registeredContainer = this.containerMap.get(id);
 
     if (registeredContainer === undefined) {
-      // TODO: Create custom error for this.
-      throw new Error('No container is registered with the given ID.');
+      throw new ContainerNotFoundError(id);
     }
 
     return registeredContainer;
@@ -91,8 +89,7 @@ export class ContainerRegistry {
     const registeredContainer = ContainerRegistry.containerMap.get(container.id);
 
     if (registeredContainer === undefined) {
-      // TODO: Create custom error for this.
-      throw new Error('No container is registered with the given ID.');
+      throw new ContainerNotFoundError(container.id);
     }
 
     /** We remove the container first. */
