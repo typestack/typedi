@@ -238,6 +238,15 @@ export class ContainerInstance {
   public of(containerId: ContainerIdentifier = 'default'): ContainerInstance {
     this.throwIfDisposed();
 
+    return this.findOf(containerId) || new ContainerInstance(containerId);
+  }
+
+  /**
+   * Gets a separate container instance for the given instance id.
+   */
+  public findOf(containerId: ContainerIdentifier = 'default'): ContainerInstance | undefined {
+    this.throwIfDisposed();
+
     if (containerId === 'default') {
       return ContainerRegistry.defaultContainer;
     }
@@ -247,11 +256,7 @@ export class ContainerInstance {
     if (ContainerRegistry.hasContainer(containerId)) {
       container = ContainerRegistry.getContainer(containerId);
     } else {
-      /**
-       * This is deprecated functionality, for now we create the container if it's doesn't exists.
-       * This will be reworked when container inheritance is reworked.
-       */
-      container = new ContainerInstance(containerId);
+      return undefined
     }
 
     return container;
