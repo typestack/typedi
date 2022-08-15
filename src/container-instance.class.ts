@@ -91,7 +91,7 @@ export class ContainerInstance {
      * If it's the first time requested in the child container we load it from parent and set it.
      * TODO: This will be removed with the container inheritance rework.
      */
-    if (global && this !== ContainerRegistry.defaultContainer) {
+    if (global && !ContainerRegistry.defaultContainer.is(this)) {
       const clonedService = { ...global };
       clonedService.value = EMPTY_VALUE;
 
@@ -145,7 +145,7 @@ export class ContainerInstance {
      * If the service is marked as singleton, we set it in the default container.
      * (And avoid an infinite loop via checking if we are in the default container or not.)
      */
-    if (serviceOptions.scope === 'singleton' && ContainerRegistry.defaultContainer !== this) {
+    if (serviceOptions.scope === 'singleton' && !ContainerRegistry.defaultContainer.is(this)) {
       ContainerRegistry.defaultContainer.set(serviceOptions);
 
       return this;
@@ -256,7 +256,7 @@ export class ContainerInstance {
     if (ContainerRegistry.hasContainer(containerId)) {
       container = ContainerRegistry.getContainer(containerId);
     } else {
-      return undefined
+      return undefined;
     }
 
     return container;

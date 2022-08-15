@@ -1,6 +1,7 @@
-import {ContainerInstanceInterface} from "./container-instance.interface";
+import { ContainerInstanceInterface } from './container-instance.interface';
 
-export interface ContainerClusterInterface extends ContainerInstanceInterface{
-  addContainer(container: ContainerInstanceInterface): void
-  removeContainer(container: ContainerInstanceInterface): void
+export interface ContainerClusterInterface extends ContainerInstanceInterface {
+  is(container: ContainerInstanceInterface): boolean;
+  addContainer(container: ContainerInstanceInterface): void;
+  removeContainer(container: ContainerInstanceInterface): void;
 }

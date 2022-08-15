@@ -1,5 +1,7 @@
 import { ContainerInstance } from './container-instance.class';
 import { ContainerIdentifier } from './types/container-identifier.type';
+import { ContainerCluster } from './container-cluster.class';
+import { ContainerClusterInterface } from './interfaces/container-cluster.interface';
 
 /**
  * The container registry is responsible for holding the default and every
@@ -21,7 +23,9 @@ export class ContainerRegistry {
    * The default global container. By default services are registered into this
    * container when registered via `Container.set()` or `@Service` decorator.
    */
-  public static readonly defaultContainer: ContainerInstance = new ContainerInstance('default');
+  public static readonly defaultContainer: ContainerClusterInterface & ContainerInstance = ContainerCluster.create(
+    new ContainerInstance('default')
+  );
 
   /**
    * Registers the given container instance or throws an error.
@@ -49,6 +53,7 @@ export class ContainerRegistry {
     }
 
     ContainerRegistry.containerMap.set(container.id, container);
+    ContainerRegistry.defaultContainer?.addContainer(container);
   }
 
   /**
@@ -100,5 +105,6 @@ export class ContainerRegistry {
 
     /** We dispose all registered classes in the container. */
     await registeredContainer.dispose();
+    ContainerRegistry.defaultContainer.removeContainer(container);
   }
 }
