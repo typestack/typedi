@@ -274,16 +274,6 @@ export class ContainerInstance {
   }
 
   /**
-   * Helper method that imports given services.
-   */
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  public import(services: Function[]): ContainerInstance {
-    this.throwIfDisposed();
-
-    return this;
-  }
-
-  /**
    * Completely resets the container by removing all previously registered services from it.
    */
   public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
