@@ -39,7 +39,7 @@ export class ContainerInstance {
    * Indicates if the container has been disposed or not.
    * Any function call should fail when called after being disposed.
    *
-   * NOTE: Currently not in used
+   * NOTE: Currently not in use
    */
   private disposed: boolean = false;
 
