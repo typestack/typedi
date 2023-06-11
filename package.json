@@ -1,5 +1,5 @@
 {
-  "name": "typedi",
+  "name": "@freshgum/typedi",
   "version": "0.10.0",
   "description": "Dependency injection for TypeScript.",
   "author": "TypeStack contributors",
