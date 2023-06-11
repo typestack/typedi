@@ -379,11 +379,6 @@ export class ContainerInstance {
       const paramTypes: unknown[] = (Reflect as any)?.getMetadata('design:paramtypes', constructableTargetType) || [];
       const params = this.initializeParams(constructableTargetType, paramTypes);
 
-      // "extra feature" - always pass container instance as the last argument to the service function
-      // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
-      // need to be injected, and user can use provided container to get instances he needs
-      // params.push(this);
-
       value = new constructableTargetType(...params);
 
       // TODO: Calling this here, leads to infinite loop, because @Inject decorator registerds a handler
