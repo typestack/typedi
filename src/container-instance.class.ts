@@ -235,8 +235,8 @@ export class ContainerInstance {
   /**
    * Gets a separate container instance for the given instance id.
    */
-  public of(containerId: ContainerIdentifier = 'default'): ContainerInstance {
-    this.throwIfDisposed();
+  public static of(containerId: ContainerIdentifier = 'default'): ContainerInstance {
+    // this.throwIfDisposed();
 
     if (containerId === 'default') {
       return ContainerRegistry.defaultContainer;
@@ -255,6 +255,14 @@ export class ContainerInstance {
     }
 
     return container;
+  }
+
+  public of(containerId?: ContainerIdentifier): ContainerInstance {
+    this.throwIfDisposed();
+
+    // Todo: make this get the constructor at runtime to aid
+    // extension of the class.
+    return ContainerInstance.of(containerId);
   }
 
   /**
