@@ -301,11 +301,6 @@ export class ContainerInstance {
 
     /** We mark the container as disposed, forbidding any further interaction with it. */
     this.disposed = true;
-
-    /**
-     * Placeholder, this function returns a promise in preparation to support async services.
-     */
-    await Promise.resolve();
   }
 
   private throwIfDisposed() {
