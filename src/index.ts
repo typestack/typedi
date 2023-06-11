@@ -1,13 +1,3 @@
-/**
- * We have a hard dependency on reflect-metadata package. Without it the
- * dependency lookup won't work, so we warn users when it's not loaded.
- */
-if (!Reflect || !(Reflect as any).getMetadata) {
-  throw new Error(
-    'TypeDI requires "Reflect.getMetadata" to work. Please import the "reflect-metadata" package at the very first line of your application.'
-  );
-}
-
 /** This is an internal package, so we don't re-export it on purpose. */
 import { ContainerRegistry } from './container-registry.class';
 
