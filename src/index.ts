@@ -1,11 +1,8 @@
 /** This is an internal package, so we don't re-export it on purpose. */
 import { ContainerRegistry } from './container-registry.class';
 
-export * from './decorators/inject-many.decorator';
-export * from './decorators/inject.decorator';
 export * from './decorators/service.decorator';
 
-export * from './error/cannot-inject-value.error';
 export * from './error/cannot-instantiate-value.error';
 export * from './error/service-not-found.error';
 
