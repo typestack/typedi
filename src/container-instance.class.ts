@@ -478,4 +478,8 @@ export class ContainerInstance {
       serviceMetadata.value = EMPTY_VALUE;
     }
   }
+
+  public [Symbol.iterator](): Iterable<[ServiceIdentifier, ServiceMetadata<unknown>]> {
+    return this.metadataMap.entries();
+  }
 }
