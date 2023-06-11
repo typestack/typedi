@@ -28,12 +28,6 @@ export class ContainerInstance {
    * generated one is stored here. This is handled like this to allow simplifying
    * the inner workings of the service instance.
    */
-  private multiServiceIds: Map<ServiceIdentifier, { tokens: Token<unknown>[]; scope: ContainerScope }> = new Map();
-
-  /**
-   * All registered handlers. The @Inject() decorator uses handlers internally to mark a property for injection.
-   **/
-  private readonly handlers: Handler[] = [];
 
   /**
    * Indicates if the container has been disposed or not.
@@ -47,12 +41,6 @@ export class ContainerInstance {
     this.id = id;
 
     ContainerRegistry.registerContainer(this);
-
-    /**
-     * TODO: This is to replicate the old functionality. This should be copied only
-     * TODO: if the container decides to inherit registered classes from a parent container.
-     */
-    this.handlers = ContainerRegistry.defaultContainer?.handlers || [];
   }
 
   /**
@@ -365,17 +353,7 @@ export class ContainerInstance {
      */
     if (!serviceMetadata.factory && serviceMetadata.type) {
       const constructableTargetType: Constructable<unknown> = serviceMetadata.type;
-      // setup constructor parameters for a newly initialized service
-      const paramTypes: unknown[] = (Reflect as any)?.getMetadata('design:paramtypes', constructableTargetType) || [];
-      const params = this.initializeParams(constructableTargetType, paramTypes);
-
-      value = new constructableTargetType(...params);
-
-      // TODO: Calling this here, leads to infinite loop, because @Inject decorator registerds a handler
-      // TODO: which calls Container.get, which will check if the requested type has a value set and if not
-      // TODO: it will start the instantiation process over. So this is currently called outside of the if branch
-      // TODO: after the current value has been assigned to the serviceMetadata.
-      // this.applyPropertyHandlers(constructableTargetType, value as Constructable<unknown>);
+      value = new constructableTargetType();
     }
 
     /** If this is not a transient service, and we resolved something, then we set it as the value. */
@@ -388,68 +366,7 @@ export class ContainerInstance {
       throw new CannotInstantiateValueError(serviceMetadata.id);
     }
 
-    if (serviceMetadata.type) {
-      this.applyPropertyHandlers(serviceMetadata.type, value as Record<string, any>);
-    }
-
     return value;
-  }
-
-  /**
-   * Initializes all parameter types for a given target service class.
-   */
-  private initializeParams(target: Function, paramTypes: any[]): unknown[] {
-    return paramTypes.map((paramType, index) => {
-      const paramHandler =
-        this.handlers.find(handler => {
-          /**
-           * @Inject()-ed values are stored as parameter handlers and they reference their target
-           * when created. So when a class is extended the @Inject()-ed values are not inherited
-           * because the handler still points to the old object only.
-           *
-           * As a quick fix a single level parent lookup is added via `Object.getPrototypeOf(target)`,
-           * however this should be updated to a more robust solution.
-           *
-           * TODO: Add proper inheritance handling: either copy the handlers when a class is registered what
-           * TODO: has it's parent already registered as dependency or make the lookup search up to the base Object.
-           */
-          return handler.object === target && handler.index === index;
-        }) ||
-        this.handlers.find(handler => {
-          return handler.object === Object.getPrototypeOf(target) && handler.index === index;
-        });
-
-      if (paramHandler) return paramHandler.value(this);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      if (paramType && paramType.name && !this.isPrimitiveParamType(paramType.name)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        return this.get(paramType);
-      }
-
-      return undefined;
-    });
-  }
-
-  /**
-   * Checks if given parameter type is primitive type or not.
-   */
-  private isPrimitiveParamType(paramTypeName: string): boolean {
-    return ['string', 'boolean', 'number', 'object'].includes(paramTypeName.toLowerCase());
-  }
-
-  /**
-   * Applies all registered handlers on a given target class.
-   */
-  private applyPropertyHandlers(target: Function, instance: { [key: string]: any }) {
-    this.handlers.forEach(handler => {
-      if (typeof handler.index === 'number') return;
-      if (handler.object.constructor !== target && !(target.prototype instanceof handler.object.constructor)) return;
-
-      if (handler.propertyName) {
-        instance[handler.propertyName] = handler.value(this);
-      }
-    });
   }
 
   /**
