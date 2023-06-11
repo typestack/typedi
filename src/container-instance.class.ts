@@ -379,7 +379,7 @@ export class ContainerInstance {
       // "extra feature" - always pass container instance as the last argument to the service function
       // this allows us to support javascript where we don't have decorators and emitted metadata about dependencies
       // need to be injected, and user can use provided container to get instances he needs
-      params.push(this);
+      // params.push(this);
 
       value = new constructableTargetType(...params);
 
