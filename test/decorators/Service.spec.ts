@@ -188,4 +188,19 @@ describe('Service Decorator', function () {
     expect(Container.get<string>('my-service-A')).toBe('TEST_STRING');
     expect(Container.get<string>('my-service-B')).toBe('TEST_STRING');
   });
+
+  it('should support factory functions', function () {
+    class Engine {
+      public serialNumber = 'A-123';
+    }
+
+    @Service({
+      factory: () => new Car(new Engine()),
+    })
+    class Car {
+      constructor(public engine: Engine) {}
+    }
+
+    expect(Container.get(Car).engine.serialNumber).toBe('A-123');
+  });
 });
