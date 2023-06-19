@@ -12,7 +12,7 @@ describe('github issues > #41 Token as service id in combination with factory', 
     }
     const SomeInterfaceToken = new Token<SomeInterface>();
 
-    @Service()
+    @Service([])
     class SomeInterfaceFactory {
       create() {
         return new SomeImplementation();

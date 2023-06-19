@@ -6,14 +6,14 @@ describe('github issues > #56 extended class is being overwritten', function () 
   beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('should work properly', function () {
-    @Service()
+    @Service([])
     class Rule {
       getRule() {
         return 'very strict rule';
       }
     }
 
-    @Service()
+    @Service([])
     class Whitelist extends Rule {
       getWhitelist() {
         return ['rule1', 'rule2'];
