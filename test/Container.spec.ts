@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Constructable, Container } from '../src/index';
+import { Container } from '../src/index';
 import { Service } from '../src/decorators/service.decorator';
 import { Token } from '../src/token.class';
 import { ServiceNotFoundError } from '../src/error/service-not-found.error';
@@ -149,7 +149,7 @@ describe('Container', function () {
 
   describe('reset', function () {
     it('should support container reset', () => {
-      @Service()
+      @Service([])
       class TestService {
         constructor(public name: string = 'frank') {}
       }
@@ -185,7 +185,7 @@ describe('Container', function () {
     });
 
     it('should support factory classes', function () {
-      @Service()
+      @Service([])
       class Engine {
         public serialNumber = 'A-123';
       }
@@ -194,7 +194,7 @@ describe('Container', function () {
         constructor(public engine: Engine) {}
       }
 
-      @Service()
+      @Service([Engine])
       class CarFactory {
         constructor(private engine: Engine) {}
 
@@ -243,14 +243,14 @@ describe('Container', function () {
     it('should call dispose function on removed service', () => {
       const destroyFnMock = jest.fn();
       const destroyPropertyFnMock = jest.fn();
-      @Service()
+      @Service([])
       class MyServiceA {
         dispose() {
           destroyFnMock();
         }
       }
 
-      @Service()
+      @Service([])
       class MyServiceB {
         public dispose = destroyPropertyFnMock;
       }
@@ -276,7 +276,7 @@ describe('Container', function () {
     });
 
     it('should be able to destroy services without destroy function', () => {
-      @Service()
+      @Service([])
       class MyService {}
 
       const instanceA = Container.get(MyService);
@@ -295,14 +295,14 @@ describe('Container', function () {
     it('should call dispose function on removed service', () => {
       const destroyFnMock = jest.fn();
       const destroyPropertyFnMock = jest.fn();
-      @Service()
+      @Service([])
       class MyServiceA {
         dispose() {
           destroyFnMock();
         }
       }
 
-      @Service()
+      @Service([])
       class MyServiceB {
         public dispose = destroyPropertyFnMock();
       }
@@ -321,7 +321,7 @@ describe('Container', function () {
     });
 
     it('should be able to destroy services without destroy function', () => {
-      @Service()
+      @Service([])
       class MyService {}
 
       Container.get(MyService);
