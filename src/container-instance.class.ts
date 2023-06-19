@@ -44,7 +44,7 @@ export class ContainerInstance implements Disposable {
    *
    * NOTE: Currently not in use
    */
-  private disposed: boolean = false;
+  public disposed: boolean = false;
 
   /**
    * The default global container. By default services are registered into this
