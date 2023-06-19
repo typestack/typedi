@@ -1,4 +1,3 @@
-import { Console } from 'console';
 import 'reflect-metadata';
 import { Container } from '../../../src/index';
 import { Service } from '../../../src/decorators/service.decorator';
