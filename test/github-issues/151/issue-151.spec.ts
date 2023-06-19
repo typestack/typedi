@@ -1,6 +1,6 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/index';
-import { Service } from '../../../src/decorators/service.decorator';
+import { Container } from '../../index';
+import { Service } from '../../decorators/service.decorator';
 
 describe('Github Issues', function () {
   beforeEach(() => Container.reset({ strategy: 'resetValue' }));
@@ -10,18 +10,18 @@ describe('Github Issues', function () {
      * Note: This is more like a behavioral test the use-case showcased below
      * should be always possible, even if the API changes.
      */
-    @Service()
+    @Service([])
     class AuthService {
       isAuthorized() {
         return 'nope';
       }
     }
 
-    @Service()
+    @Service([AuthService])
     class DataService {
       constructor(public authService: AuthService) {}
     }
-    @Service()
+    @Service([AuthService])
     class FakeDataService {
       constructor(public authService: AuthService) {}
     }
