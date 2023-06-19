@@ -1,22 +1,20 @@
 import { Token } from '../token.class';
-import { Constructable } from '../types/constructable.type';
-import { ServiceIdentifier } from '../types/service-identifier.type';
+import { AnyInjectIdentifier } from '../types/inject-identifier.type';
+import { LazyReference } from '../types/lazy-reference.type';
+import { TypeWrapper } from '../types/type-wrapper.type';
+import { isInjectedFactory } from './is-inject-identifier.util';
+import { isLazyReference } from './is-lazy-reference.util';
 
 /**
- * Helper function used in inject decorators to resolve the received identifier to
+ * Helper function used in the injection-related decorators to resolve the received identifier to
  * an eager type when possible or to a lazy type when cyclic dependencies are possibly involved.
  *
  * @param typeOrIdentifier a service identifier or a function returning a type acting as service identifier or nothing
  * @param target the class definition of the target of the decorator
- * @param propertyName the name of the property in case of a PropertyDecorator
- * @param index the index of the parameter in the constructor in case of ParameterDecorator
  */
 export function resolveToTypeWrapper(
-  typeOrIdentifier: ((type?: never) => Constructable<unknown>) | ServiceIdentifier<unknown> | undefined,
-  target: Object,
-  propertyName: string | Symbol,
-  index?: number
-): { eagerType: ServiceIdentifier | null; lazyType: (type?: never) => ServiceIdentifier } {
+  typeOrIdentifier: AnyInjectIdentifier
+): TypeWrapper {
   /**
    * ? We want to error out as soon as possible when looking up services to inject, however
    * ? we cannot determine the type at decorator execution when cyclic dependencies are involved
@@ -26,33 +24,22 @@ export function resolveToTypeWrapper(
    * ?  - the lazyType is executed in the handler so we never have a JS error
    * ?  - the eagerType is checked when decorator is running and an error is raised if an unknown type is encountered
    */
-  let typeWrapper!: { eagerType: ServiceIdentifier | null; lazyType: (type?: never) => ServiceIdentifier };
+  let typeWrapper!: TypeWrapper;
 
   /** If requested type is explicitly set via a string ID or token, we set it explicitly. */
-  if ((typeOrIdentifier && typeof typeOrIdentifier === 'string') || typeOrIdentifier instanceof Token) {
-    typeWrapper = { eagerType: typeOrIdentifier, lazyType: () => typeOrIdentifier };
+  if (typeOrIdentifier && (typeof typeOrIdentifier === 'string' || typeOrIdentifier instanceof Token || typeof typeOrIdentifier === 'function')) {
+    typeWrapper = { eagerType: typeOrIdentifier, lazyType: () => typeOrIdentifier, isFactory: false };
   }
 
-  /** If requested type is explicitly set via a () => MyClassType format, we set it explicitly. */
-  if (typeOrIdentifier && typeof typeOrIdentifier === 'function') {
+  /** If requested type is an injected factory, we set it explicitly. */
+  else if (typeof typeOrIdentifier === 'object' && isInjectedFactory(typeOrIdentifier)) {
+    typeWrapper = { eagerType: null, factory: typeOrIdentifier, isFactory: true }
+  }
+
+  /** If requested type is explicitly set via a LazyReference, we set it explicitly. */
+  else if (typeOrIdentifier && isLazyReference(typeOrIdentifier as object)) {
     /** We set eagerType to null, preventing the raising of the CannotInjectValueError in decorators.  */
-    typeWrapper = { eagerType: null, lazyType: () => (typeOrIdentifier as CallableFunction)() };
-  }
-
-  /** If no explicit type is set and handler registered for a class property, we need to get the property type. */
-  if (!typeOrIdentifier && propertyName) {
-    const identifier = (Reflect as any).getMetadata('design:type', target, propertyName);
-
-    typeWrapper = { eagerType: identifier, lazyType: () => identifier };
-  }
-
-  /** If no explicit type is set and handler registered for a constructor parameter, we need to get the parameter types. */
-  if (!typeOrIdentifier && typeof index == 'number' && Number.isInteger(index)) {
-    const paramTypes: ServiceIdentifier[] = (Reflect as any).getMetadata('design:paramtypes', target, propertyName);
-    /** It's not guaranteed, that we find any types for the constructor. */
-    const identifier = paramTypes?.[index];
-
-    typeWrapper = { eagerType: identifier, lazyType: () => identifier };
+    typeWrapper = { eagerType: null, lazyType: () => (typeOrIdentifier as LazyReference<any>).get(), isFactory: false };
   }
 
   return typeWrapper;
