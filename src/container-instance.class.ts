@@ -52,7 +52,8 @@ export class ContainerInstance implements Disposable {
    */
   public static defaultContainer = new ContainerInstance("default");
 
-    ContainerRegistry.registerContainer(this);
+  protected constructor (id: ContainerIdentifier, public parent?: ContainerInstance) {
+    this.id = id;
   }
 
   /**
