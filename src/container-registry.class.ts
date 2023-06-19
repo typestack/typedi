@@ -5,7 +5,7 @@ import { ContainerIdentifier } from './types/container-identifier.type';
  * The container registry is responsible for holding the default and every
  * created container instance for later access.
  *
- * _Note: This class is for internal use and it's API may break in minor or
+ * _Note: This class is for internal use and its API may break in minor or
  * patch releases without warning._
  */
 export class ContainerRegistry {
@@ -16,12 +16,6 @@ export class ContainerRegistry {
    * This map doesn't contains the default container.
    */
   private static readonly containerMap: Map<ContainerIdentifier, ContainerInstance> = new Map();
-
-  /**
-   * The default global container. By default services are registered into this
-   * container when registered via `Container.set()` or `@Service` decorator.
-   */
-  public static readonly defaultContainer: ContainerInstance = new ContainerInstance('default');
 
   /**
    * Registers the given container instance or throws an error.
@@ -38,7 +32,7 @@ export class ContainerRegistry {
     }
 
     /** If we already set the default container (in index) then no-one else can register a default. */
-    if (!!ContainerRegistry.defaultContainer && container.id === 'default') {
+    if (!!ContainerInstance.defaultContainer && container.id === 'default') {
       // TODO: Create custom error for this.
       throw new Error('You cannot register a container with the "default" ID.');
     }

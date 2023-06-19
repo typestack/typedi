@@ -37,8 +37,11 @@ export class ContainerInstance {
    */
   private disposed: boolean = false;
 
-  constructor(id: ContainerIdentifier) {
-    this.id = id;
+  /**
+   * The default global container. By default services are registered into this
+   * container when registered via `Container.set()` or `@Service` decorator.
+   */
+  public static defaultContainer = new ContainerInstance("default");
 
     ContainerRegistry.registerContainer(this);
   }

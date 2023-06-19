@@ -1,4 +1,5 @@
 /** This is an internal package, so we don't re-export it on purpose. */
+import { ContainerInstance } from './container-instance.class';
 import { ContainerRegistry } from './container-registry.class';
 
 export * from './decorators/service.decorator';
@@ -16,5 +17,5 @@ export { ContainerInstance } from './container-instance.class';
 export { Token } from './token.class';
 
 /** We export the default container under the Container alias. */
-export const Container = ContainerRegistry.defaultContainer;
+export const Container = ContainerInstance.defaultContainer;
 export default Container;
