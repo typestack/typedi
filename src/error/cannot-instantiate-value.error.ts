@@ -2,7 +2,7 @@ import { ServiceIdentifier } from '../types/service-identifier.type';
 import { Token } from '../token.class';
 
 /**
- * Thrown when DI cannot inject value into property decorated by @Inject decorator.
+ * Thrown when DI cannot inject value into property decorated by `@Inject` decorator.
  */
 export class CannotInstantiateValueError extends Error {
   public name = 'CannotInstantiateValueError';
