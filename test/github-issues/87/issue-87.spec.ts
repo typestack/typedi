@@ -18,6 +18,6 @@ describe('Github Issues', function () {
       constructor(private injectedClassA: InjectedClassA, private injectedClassB: InjectedClassB) {}
     }
 
-    expect(() => Container.get(MyClass)).toThrowError(ServiceNotFoundError);
+    expect(() => Container.get(MyClass)).toThrow(ServiceNotFoundError);
   });
 });
