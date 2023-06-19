@@ -7,7 +7,7 @@ describe('Service Decorator', function () {
   beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('should register class in the container, and its instance should be retrievable', function () {
-    @Service()
+    @Service([])
     class TestService {}
     @Service({ id: 'super.service' })
     class NamedService {}
@@ -16,7 +16,7 @@ describe('Service Decorator', function () {
   });
 
   it('should register class in the container with given name, and its instance should be retrievable', function () {
-    @Service()
+    @Service([])
     class TestService {}
     @Service({ id: 'super.service' })
     class NamedService {}
@@ -25,11 +25,11 @@ describe('Service Decorator', function () {
   });
 
   it('should register class in the container, and its parameter dependencies should be properly initialized', function () {
-    @Service()
+    @Service([])
     class TestService {}
-    @Service()
+    @Service([])
     class SecondTestService {}
-    @Service()
+    @Service([TestService, SecondTestService])
     class TestServiceWithParameters {
       constructor(public testClass: TestService, public secondTest: SecondTestService) {}
     }
@@ -39,7 +39,7 @@ describe('Service Decorator', function () {
   });
 
   it('should support factory functions', function () {
-    @Service()
+    @Service([])
     class Engine {
       constructor(public serialNumber: string) {}
     }
@@ -48,7 +48,7 @@ describe('Service Decorator', function () {
       return new Car('BMW', new Engine('A-123'));
     }
 
-    @Service({ factory: createCar })
+    @Service({ factory: createCar }, [String, Engine])
     class Car {
       constructor(public name: string, public engine: Engine) {}
     }
@@ -58,12 +58,12 @@ describe('Service Decorator', function () {
   });
 
   it('should support factory classes', function () {
-    @Service()
+    @Service([])
     class Engine {
       public serialNumber = 'A-123';
     }
 
-    @Service()
+    @Service([Engine])
     class CarFactory {
       constructor(public engine: Engine) {}
 
@@ -85,12 +85,12 @@ describe('Service Decorator', function () {
   });
 
   it('should support factory function with arguments', function () {
-    @Service()
+    @Service([])
     class Engine {
       public type = 'V8';
     }
 
-    @Service()
+    @Service([])
     class CarFactory {
       createCar(engine: Engine) {
         engine.type = 'V6';
@@ -107,7 +107,7 @@ describe('Service Decorator', function () {
   });
 
   it('should support transient services', function () {
-    @Service()
+    @Service([])
     class Car {
       public serial = Math.random();
     }
@@ -134,7 +134,7 @@ describe('Service Decorator', function () {
   });
 
   it('should support global services', function () {
-    @Service()
+    @Service([])
     class Engine {
       public name = 'sporty';
     }
