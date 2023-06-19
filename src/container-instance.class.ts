@@ -10,12 +10,13 @@ import { ContainerIdentifier } from './types/container-identifier.type';
 import { Handler } from './interfaces/handler.interface';
 import { ContainerRegistry } from './container-registry.class';
 import { ContainerScope } from './types/container-scope.type';
+import { Disposable } from './types/disposable.type';
 
 /**
  * TypeDI can have multiple containers.
  * One container is ContainerInstance.
  */
-export class ContainerInstance {
+export class ContainerInstance implements Disposable {
   /** Container instance id. */
   public readonly id!: ContainerIdentifier;
 
