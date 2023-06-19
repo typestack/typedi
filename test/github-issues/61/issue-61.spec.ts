@@ -1,36 +1,45 @@
 import 'reflect-metadata';
-import { Container } from '../../../src/index';
+import { Container, ContainerInstance } from '../../../src/index';
 import { Service } from '../../../src/decorators/service.decorator';
 
 describe('Github Issues', function () {
   beforeEach(() => Container.reset({ strategy: 'resetValue' }));
 
   it('#61 - Scoped container creates new instance of service every time', function () {
-    @Service()
-    class Car {
-      public serial = Math.random();
+    @Service([])
+    class CarABC {
+      public name = 'carabc-default';
     }
 
     const fooContainer = Container.of('foo');
     const barContainer = Container.of('bar');
 
-    const car1Serial = Container.get(Car).serial;
-    const car2Serial = Container.get(Car).serial;
+    // Set the "name" of the CarABC in root.
+    Container.get(CarABC).name = 'carabc-root';
 
-    const fooCar1Serial = fooContainer.get(Car).serial;
-    const fooCar2Serial = fooContainer.get(Car).serial;
+    const car1Name = Container.get(CarABC).name;
+    const car2Name = Container.get(CarABC).name;
 
-    const barCar1Serial = barContainer.get(Car).serial;
-    const barCar2Serial = barContainer.get(Car).serial;
+    // Set the "name" of the CarABC for fooContainer.
+    fooContainer.get(CarABC).name = 'carabc-foo';
 
-    expect(car1Serial).toEqual(car2Serial);
-    expect(fooCar1Serial).toEqual(fooCar2Serial);
-    expect(barCar1Serial).toEqual(barCar2Serial);
+    const fooCar1Name = fooContainer.get(CarABC).name;
+    const fooCar2Name = fooContainer.get(CarABC).name;
 
-    expect(car1Serial).not.toEqual(fooCar1Serial);
-    expect(car1Serial).not.toEqual(barCar1Serial);
-    expect(fooCar1Serial).not.toEqual(barCar1Serial);
+    // Set the "name" of the CarABC in barContainer.
+    barContainer.get(CarABC).name = 'carabc-bar';
 
-    expect(Container.of('TEST').get(Car).serial === Container.of('TEST').get(Car).serial).toBe(true);
+    const barCar1Name = barContainer.get(CarABC).name;
+    const barCar2Name = barContainer.get(CarABC).name;
+
+    expect(car1Name).toEqual(car2Name);
+    expect(fooCar1Name).toEqual(fooCar2Name);
+    expect(barCar1Name).toEqual(barCar2Name);
+    expect(barCar1Name).toStrictEqual('carabc-bar');
+
+    expect(car1Name).toStrictEqual('carabc-root');
+    expect(fooCar1Name).toStrictEqual('carabc-foo');
+
+    // expect(Container.of('TEST').get(CarABC, false)).toStrictEqual(Container.of('TEST').get(CarABC, false).serial);
   });
 });
