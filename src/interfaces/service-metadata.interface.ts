@@ -1,8 +1,8 @@
 import { ContainerInstance } from '../container-instance.class';
 import { Constructable } from '../types/constructable.type';
-import { ContainerIdentifier } from '../types/container-identifier.type';
 import { ContainerScope } from '../types/container-scope.type';
 import { ServiceIdentifier } from '../types/service-identifier.type';
+import { TypeWrapper } from '../types/type-wrapper.type';
 
 /**
  * Service metadata is used to initialize service and store its state.
@@ -57,5 +57,18 @@ export interface ServiceMetadata<Type = unknown> {
    * the metadata. Namely, a service can be disposed only if it's only referenced
    * by the container being disposed.
    */
-  referencedBy: Map<ContainerIdentifier, ContainerInstance>;
+  // referencedBy: Map<ContainerIdentifier, ContainerInstance>;
+
+  // todo: if we use TypeWrapper here, expose it publicly?
+  /**
+   * The dependencies of the service's constructor.
+   * These are wrapped objects.
+   */
+  dependencies: TypeWrapper[];
+
+  /**
+   * Optionally, a container to register the service under.
+   * By default, this is the global container.
+   */
+  container?: ContainerInstance;
 }
