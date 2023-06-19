@@ -123,6 +123,7 @@ describe('Container', function () {
   describe('remove', function () {
     it('should be able to remove previously registered services', function () {
       class TestService {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         constructor() {}
       }
 
