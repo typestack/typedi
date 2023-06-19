@@ -12,6 +12,14 @@ import { ContainerRegistry } from './container-registry.class';
 import { ContainerScope } from './types/container-scope.type';
 import { Disposable } from './types/disposable.type';
 
+// todo: make const
+export enum ServiceIdentifierLocation {
+  Local = 'local',
+  Parent = 'parent',
+  None = 'none'
+}
+
+
 /**
  * TypeDI can have multiple containers.
  * One container is ContainerInstance.
