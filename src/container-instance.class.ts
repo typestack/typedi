@@ -463,6 +463,7 @@ export class ContainerInstance implements Disposable {
     return this;
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async dispose(): Promise<void> {
     this.reset({ strategy: 'resetServices' });
 
