@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Constructable, Container } from '../src/index';
+import { Constructable, Container, ContainerInstance } from '../src/index';
 import { Service } from '../src/decorators/service.decorator';
 import { Token } from '../src/token.class';
 import { ServiceNotFoundError } from '../src/error/service-not-found.error';
@@ -363,6 +363,38 @@ describe('Container', function () {
       expect(instanceA).toBeInstanceOf(MyService);
       expect(instanceB).toBeInstanceOf(MyService);
       expect(instanceA).not.toBe(instanceB);
+    });
+  });
+
+  describe('Container.clone', () => {
+    it('should be able to create a clone', () => {
+      @Service()
+      class MyServiceA {
+        valueA = 'a';
+      }
+
+      @Service()
+      class MyServiceB {
+        valueB = 'b';
+      }
+
+      const container = new ContainerInstance('Container.clone.1.1');
+      container.get(MyServiceA);
+
+      const clone = container.clone('Container.clone.1.2');
+      const serviceA1 = container.get(MyServiceA);
+      const serviceA2 = clone.get(MyServiceA);
+
+      const serviceB1 = container.get(MyServiceB);
+      const serviceB2 = clone.get(MyServiceB);
+
+      expect(serviceA1).toBeInstanceOf(MyServiceA);
+      expect(serviceA2).toBeInstanceOf(MyServiceA);
+      expect(serviceA1).toBe(serviceA2);
+
+      expect(serviceB1).toBeInstanceOf(MyServiceB);
+      expect(serviceB2).toBeInstanceOf(MyServiceB);
+      expect(serviceB1).not.toBe(serviceB2);
     });
   });
 

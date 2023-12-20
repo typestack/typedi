@@ -11,6 +11,9 @@ import { Handler } from './interfaces/handler.interface';
 import { ContainerRegistry } from './container-registry.class';
 import { ContainerScope } from './types/container-scope.type';
 
+// used to allow the container to set internal properties for a clone
+const setInternal = Symbol('set-internal');
+
 /**
  * TypeDI can have multiple containers.
  * One container is ContainerInstance.
@@ -276,6 +279,19 @@ export class ContainerInstance {
   }
 
   /**
+   * Create a clone of the current container.
+   */
+  public clone(id: ContainerIdentifier) {
+    const clone = new ContainerInstance(id);
+    clone[setInternal]({
+      metadataMap: new Map(this.metadataMap),
+      multiServiceIds: new Map(this.multiServiceIds),
+      handlers: [...this.handlers],
+    });
+    return clone;
+  }
+
+  /**
    * Completely resets the container by removing all previously registered services from it.
    */
   public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
@@ -307,6 +323,20 @@ export class ContainerInstance {
      */
     await Promise.resolve();
   }
+
+  [setInternal] = ({
+    metadataMap,
+    multiServiceIds,
+    handlers,
+  }: {
+    metadataMap: Map<ServiceIdentifier, ServiceMetadata<unknown>>;
+    multiServiceIds: Map<ServiceIdentifier, { tokens: Token<unknown>[]; scope: ContainerScope }>;
+    handlers: Handler[];
+  }) => {
+    this.metadataMap = metadataMap;
+    this.multiServiceIds = multiServiceIds;
+    this.handlers.push(...handlers);
+  };
 
   private throwIfDisposed() {
     if (this.disposed) {
