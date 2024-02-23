@@ -447,7 +447,7 @@ export class ContainerInstance {
    * Checks if given parameter type is primitive type or not.
    */
   private isPrimitiveParamType(paramTypeName: string): boolean {
-    return ['string', 'boolean', 'number', 'object'].includes(paramTypeName.toLowerCase());
+    return ['string', 'boolean', 'number', 'object', 'array'].includes(paramTypeName.toLowerCase());
   }
 
   /**
