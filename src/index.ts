@@ -22,6 +22,8 @@ export * from './error/service-not-found.error';
 export { Handler } from './interfaces/handler.interface';
 export { ServiceMetadata } from './interfaces/service-metadata.interface';
 export { ServiceOptions } from './interfaces/service-options.interface';
+export { TokenInfer } from './types/token-infer.type';
+export { TokenInferMany } from './types/token-infer-many.type';
 export { Constructable } from './types/constructable.type';
 export { ServiceIdentifier } from './types/service-identifier.type';
 
