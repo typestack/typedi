@@ -17,8 +17,15 @@ export class ContainerInstance {
   /** Container instance id. */
   public readonly id!: string;
 
-  /** All registered services in the container. */
-  private services: ServiceMetadata<unknown>[] = [];
+  /**
+   * All registered services in the container, indexed by service identifier.
+   *
+   * A given identifier maps to a list because services registered with
+   * `multiple: true` share one identifier. Insertion order within an
+   * identifier is preserved, so `findService` still returns the first match
+   * exactly as the previous array scan did.
+   */
+  private services: Map<ServiceIdentifier, ServiceMetadata<unknown>[]> = new Map();
 
   constructor(id: string) {
     this.id = id;
@@ -148,12 +155,15 @@ export class ContainerInstance {
       ...identifierOrServiceMetadata,
     };
 
-    const service = this.findService(newService.id);
+    const existingServices = this.services.get(newService.id);
+    const firstExistingService = existingServices?.[0];
 
-    if (service && service.multiple !== true) {
-      Object.assign(service, newService);
+    if (firstExistingService && firstExistingService.multiple !== true) {
+      Object.assign(firstExistingService, newService);
+    } else if (existingServices) {
+      existingServices.push(newService);
     } else {
-      this.services.push(newService);
+      this.services.set(newService.id, [newService]);
     }
 
     if (newService.eager) {
@@ -170,14 +180,12 @@ export class ContainerInstance {
     if (Array.isArray(identifierOrIdentifierArray)) {
       identifierOrIdentifierArray.forEach(id => this.remove(id));
     } else {
-      this.services = this.services.filter(service => {
-        if (service.id === identifierOrIdentifierArray) {
-          this.destroyServiceInstance(service);
-          return false;
-        }
+      const removedServices = this.services.get(identifierOrIdentifierArray);
 
-        return true;
-      });
+      if (removedServices) {
+        this.services.delete(identifierOrIdentifierArray);
+        removedServices.forEach(service => this.destroyServiceInstance(service));
+      }
     }
 
     return this;
@@ -189,11 +197,11 @@ export class ContainerInstance {
   public reset(options: { strategy: 'resetValue' | 'resetServices' } = { strategy: 'resetValue' }): this {
     switch (options.strategy) {
       case 'resetValue':
-        this.services.forEach(service => this.destroyServiceInstance(service));
+        this.destroyAllServiceInstances();
         break;
       case 'resetServices':
-        this.services.forEach(service => this.destroyServiceInstance(service));
-        this.services = [];
+        this.destroyAllServiceInstances();
+        this.services.clear();
         break;
       default:
         throw new Error('Received invalid reset strategy.');
@@ -205,14 +213,23 @@ export class ContainerInstance {
    * Returns all services registered with the given identifier.
    */
   private findAllServices(identifier: ServiceIdentifier): ServiceMetadata<unknown>[] {
-    return this.services.filter(service => service.id === identifier);
+    /* Returns a copy, matching the fresh array the previous `filter` produced. */
+    return this.services.get(identifier)?.slice() ?? [];
   }
 
   /**
    * Finds registered service in the with a given service identifier.
    */
   private findService(identifier: ServiceIdentifier): ServiceMetadata<unknown> | undefined {
-    return this.services.find(service => service.id === identifier);
+    return this.services.get(identifier)?.[0];
+  }
+
+  /**
+   * Destroys the instance of every registered service, leaving the
+   * registrations themselves untouched.
+   */
+  private destroyAllServiceInstances(): void {
+    this.services.forEach(services => services.forEach(service => this.destroyServiceInstance(service)));
   }
 
   /**
